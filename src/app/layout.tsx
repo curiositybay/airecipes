@@ -4,6 +4,8 @@ import './globals.css';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { appConfig } from '@/config/app';
 import StructuredData from '@/components/StructuredData';
+import Layout from '@/components/Layout/Layout';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -24,7 +26,11 @@ export default function RootLayout({
         <meta name='description' content={appConfig.description} />
         <StructuredData />
       </head>
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+        <ThemeProvider initialTheme='desert'>
+          <Layout>{children}</Layout>
+        </ThemeProvider>
+      </body>
     </html>
   );
 }

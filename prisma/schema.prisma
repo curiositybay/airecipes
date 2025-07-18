@@ -46,3 +46,35 @@ model AppMetadata {
   @@index([appVersion])
   @@index([apiVersion])
 }
+
+// AI Recipe Generator Models
+
+model Ingredient {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  category    String   // e.g., "protein", "vegetable", "dairy", "spice", "grain"
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([name])
+  @@index([category])
+  @@index([isActive])
+}
+
+model TokenUsage {
+  id              Int      @id @default(autoincrement())
+  method          String   // e.g., "generateRecipes"
+  model           String   // e.g., "gpt-4o-mini"
+  promptTokens    Int
+  completionTokens Int
+  totalTokens     Int
+  success         Boolean  @default(true)
+  errorMessage    String?  // If success is false
+  createdAt       DateTime @default(now())
+
+  @@index([method])
+  @@index([model])
+  @@index([createdAt])
+  @@index([success])
+}

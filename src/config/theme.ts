@@ -16,40 +16,84 @@ export interface Theme {
       iconPrimary: string;
       iconSecondary: string;
     };
+    // CSS values for custom properties
+    css: {
+      primary: string;
+      primaryHover: string;
+      secondary: string;
+      secondaryHover: string;
+      accent: string;
+      accentHover: string;
+      background: string;
+      backgroundGradient: string;
+      textPrimary: string;
+      textSecondary: string;
+      textMuted: string;
+      textIconPrimary: string;
+      textIconSecondary: string;
+      // Surface colors
+      surface: string;
+      surfaceHover: string;
+      surfaceSecondary: string;
+      surfaceSecondaryHover: string;
+      // Border colors
+      border: string;
+      borderHover: string;
+      borderLight: string;
+      borderError: string;
+      // Error colors
+      error: string;
+      errorLight: string;
+      errorText: string;
+      // Success colors
+      success: string;
+      successLight: string;
+      successText: string;
+      // Warning colors
+      warning: string;
+      warningLight: string;
+      warningText: string;
+      // Info colors
+      info: string;
+      infoLight: string;
+      infoText: string;
+      // Neutral colors
+      neutral: string;
+      neutralLight: string;
+      neutralText: string;
+      // Card colors
+      card: string;
+      cardHover: string;
+      cardBorder: string;
+      // Input colors
+      input: string;
+      inputBorder: string;
+      inputFocus: string;
+      inputPlaceholder: string;
+      // Button text colors
+      buttonText: string;
+      buttonTextSecondary: string;
+      // Footer colors
+      footer: string;
+      footerText: string;
+    };
   };
 }
 
-export const oceanTheme: Theme = {
-  name: 'ocean',
-  colors: {
-    primary: 'bg-blue-600',
-    primaryHover: 'hover:bg-blue-700',
-    secondary: 'bg-teal-600',
-    secondaryHover: 'hover:bg-teal-700',
-    accent: 'bg-cyan-500',
-    accentHover: 'hover:bg-cyan-600',
-    background: 'bg-blue-50',
-    backgroundGradient:
-      'bg-gradient-to-br from-blue-50 via-blue-100 to-cyan-100',
-    text: {
-      primary: 'text-slate-800',
-      secondary: 'text-slate-600',
-      muted: 'text-slate-500',
-      iconPrimary: 'text-blue-600',
-      iconSecondary: 'text-cyan-500',
-    },
-  },
-};
+// Import themes from the themes directory
+import { oceanTheme, desertTheme, desertNightTheme } from './themes';
 
-export const defaultTheme = oceanTheme;
+export const defaultTheme = desertTheme;
 
 export const themes: Record<string, Theme> = {
   ocean: oceanTheme,
+  desert: desertTheme,
+  'desert-night': desertNightTheme,
   // Add more themes here as needed.
   // sunset: sunsetTheme,
   // forest: forestTheme,
 };
 
-export function getTheme(themeName: string = 'ocean'): Theme {
+export function getTheme(themeName: string = 'desert'): Theme {
   return themes[themeName] || defaultTheme;
 }

@@ -85,13 +85,13 @@ Configure the following secrets and variables in your GitHub repository:
 
 ### Required Configuration
 
-| Type         | Name                 | Description                        | Example                                  |
-| ------------ | -------------------- | ---------------------------------- | ---------------------------------------- |
-| **Secret**   | `DOCKERHUB_TOKEN`    | Docker Hub access token            | `dckr_pat_...`                           |
-| **Secret**   | `SSH_PRIVATE_KEY`    | SSH private key for server access  | `-----BEGIN OPENSSH PRIVATE KEY-----...` |
-| **Variable** | `SERVER_USER`        | SSH username for production server | `ubuntu`                                 |
-| **Variable** | `SERVER_HOST`        | Production server IP/hostname      | `192.168.1.100`                          |
-| **Variable** | `ENV_PATH`           | Path to production .env file       | `/srv/deploy/docker/apps/.appname.env`   |
+| Type         | Name              | Description                        | Example                                  |
+| ------------ | ----------------- | ---------------------------------- | ---------------------------------------- |
+| **Secret**   | `DOCKERHUB_TOKEN` | Docker Hub access token            | `dckr_pat_...`                           |
+| **Secret**   | `SSH_PRIVATE_KEY` | SSH private key for server access  | `-----BEGIN OPENSSH PRIVATE KEY-----...` |
+| **Variable** | `SERVER_USER`     | SSH username for production server | `ubuntu`                                 |
+| **Variable** | `SERVER_HOST`     | Production server IP/hostname      | `192.168.1.100`                          |
+| **Variable** | `ENV_PATH`        | Path to production .env file       | `/srv/deploy/docker/apps/.appname.env`   |
 
 **Note:** All secrets and variables should be configured as **Repository Secrets/Variables** (not Environment Secrets).
 

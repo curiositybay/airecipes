@@ -4,7 +4,6 @@ import React, { useState, useEffect, ReactNode } from 'react';
 import Link from 'next/link';
 import { appConfig } from '@/config/app';
 import { PrimaryButton, SecondaryButton } from '@/components/UI/Button';
-import { getTheme } from '@/config/theme';
 
 interface ErrorPageProps {
   code: number;
@@ -24,7 +23,6 @@ export default function ErrorPage({
   customActions,
 }: ErrorPageProps) {
   const [hasHistory, setHasHistory] = useState(false);
-  const theme = getTheme('ocean');
 
   useEffect(() => {
     setHasHistory(window.history.length > 1);
@@ -35,18 +33,18 @@ export default function ErrorPage({
   }, [title]);
 
   return (
-    <div className={`min-h-screen ${theme.colors.backgroundGradient} relative`}>
+    <div className='min-h-screen theme-bg-gradient relative'>
       <div className='absolute inset-0 overflow-hidden pointer-events-none'>
         <div className='absolute -top-20 -right-20 w-60 h-60 bg-gradient-to-br from-blue-400 to-blue-600 opacity-5 rounded-full'></div>
         <div className='absolute -bottom-20 -left-20 w-40 h-40 bg-gradient-to-br from-blue-400 to-blue-600 opacity-5 rounded-full'></div>
       </div>
 
       <div className='flex items-center justify-center min-h-screen px-4'>
-        <div className='max-w-md w-full bg-white rounded-2xl shadow-xl p-8 text-center relative z-10'>
+        <div className='max-w-md w-full theme-bg-card rounded-2xl shadow-xl p-8 text-center relative z-10'>
           <div className='mb-6'>
-            <div className='w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4'>
+            <div className='w-20 h-20 theme-bg rounded-full flex items-center justify-center mx-auto mb-4'>
               <i
-                className={`fas ${icon} text-3xl ${theme.colors.text.iconPrimary}`}
+                className={`fas ${icon} text-3xl theme-text-icon-primary`}
                 role='img'
                 data-testid='error-icon'
               ></i>
@@ -54,20 +52,16 @@ export default function ErrorPage({
           </div>
 
           <div className='mb-6'>
-            <h1
-              className={`text-6xl font-bold mb-2 ${theme.colors.text.primary}`}
-            >
+            <h1 className='text-6xl font-bold mb-2 theme-text-primary'>
               {code}
             </h1>
-            <h2
-              className={`text-2xl font-semibold mb-4 ${theme.colors.text.secondary}`}
-            >
+            <h2 className='text-2xl font-semibold mb-4 theme-text-secondary'>
               {title}
             </h2>
           </div>
 
           <div className='mb-8'>
-            <p className={`text-lg ${theme.colors.text.muted}`}>{message}</p>
+            <p className='text-lg theme-text-muted'>{message}</p>
           </div>
 
           <div className='flex flex-col gap-4'>

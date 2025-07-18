@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import './theme.css';
 
 @theme {
   --color-bay-teal: #528298;
@@ -44,3 +45,6 @@
 /* Import component styles */
 @import './components/Footer.css';
 @import './components/Layout.css';
+@import './components/AIMeals.css';
+@import './components/IngredientInput.css';
+@import './components/RecipeCard.css';

@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import api from '@/lib/api';
-import { getTheme } from '@/config/theme';
 
 interface Example {
   id: number;
@@ -11,7 +10,6 @@ interface Example {
 }
 
 const ExamplesPage = () => {
-  const theme = getTheme('ocean');
   const [examples, setExamples] = useState<Example[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -68,7 +66,7 @@ const ExamplesPage = () => {
     return (
       <div className='flex justify-center items-center h-64'>
         <div
-          className={`animate-spin rounded-full h-8 w-8 border-b-2 ${theme.colors.text.iconPrimary}`}
+          className='animate-spin rounded-full h-8 w-8 border-b-2 theme-text-icon-primary'
           role='status'
         ></div>
       </div>
@@ -77,14 +75,10 @@ const ExamplesPage = () => {
 
   return (
     <div className='max-w-4xl mx-auto p-6'>
-      <h1 className={`text-3xl font-bold mb-8 ${theme.colors.text.primary}`}>
-        Examples
-      </h1>
+      <h1 className='text-3xl font-bold mb-8 theme-text-primary'>Examples</h1>
 
       {error && (
-        <div className='bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4'>
-          {error}
-        </div>
+        <div className='theme-error px-4 py-3 rounded mb-4'>{error}</div>
       )}
 
       <form onSubmit={handleSubmit} className='mb-8'>
@@ -99,7 +93,7 @@ const ExamplesPage = () => {
                 name: e.target.value,
               })
             }
-            className={`flex-1 px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 ${theme.colors.text.iconPrimary}`}
+            className='flex-1 px-4 py-2 border theme-border-input rounded focus:outline-none focus:ring-2 theme-input-focus'
           />
           <input
             type='text'
@@ -111,11 +105,11 @@ const ExamplesPage = () => {
                 description: e.target.value,
               })
             }
-            className={`flex-1 px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 ${theme.colors.text.iconPrimary}`}
+            className='flex-1 px-4 py-2 border theme-border-input rounded focus:outline-none focus:ring-2 theme-input-focus'
           />
           <button
             type='submit'
-            className={`px-6 py-2 text-white rounded focus:outline-none focus:ring-2 ${theme.colors.primary} ${theme.colors.primaryHover}`}
+            className='px-6 py-2 theme-text-button rounded focus:outline-none focus:ring-2 theme-btn-primary'
           >
             Create Example
           </button>
@@ -126,20 +120,18 @@ const ExamplesPage = () => {
         {examples.map(example => (
           <div
             key={example.id}
-            className='border border-gray-200 rounded-lg p-4'
+            className='border theme-border-card rounded-lg p-4'
           >
             <div className='flex justify-between items-start'>
               <div>
-                <h3
-                  className={`text-lg font-semibold ${theme.colors.text.primary}`}
-                >
+                <h3 className='text-lg font-semibold theme-text-primary'>
                   {example.name}
                 </h3>
-                <p className={theme.colors.text.muted}>{example.description}</p>
+                <p className='theme-text-muted'>{example.description}</p>
               </div>
               <button
                 onClick={() => handleDelete(example.id)}
-                className='px-3 py-1 bg-red-600 text-white rounded text-sm hover:bg-red-700'
+                className='px-3 py-1 theme-error rounded text-sm hover:bg-red-700'
               >
                 Delete
               </button>

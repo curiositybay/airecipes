@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { getTheme } from '@/config/theme';
 
 interface Metadata {
   appVersion: string;
@@ -13,7 +12,6 @@ export default function VersionDisplay() {
   const [metadata, setMetadata] = useState<Metadata | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const theme = getTheme('ocean');
 
   useEffect(() => {
     const fetchMetadata = async () => {
@@ -43,9 +41,7 @@ export default function VersionDisplay() {
   }
 
   return (
-    <div
-      className={`fixed bottom-4 right-4 text-sm z-50 ${theme.colors.text.primary}`}
-    >
+    <div className='fixed bottom-4 right-4 text-sm z-50 theme-text-primary'>
       v{metadata.appVersion}
     </div>
   );

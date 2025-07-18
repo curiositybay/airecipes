@@ -1,0 +1,140 @@
+/* Ingredient Input Styles */
+
+/* Ingredient Input Container */
+.ingredient-input-container {
+  @apply max-w-2xl mx-auto relative;
+}
+
+/* Custom Ingredient Warning */
+.custom-ingredient-warning {
+  @apply rounded-lg p-3 mb-4 flex items-start;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+}
+
+/* Ingredient Pills */
+.ingredient-pills {
+  @apply flex flex-wrap gap-2 mb-6;
+}
+
+.ingredient-pill {
+  @apply inline-flex items-center px-3 py-2 rounded-full text-sm font-bold transition-all duration-200;
+  background-color: var(--color-primary);
+  color: var(--color-button-text);
+}
+
+.ingredient-pill:hover {
+  @apply shadow-sm;
+}
+
+.ingredient-pill-text {
+  @apply mr-2;
+}
+
+.ingredient-pill-remove {
+  @apply transition-colors duration-200 w-4 h-4 flex items-center justify-center rounded-full;
+  color: var(--color-button-text);
+}
+
+.ingredient-pill-remove:hover {
+  background-color: var(--color-primary-hover);
+}
+
+/* Input Wrapper */
+.ingredient-input-wrapper {
+  @apply relative;
+}
+
+.ingredient-input {
+  @apply w-full px-4 py-3 border-2 rounded-lg focus:outline-none transition-colors duration-200 text-base;
+  border-color: var(--color-input-border);
+  color: var(--color-text-primary);
+}
+
+.ingredient-input:focus {
+  border-color: var(--color-input-focus);
+}
+
+.ingredient-input::placeholder {
+  color: var(--color-input-placeholder);
+}
+
+.ingredient-input-loading {
+  @apply absolute right-3 top-1/2 transform -translate-y-1/2;
+  color: var(--color-text-icon-primary);
+}
+
+/* Suggestions Dropdown */
+.ingredient-suggestions {
+  @apply absolute top-full left-0 right-0 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto mt-1;
+  background-color: var(--color-card);
+  border: 1px solid var(--color-input-border);
+}
+
+.ingredient-suggestion {
+  @apply w-full px-4 py-3 text-left transition-colors duration-200 flex items-center justify-between cursor-pointer;
+  color: var(--color-text-primary);
+}
+
+.ingredient-suggestion:hover {
+  background-color: var(--color-surface-hover);
+}
+
+.ingredient-suggestion.selected {
+  background-color: var(--color-surface-secondary);
+}
+
+.ingredient-suggestion.loading {
+  @apply italic;
+  color: var(--color-text-muted);
+}
+
+.ingredient-suggestion-content {
+  @apply flex items-center justify-between w-full;
+}
+
+.ingredient-suggestion-name {
+  @apply font-medium;
+}
+
+.ingredient-suggestion-category {
+  @apply text-xs px-2 py-1 rounded-full;
+  color: var(--color-text-muted);
+  background-color: var(--color-neutral-light);
+}
+
+.ingredient-suggestion:first-child {
+  @apply rounded-t-lg;
+}
+
+.ingredient-suggestion:last-child {
+  @apply rounded-b-lg;
+}
+
+/* Helper Text */
+.ingredient-helper-text {
+  @apply text-sm mt-3 text-center;
+  color: var(--color-text-muted);
+}
+
+/* Category Pills in Dropdown */
+.ingredient-category-pill {
+  @apply text-xs px-2 py-1 rounded-full font-medium;
+  background-color: var(--color-secondary);
+  color: var(--color-button-text);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .ingredient-input {
+    @apply text-base;
+  }
+
+  .ingredient-pill {
+    @apply text-xs px-2 py-1;
+  }
+
+  .ingredient-suggestions {
+    @apply max-h-48;
+  }
+}

@@ -2,7 +2,9 @@
 
 /* Footer Layout */
 .footer {
-  @apply py-13 text-white bg-stone-800;
+  @apply py-13;
+  background: var(--color-footer);
+  color: var(--color-footer-text);
 }
 
 .footer-container {
@@ -14,11 +16,13 @@
 }
 
 .footer-tagline {
-  @apply text-stone-300 text-sm;
+  @apply text-sm;
+  color: var(--color-text-secondary);
 }
 
 .footer-copyright {
-  @apply text-stone-400 text-sm;
+  @apply text-sm;
+  color: var(--color-text-muted);
 }
 
 /* Responsive footer height to match GitHub triangle */

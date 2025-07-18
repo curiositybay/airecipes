@@ -1,0 +1,280 @@
+/* Theme CSS Variables and Utility Classes */
+
+/* CSS Custom Properties */
+:root {
+  /* Primary Colors */
+  --color-primary: #d97706;
+  --color-primary-hover: #b45309;
+  --color-secondary: #ea580c;
+  --color-secondary-hover: #c2410c;
+  --color-accent: #eab308;
+  --color-accent-hover: #ca8a04;
+
+  /* Background Colors */
+  --color-background: #fffbeb;
+  --color-background-gradient: linear-gradient(
+    135deg,
+    #fffbeb 0%,
+    #fed7aa 50%,
+    #fef3c7 100%
+  );
+
+  /* Text Colors */
+  --color-text-primary: #292524;
+  --color-text-secondary: #57534e;
+  --color-text-muted: #78716c;
+  --color-text-icon-primary: #d97706;
+  --color-text-icon-secondary: #ea580c;
+
+  /* Surface Colors */
+  --color-surface: #fdf6e3;
+  --color-surface-hover: #fcf3e0;
+  --color-surface-secondary: #fbe9c6;
+  --color-surface-secondary-hover: #fadf9f;
+
+  /* Border Colors */
+  --color-border: #f5e6cb;
+  --color-border-hover: #e9d5af;
+  --color-border-light: #fdf6e3;
+  --color-border-error: #ef4444;
+
+  /* Error Colors */
+  --color-error: #ef4444;
+  --color-error-light: #fee2e2;
+  --color-error-text: #991b1b;
+
+  /* Success Colors */
+  --color-success: #10b981;
+  --color-success-light: #ecfdf5;
+  --color-success-text: #065f46;
+
+  /* Warning Colors */
+  --color-warning: #f59e0b;
+  --color-warning-light: #fef3c7;
+  --color-warning-text: #92400e;
+
+  /* Info Colors */
+  --color-info: #3b82f6;
+  --color-info-light: #eff6ff;
+  --color-info-text: #1e40af;
+
+  /* Neutral Colors */
+  --color-neutral: #6b7280;
+  --color-neutral-light: #f3f4f6;
+  --color-neutral-text: #374151;
+
+  /* Card Colors */
+  --color-card: #ffffff;
+  --color-card-hover: #f9fafb;
+  --color-card-border: #e5e7eb;
+
+  /* Input Colors */
+  --color-input: #f3f4f6;
+  --color-input-border: #d1d5db;
+  --color-input-focus: #93c5fd;
+  --color-input-placeholder: #9ca3af;
+
+  /* Button Text Colors */
+  --color-button-text: #ffffff;
+  --color-button-text-secondary: #4b5563;
+
+  /* Footer Colors */
+  --color-footer: #f3f4f6;
+  --color-footer-text: #4b5563;
+}
+
+/* Background Utilities */
+.theme-bg {
+  background-color: var(--color-background);
+}
+
+.theme-bg-gradient {
+  background: var(--color-background-gradient);
+}
+
+.theme-bg-surface {
+  background-color: var(--color-surface);
+}
+
+.theme-bg-surface-hover {
+  background-color: var(--color-surface-hover);
+}
+
+.theme-bg-surface-secondary {
+  background-color: var(--color-surface-secondary);
+}
+
+.theme-bg-surface-secondary-hover {
+  background-color: var(--color-surface-secondary-hover);
+}
+
+.theme-bg-card {
+  background-color: var(--color-card);
+}
+
+.theme-bg-card-hover {
+  background-color: var(--color-card-hover);
+}
+
+.theme-bg-input {
+  background-color: var(--color-input);
+}
+
+/* Text Utilities */
+.theme-text-primary {
+  color: var(--color-text-primary);
+}
+
+.theme-text-secondary {
+  color: var(--color-text-secondary);
+}
+
+.theme-text-muted {
+  color: var(--color-text-muted);
+}
+
+.theme-text-icon-primary {
+  color: var(--color-text-icon-primary);
+}
+
+.theme-text-icon-secondary {
+  color: var(--color-text-icon-secondary);
+}
+
+.theme-text-button {
+  color: var(--color-button-text);
+}
+
+.theme-text-button-secondary {
+  color: var(--color-button-text-secondary);
+}
+
+/* Border Utilities */
+.theme-border {
+  border-color: var(--color-border);
+}
+
+.theme-border-hover {
+  border-color: var(--color-border-hover);
+}
+
+.theme-border-light {
+  border-color: var(--color-border-light);
+}
+
+.theme-border-error {
+  border-color: var(--color-border-error);
+}
+
+.theme-border-card {
+  border-color: var(--color-card-border);
+}
+
+.theme-border-input {
+  border-color: var(--color-input-border);
+}
+
+/* Button Utilities */
+.theme-btn-primary {
+  background-color: var(--color-primary);
+  color: var(--color-button-text);
+}
+
+.theme-btn-primary:hover {
+  background-color: var(--color-primary-hover);
+}
+
+.theme-btn-secondary {
+  background-color: var(--color-secondary);
+  color: var(--color-button-text);
+}
+
+.theme-btn-secondary:hover {
+  background-color: var(--color-secondary-hover);
+}
+
+.theme-btn-accent {
+  background-color: var(--color-accent);
+  color: var(--color-button-text);
+}
+
+.theme-btn-accent:hover {
+  background-color: var(--color-accent-hover);
+}
+
+/* Input Utilities */
+.theme-input {
+  background-color: var(--color-input);
+  border-color: var(--color-input-border);
+  color: var(--color-text-primary);
+}
+
+.theme-input:focus {
+  border-color: var(--color-input-focus);
+  outline-color: var(--color-input-focus);
+}
+
+.theme-input::placeholder {
+  color: var(--color-input-placeholder);
+}
+
+/* Input placeholder utility */
+.theme-input-placeholder::placeholder {
+  color: var(--color-input-placeholder);
+}
+
+.theme-input-error {
+  border-color: var(--color-border-error);
+}
+
+/* Status Utilities */
+.theme-error {
+  background-color: var(--color-error-light);
+  color: var(--color-error-text);
+  border-color: var(--color-error);
+}
+
+.theme-success {
+  background-color: var(--color-success-light);
+  color: var(--color-success-text);
+  border-color: var(--color-success);
+}
+
+.theme-warning {
+  background-color: var(--color-warning-light);
+  color: var(--color-warning-text);
+  border-color: var(--color-warning);
+}
+
+.theme-info {
+  background-color: var(--color-info-light);
+  color: var(--color-info-text);
+  border-color: var(--color-info);
+}
+
+/* Hover Utilities */
+.theme-hover-surface:hover {
+  background-color: var(--color-surface-hover);
+}
+
+.theme-hover-surface-secondary:hover {
+  background-color: var(--color-surface-secondary-hover);
+}
+
+.theme-hover-card:hover {
+  background-color: var(--color-card-hover);
+}
+
+.theme-hover-border:hover {
+  border-color: var(--color-border-hover);
+}
+
+/* Focus Utilities */
+.theme-focus-ring:focus {
+  outline: 2px solid var(--color-input-focus);
+  outline-offset: 2px;
+}
+
+.theme-focus-border:focus {
+  border-color: var(--color-input-focus);
+}

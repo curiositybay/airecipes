@@ -1,0 +1,221 @@
+/* Recipe Card Styles */
+
+/* Recipe Results Container */
+.recipe-results {
+  @apply space-y-6;
+}
+
+/* Recipe Grid */
+.recipe-grid {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+}
+
+/* Recipe Card - Updated to use theme system */
+.recipe-card {
+  @apply rounded-lg shadow-sm hover:shadow-md transition-all duration-300 p-6 flex flex-col;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.recipe-card:hover {
+  background-color: var(--color-surface-hover);
+  border-color: var(--color-border-hover);
+}
+
+.recipe-card-content {
+  @apply flex-1;
+}
+
+/* Recipe Header */
+.recipe-card-header {
+  @apply flex items-start justify-between mb-4;
+}
+
+.recipe-title-section {
+  @apply flex-1 mr-4;
+}
+
+.recipe-title {
+  @apply text-xl font-semibold mb-2;
+  color: var(--color-text-primary);
+}
+
+.recipe-actions {
+  @apply flex items-center space-x-2;
+}
+
+.recipe-action-btn {
+  @apply w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-200;
+  color: var(--color-text-muted);
+}
+
+.recipe-action-btn:hover {
+  color: var(--color-text-icon-primary);
+  background-color: var(--color-surface-secondary);
+}
+
+.copy-btn {
+  color: var(--color-text-muted);
+}
+
+.copy-btn:hover {
+  color: var(--color-text-icon-primary);
+  background-color: var(--color-surface-secondary);
+}
+
+/* Recipe Description */
+.recipe-description {
+  @apply mb-4 leading-relaxed;
+  color: var(--color-text-secondary);
+}
+
+/* Recipe Tags */
+.recipe-tags {
+  @apply flex flex-wrap gap-2 mb-4;
+}
+
+.recipe-tag {
+  @apply px-2 py-1 text-xs font-bold rounded-full;
+  background-color: var(--color-primary);
+  color: var(--color-button-text);
+}
+
+/* Recipe Content */
+.recipe-content {
+  @apply space-y-4;
+}
+
+.recipe-section {
+  @apply space-y-2;
+}
+
+.recipe-section-title {
+  @apply text-sm font-semibold mb-2;
+  color: var(--color-text-primary);
+}
+
+.recipe-ingredients-title,
+.recipe-instructions-title {
+  @apply text-sm font-semibold mb-2;
+  color: var(--color-text-primary);
+}
+
+.recipe-ingredients-list {
+  @apply list-disc list-inside text-sm space-y-1;
+  color: var(--color-text-secondary);
+}
+
+.recipe-instructions-list {
+  @apply list-decimal list-inside text-sm space-y-1;
+  color: var(--color-text-secondary);
+}
+
+.recipe-ingredient,
+.recipe-instruction {
+  @apply text-sm;
+  color: var(--color-text-secondary);
+}
+
+/* Recipe Metadata */
+.recipe-metadata {
+  @apply flex flex-wrap gap-3;
+}
+
+.recipe-meta {
+  @apply text-sm flex items-center;
+  color: var(--color-text-secondary);
+}
+
+.recipe-meta i {
+  @apply mr-1;
+}
+
+/* Nutritional Information */
+.recipe-nutrition {
+  @apply mt-4 pt-4;
+  border-top: 1px solid var(--color-border-light);
+}
+
+.recipe-nutrition-title {
+  @apply text-sm font-semibold mb-2;
+  color: var(--color-text-primary);
+}
+
+.recipe-nutrition-grid {
+  @apply grid grid-cols-2 md:grid-cols-4 gap-2;
+}
+
+.nutrition-item {
+  @apply text-sm flex items-center;
+  color: var(--color-text-secondary);
+}
+
+.nutrition-item i {
+  @apply mr-1;
+  color: var(--color-text-icon-primary);
+}
+
+/* Empty State */
+.recipe-results-empty {
+  @apply text-center py-12;
+}
+
+.recipe-results-empty-icon {
+  @apply text-6xl mb-4;
+  color: var(--color-text-muted);
+}
+
+.recipe-results-empty-title {
+  @apply text-xl font-semibold mb-2;
+  color: var(--color-text-secondary);
+}
+
+.recipe-results-empty-description {
+  color: var(--color-text-muted);
+}
+
+/* Loading State */
+.recipe-results-loading {
+  @apply text-center py-12;
+}
+
+.recipe-results-loading-icon {
+  @apply text-4xl mb-4;
+  color: var(--color-text-icon-primary);
+}
+
+.recipe-results-loading-text {
+  @apply text-lg;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .recipe-card {
+    @apply p-4;
+  }
+
+  .recipe-title {
+    @apply text-lg;
+  }
+
+  .recipe-metadata {
+    @apply gap-2;
+  }
+
+  .recipe-nutrition-grid {
+    @apply grid-cols-2;
+  }
+}
