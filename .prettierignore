@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+.next/
+out/
+dist/
+build/
+
+# Coverage reports
+coverage/
+
+# Logs
+logs/
+
+# Environment files
+.env*
+
+# Database
+*.db
+*.sqlite
+
+# Generated files
+prisma/generated/
+
+# Package files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Other
+.swc/ 

@@ -1,0 +1,81 @@
+@reference "tailwindcss";
+
+/* Main Layout */
+.main-layout {
+  @apply min-h-screen flex flex-col;
+}
+
+.main-content {
+  @apply flex-1;
+}
+
+/* Container */
+.container {
+  @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+.container-sm {
+  @apply max-w-3xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+.container-lg {
+  @apply max-w-6xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+/* Section Spacing */
+.section {
+  @apply py-8 md:py-12;
+}
+
+.section-sm {
+  @apply py-4 md:py-6;
+}
+
+.section-lg {
+  @apply py-12 md:py-16;
+}
+
+/* Grid Layouts */
+.grid-responsive {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+}
+
+.grid-2 {
+  @apply grid grid-cols-1 md:grid-cols-2 gap-6;
+}
+
+.grid-3 {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6;
+}
+
+.grid-4 {
+  @apply grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6;
+}
+
+/* Flex Layouts */
+.flex-center {
+  @apply flex items-center justify-center;
+}
+
+.flex-between {
+  @apply flex items-center justify-between;
+}
+
+.flex-col-center {
+  @apply flex flex-col items-center justify-center;
+}
+
+/* Responsive Utilities */
+@media (max-width: 768px) {
+  .container {
+    @apply px-4;
+  }
+
+  .section {
+    @apply py-6;
+  }
+
+  .section-lg {
+    @apply py-8;
+  }
+}

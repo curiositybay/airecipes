@@ -1,0 +1,48 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema.
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Example {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([name])
+  @@index([isActive])
+}
+
+model UsageLog {
+  id              Int      @id @default(autoincrement())
+  method          String   // e.g., "createExample", "updateExample".
+  success         Boolean  @default(true)
+  errorMessage    String?  // If success is false.
+  createdAt       DateTime @default(now())
+
+  @@index([method])
+  @@index([createdAt])
+  @@index([success])
+}
+
+model AppMetadata {
+  id           Int      @id @default(autoincrement())
+  appVersion   String   @unique
+  apiVersion   String
+  lastDeployed DateTime @default(now())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([appVersion])
+  @@index([apiVersion])
+}

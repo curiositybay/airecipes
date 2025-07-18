@@ -1,0 +1,45 @@
+services:
+  app:
+    image: dockehubuser/appname:latest
+    container_name: appname
+    restart: unless-stopped
+    env_file:
+      - /app/env/server/location/.env
+    volumes:
+      - app_data:/app/data
+      - app_logs:/app/logs
+    networks:
+      - app-network
+      - proxy-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    labels:
+      # Enable Traefik for this service
+      - "traefik.enable=true"
+      # HTTP router configuration
+      - "traefik.http.routers.app.rule=Host(`appname.yourdomain.com`)"
+      - "traefik.http.routers.app.entrypoints=websecure"
+      - "traefik.http.routers.app.tls.certresolver=letsencrypt"
+      # Service configuration
+      - "traefik.http.services.app.loadbalancer.server.port=3000"
+      # Middleware configuration
+      - "traefik.http.routers.app.middlewares=security-headers,compression"
+      # Rate limiting (adjust as needed)
+      - "traefik.http.middlewares.app-rate-limit.ratelimit.average=50"
+      - "traefik.http.middlewares.app-rate-limit.ratelimit.burst=100"
+      - "traefik.http.routers.app.middlewares=app-rate-limit"
+      - "traefik.http.routers.app.priority=100"
+
+volumes:
+  app_data:
+  app_logs:
+
+networks:
+  app-network:
+    external: true
+  proxy-network:
+    external: true

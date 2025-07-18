@@ -1,0 +1,29 @@
+@reference "tailwindcss";
+
+/* Footer Layout */
+.footer {
+  @apply py-13 text-white bg-stone-800;
+}
+
+.footer-container {
+  @apply max-w-4xl mx-auto px-6 text-center;
+}
+
+.footer-content {
+  @apply space-y-4;
+}
+
+.footer-tagline {
+  @apply text-stone-300 text-sm;
+}
+
+.footer-copyright {
+  @apply text-stone-400 text-sm;
+}
+
+/* Responsive footer height to match GitHub triangle */
+@media (max-width: 768px) {
+  .footer {
+    @apply py-12;
+  }
+}
