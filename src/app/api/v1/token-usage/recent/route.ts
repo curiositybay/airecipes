@@ -40,7 +40,6 @@ export async function GET(request: NextRequest) {
         model: true,
         promptTokens: true,
         completionTokens: true,
-        totalTokens: true,
         success: true,
         errorMessage: true,
         createdAt: true,

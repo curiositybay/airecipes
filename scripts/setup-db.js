@@ -5,6 +5,9 @@ const { execSync } = require('child_process');
 
 const prisma = new PrismaClient();
 
+// Import the ingredient seeding function
+const { seedIngredients } = require('./seed-ingredients');
+
 async function setupDatabase() {
   try {
     console.log('Setting up database...');
@@ -49,6 +52,11 @@ async function setupDatabase() {
     });
 
     console.log('App metadata added successfully!');
+
+    console.log('Seeding ingredients...');
+    await seedIngredients();
+
+    console.log('Database setup and seeding completed successfully!');
   } catch (error) {
     console.error('Error setting up database:', error);
     process.exit(1);

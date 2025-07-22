@@ -8,25 +8,22 @@ services:
       dockerfile: Dockerfile.dev
     container_name: ${APP_NAME}-app
     ports:
-      - '3000:3000'
+      - '3002:3000'
+      - '5557:5555'
     volumes:
       - .:/app
-      - node_modules:/app/node_modules
-      - /app/.next
     environment:
       - NODE_ENV=development
-      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
-      - REDIS_URL=redis://redis:6379
+      - DATABASE_URL=postgresql://postgres:postgres@shared-postgres:5432/${APP_NAME}
+      - REDIS_URL=redis://shared-redis:6379
     env_file:
       - .env
+    user: '1000:1000'
     networks:
       - app-network
+      - shared-apps-network
     restart: unless-stopped
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:3000/api/health']
       interval: 30s
@@ -34,70 +31,17 @@ services:
       retries: 3
       start_period: 40s
 
-  # PostgreSQL database for development
-  postgres:
-    image: postgres:15-alpine
-    container_name: ${APP_NAME}-postgres
-    restart: unless-stopped
-    environment:
-      POSTGRES_DB: main
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-      - ./init-scripts:/docker-entrypoint-initdb.d
-    ports:
-      - '5432:5432'
-    networks:
-      - app-network
-    healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U ${DB_USER}']
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    deploy:
-      resources:
-        limits:
-          memory: 512M
-          cpus: '0.5'
-        reservations:
-          memory: 256M
-          cpus: '0.25'
-
-  # Redis for caching and sessions
-  redis:
-    image: redis:7-alpine
-    container_name: ${APP_NAME}-redis
-    restart: unless-stopped
-    volumes:
-      - redis_data:/data
-    ports:
-      - '6379:6379'
-    networks:
-      - app-network
-    healthcheck:
-      test: ['CMD', 'redis-cli', 'ping']
-      interval: 30s
-      timeout: 10s
-      retries: 3
-    deploy:
-      resources:
-        limits:
-          memory: 256M
-          cpus: '0.25'
-        reservations:
-          memory: 128M
-          cpus: '0.1'
-
 volumes:
   postgres_data:
     name: ${APP_NAME}-postgres-data
   redis_data:
     name: ${APP_NAME}-redis-data
-  node_modules:
-    name: ${APP_NAME}-node-modules
 
 networks:
   app-network:
     name: ${APP_NAME}-app-network
     driver: bridge
+  shared-apps-network:
+    name: web-app-apps-shared
+    driver: bridge
+    external: true

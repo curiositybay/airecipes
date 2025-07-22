@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
 
     const { period: periodFilter, model: modelFilter } = validation.data;
 
-    let whereClause: any = {};
+    const whereClause: any = {};
 
     // Apply time-based filtering for different periods
     if (periodFilter === 'today') {
@@ -59,7 +59,6 @@ export async function GET(request: NextRequest) {
       _sum: {
         promptTokens: true,
         completionTokens: true,
-        totalTokens: true,
       },
       _count: {
         id: true,
@@ -72,7 +71,6 @@ export async function GET(request: NextRequest) {
         DATE_TRUNC('day', "createdAt") as date,
         SUM("promptTokens") as promptTokens,
         SUM("completionTokens") as completionTokens,
-        SUM("totalTokens") as totalTokens,
         COUNT(*) as requests
       FROM "TokenUsage"
       WHERE "createdAt" >= NOW() - INTERVAL '30 days'
@@ -87,7 +85,6 @@ export async function GET(request: NextRequest) {
       _sum: {
         promptTokens: true,
         completionTokens: true,
-        totalTokens: true,
       },
       _count: {
         id: true,
@@ -98,7 +95,8 @@ export async function GET(request: NextRequest) {
       period: periodFilter,
       model: modelFilter,
       totalRequests: totalUsage._count.id || 0,
-      totalTokens: totalUsage._sum.totalTokens || 0,
+      totalPromptTokens: totalUsage._sum.promptTokens || 0,
+      totalCompletionTokens: totalUsage._sum.completionTokens || 0,
     });
 
     return NextResponse.json({
@@ -109,13 +107,11 @@ export async function GET(request: NextRequest) {
         requests: Number(totalUsage._count.id) || 0,
         promptTokens: Number(totalUsage._sum.promptTokens) || 0,
         completionTokens: Number(totalUsage._sum.completionTokens) || 0,
-        totalTokens: Number(totalUsage._sum.totalTokens) || 0,
       },
       dailyBreakdown: (dailyBreakdown as any[]).map(item => ({
         date: item.date,
         promptTokens: Number(item.promptTokens),
         completionTokens: Number(item.completionTokens),
-        totalTokens: Number(item.totalTokens),
         requests: Number(item.requests),
       })),
       modelBreakdown: modelBreakdown.map(item => ({
@@ -123,7 +119,6 @@ export async function GET(request: NextRequest) {
         requests: Number(item._count.id),
         promptTokens: Number(item._sum.promptTokens),
         completionTokens: Number(item._sum.completionTokens),
-        totalTokens: Number(item._sum.totalTokens),
       })),
     });
   } catch (error) {

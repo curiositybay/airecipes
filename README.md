@@ -17,22 +17,23 @@ A modern web application built with Next.js, TypeScript, and Tailwind CSS for ma
 ### Prerequisites
 
 - Node.js (v18 or higher)
-- npm, yarn, pnpm, or bun
+- Docker (for containerized development)
 
 ### Setup
 
 ```bash
-# Install dependencies
-npm install
+# Clone the repository
+git clone <repository-url>
+cd airecipes
 
-# Set up environment files
-cp env.example .env.local
+# Start with Docker
+docker-compose up -d
 
 # Set up database
-npm run db:setup
+docker exec -it airecipes-app npm run db:setup
 
-# Start development server
-npm run dev
+# Seed database with sample data
+docker exec -it airecipes-app npm run db:seed
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
@@ -41,18 +42,45 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ### Available Scripts
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run start` - Start production server
-- `npm run lint` - Run ESLint
-- `npm run test` - Run tests
-- `npm run test:watch` - Run tests in watch mode
-- `npm run test:coverage` - Run tests with coverage
-- `npm run db:setup` - Set up database and run migrations
-- `npm run db:seed` - Seed database with sample data
-- `npm run format` - Format all files with Prettier
-- `npm run format:check` - Check formatting without changing files
-- `npm run format:fix` - Format all files and run linting
+Run these commands inside the Docker container:
+
+```bash
+# Start development server
+docker-compose up -d
+
+# Build for production
+docker exec -it airecipes-app npm run build
+
+# Start production server
+docker exec -it airecipes-app npm run start
+
+# Run linting
+docker exec -it airecipes-app npm run lint
+
+# Run tests
+docker exec -it airecipes-app npm run test
+
+# Run tests in watch mode
+docker exec -it airecipes-app npm run test:watch
+
+# Run tests with coverage
+docker exec -it airecipes-app npm run test:coverage
+
+# Set up database and run migrations
+docker exec -it airecipes-app npm run db:setup
+
+# Seed database with sample data
+docker exec -it airecipes-app npm run db:seed
+
+# Format all files with Prettier
+docker exec -it airecipes-app npm run format
+
+# Check formatting without changing files
+docker exec -it airecipes-app npm run format:check
+
+# Format all files and run linting
+docker exec -it airecipes-app npm run format:fix
+```
 
 ## Environment Configuration
 
@@ -142,19 +170,19 @@ This project uses Prisma ORM with SQLite for simplicity. The database schema is 
 
 ```bash
 # Set up database
-npm run db:setup
+docker exec -it airecipes-app npm run db:setup
 
 # Generate Prisma client
-npx prisma generate
+docker exec -it airecipes-app npx prisma generate
 
 # Run migrations
-npx prisma migrate dev
+docker exec -it airecipes-app npx prisma migrate dev
 
 # Open Prisma Studio
-npx prisma studio
+docker exec -it airecipes-app npx prisma studio
 
 # Reset database
-npx prisma migrate reset
+docker exec -it airecipes-app npx prisma migrate reset
 ```
 
 ## Testing
@@ -163,13 +191,13 @@ npx prisma migrate reset
 
 ```bash
 # Run all tests
-npm run test
+docker exec -it airecipes-app npm run test
 
 # Run tests in watch mode
-npm run test:watch
+docker exec -it airecipes-app npm run test:watch
 
 # Run tests with coverage
-npm run test:coverage
+docker exec -it airecipes-app npm run test:coverage
 ```
 
 ### Test Structure
