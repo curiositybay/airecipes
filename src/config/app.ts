@@ -1,12 +1,20 @@
+// Validate required environment variables only on server side
+if (typeof window === 'undefined' && !process.env.AUTH_SERVICE_URL) {
+  throw new Error('AUTH_SERVICE_URL environment variable is required');
+}
+
 export const appConfig = {
-  name: process.env.NEXT_PUBLIC_APP_NAME || 'Web App Template',
+  name: process.env.NEXT_PUBLIC_APP_NAME || 'AI Recipes by Curiosity Bay',
   version: process.env.NEXT_PUBLIC_APP_VERSION || '1.0.0',
   environment: process.env.NEXT_PUBLIC_APP_ENVIRONMENT || 'development',
   description:
     process.env.NEXT_PUBLIC_APP_DESCRIPTION ||
-    'A modern full-stack web application template',
+    'AI-powered recipe generation and meal planning',
 
   apiUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000',
+
+  // Auth Service Configuration - only available on server side
+  authServiceUrl: typeof window === 'undefined' ? process.env.AUTH_SERVICE_URL : undefined,
 
   domain: process.env.NEXT_PUBLIC_APP_DOMAIN || 'your-domain.com',
   url: process.env.NEXT_PUBLIC_APP_URL || 'https://your-domain.com',

@@ -6,7 +6,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dev
-    container_name: ${APP_NAME}-app
+    container_name: ${APP_NAME}
     ports:
       - '3002:3000'
       - '5557:5555'
@@ -14,14 +14,11 @@ services:
       - .:/app
     environment:
       - NODE_ENV=development
-      - DATABASE_URL=postgresql://postgres:postgres@shared-postgres:5432/${APP_NAME}
-      - REDIS_URL=redis://shared-redis:6379
     env_file:
       - .env
     user: '1000:1000'
     networks:
-      - app-network
-      - shared-apps-network
+      - web-apps
     restart: unless-stopped
 
     healthcheck:
@@ -38,10 +35,5 @@ volumes:
     name: ${APP_NAME}-redis-data
 
 networks:
-  app-network:
-    name: ${APP_NAME}-app-network
-    driver: bridge
-  shared-apps-network:
-    name: web-app-apps-shared
-    driver: bridge
+  web-apps:
     external: true

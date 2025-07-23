@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 
 const GITHUB_REPO =
   process.env.NEXT_PUBLIC_GITHUB_REPO ||
@@ -51,11 +52,11 @@ export default function GitHubCorner() {
         >
           <div className='bg-black border-2 border-white rounded-tl-lg shadow-lg relative p-6'>
             <div className='flex flex-col items-center gap-2'>
-              <img
+              <Image
                 src='/GitHub_Lockup_Light.svg'
                 alt='GitHub'
-                width='120'
-                height='30'
+                width={120}
+                height={30}
                 className='transition-transform duration-200 group-hover:scale-110'
               />
               <span className='theme-text-button text-sm font-medium transition-transform duration-200 group-hover:scale-110'>

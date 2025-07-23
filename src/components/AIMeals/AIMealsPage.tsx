@@ -5,6 +5,9 @@ import { PrimaryButton, SecondaryButton, ButtonIcon } from '../UI/Button';
 import IngredientInput from './IngredientInput';
 import RecipeResults from './RecipeResults';
 import { Recipe } from '@/types/ai-meals';
+import Swal from 'sweetalert2';
+import { appConfig } from '@/config/app';
+import { useAuth } from '@/contexts/AuthContext';
 
 function AIMealsPage() {
   const [ingredients, setIngredients] = useState<string[]>([]);
@@ -13,6 +16,9 @@ function AIMealsPage() {
   const [error, setError] = useState('');
   const [isFallbackRecipes, setIsFallbackRecipes] = useState(false);
   const [fallbackMessage, setFallbackMessage] = useState('');
+  
+  // Use AuthContext instead of local state
+  const { user, isLoading: isAuthLoading, loginAsDemoUser } = useAuth();
 
   // Loads recent ingredients from localStorage.
   useEffect(() => {
@@ -44,6 +50,26 @@ function AIMealsPage() {
     if (ingredientsList.length === 0) {
       setError('Please add at least one ingredient');
       return;
+    }
+
+    // Check if user is logged in
+    if (!user) {
+      const result = await Swal.fire({
+        title: 'Demo Login Required',
+        text: 'To test the recipe generation functionality, you will be automatically logged in as a demo user.',
+        icon: 'info',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Continue as Demo User',
+        cancelButtonText: 'Cancel',
+      });
+
+      if (result.isConfirmed) {
+        await loginAsDemoUser();
+      } else {
+        return; // User cancelled
+      }
     }
 
     setIsLoading(true);
@@ -154,6 +180,45 @@ function AIMealsPage() {
             Turn your ingredients into delicious meals with AI-powered recipe
             suggestions
           </p>
+          
+          {/* Login/User Status Section */}
+          <div className='mt-6 flex justify-center'>
+            {isAuthLoading ? (
+              <div className='animate-spin rounded-full h-6 w-6 border-b-2 theme-text-icon-primary'></div>
+            ) : user ? (
+              <div className='flex items-center space-x-4'>
+                <span className='text-sm theme-text-muted'>
+                  Logged in as: {user.email}
+                </span>
+                <button
+                  onClick={async () => {
+                    try {
+                      await fetch(`${appConfig.authServiceUrl}/api/v1/auth/logout`, {
+                        method: 'POST',
+                        credentials: 'include',
+                      });
+                      // setUser(null); // This will be handled by AuthContext
+                    } catch (error) {
+                      console.error('Logout error:', error);
+                    }
+                  }}
+                  className='px-3 py-1 text-sm theme-btn-secondary rounded'
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={async () => {
+                  await loginAsDemoUser();
+                }}
+                className='px-4 py-2 theme-btn-primary rounded-lg font-semibold'
+              >
+                <i className='fas fa-user mr-2'></i>
+                Login as Demo User
+              </button>
+            )}
+          </div>
         </div>
       </section>
       {/* Main Content */}

@@ -65,6 +65,9 @@ COPY --chown=nextjs:nodejs --from=builder /app/.next/static ./.next/static
 COPY --chown=nextjs:nodejs --from=builder /app/public ./public
 COPY --chown=nextjs:nodejs --from=builder /app/scripts ./scripts
 
+# Ensure script files are executable
+RUN chmod +x scripts/*.js
+
 # Copy minimal Prisma and runtime dependencies
 COPY --chown=nextjs:nodejs --from=builder /app/node_modules/prisma ./node_modules/prisma
 COPY --chown=nextjs:nodejs --from=builder /app/node_modules/jiti ./node_modules/jiti

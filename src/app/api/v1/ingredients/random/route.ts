@@ -1,11 +1,11 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import logger from '@/lib/logger';
 
 /**
  * Get random ingredients from the database
  */
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // Get a random number between 4 and 6
     const count = Math.floor(Math.random() * 3) + 4; // 4, 5, or 6
@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
     `;
 
     logger.info('Random ingredients fetched', {
-      count: (randomIngredients as any[]).length,
+      count: (randomIngredients as unknown[]).length,
     });
 
     return NextResponse.json({

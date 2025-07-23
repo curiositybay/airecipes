@@ -4,6 +4,13 @@ import logger from '@/lib/logger';
 import { validateRequest } from '@/lib/validation';
 import { tokenUsageStatsSchema } from '@/lib/validation/token-usage';
 
+interface DailyBreakdownItem {
+  date: Date;
+  promptTokens: string | number;
+  completionTokens: string | number;
+  requests: string | number;
+}
+
 /**
  * Retrieve comprehensive token usage statistics with filtering options.
  */
@@ -31,7 +38,7 @@ export async function GET(request: NextRequest) {
 
     const { period: periodFilter, model: modelFilter } = validation.data;
 
-    const whereClause: any = {};
+    const whereClause: Record<string, unknown> = {};
 
     // Apply time-based filtering for different periods
     if (periodFilter === 'today') {
@@ -108,7 +115,7 @@ export async function GET(request: NextRequest) {
         promptTokens: Number(totalUsage._sum.promptTokens) || 0,
         completionTokens: Number(totalUsage._sum.completionTokens) || 0,
       },
-      dailyBreakdown: (dailyBreakdown as any[]).map(item => ({
+      dailyBreakdown: (dailyBreakdown as DailyBreakdownItem[]).map(item => ({
         date: item.date,
         promptTokens: Number(item.promptTokens),
         completionTokens: Number(item.completionTokens),

@@ -2,7 +2,7 @@ name: ${APP_NAME}
 
 services:
   app:
-    image: dockehubuser/appname:latest
+    image: dockerhubuser/appname:latest
     container_name: ${APP_NAME}-app
     restart: unless-stopped
     env_file:

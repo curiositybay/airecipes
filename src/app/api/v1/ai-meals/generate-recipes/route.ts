@@ -4,6 +4,7 @@ import logger from '@/lib/logger';
 import OpenAiService from '@/lib/openai-service';
 import { validateRequest } from '@/lib/validation';
 import { generateRecipesSchema } from '@/lib/validation/ai-meals';
+import { requireAuth } from '@/lib/auth';
 
 const openAiService = new OpenAiService();
 
@@ -79,6 +80,28 @@ const validateIngredients = async (
  */
 export async function POST(request: NextRequest) {
   try {
+    // Verify authentication
+    let authResult;
+    try {
+      authResult = await requireAuth(request);
+    } catch (authError) {
+      logger.warn('Authentication failed for recipe generation', {
+        error: authError instanceof Error ? authError.message : 'Unknown error',
+      });
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Authentication required. Please log in to generate recipes.',
+        },
+        { status: 401 }
+      );
+    }
+    
+    logger.info('Recipe generation request', {
+      user: authResult.user?.email,
+      role: authResult.user?.role,
+    });
+    
     // Get raw request data
     const body = await request.json();
 
