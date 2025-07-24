@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import * as ButtonNamed from './Button';
-import ButtonDefault from './Button';
+import { Button as ButtonDefault } from './Button';
 
 describe('Debug Import Test', () => {
   it('should import Button components (named)', () => {
@@ -11,10 +11,10 @@ describe('Debug Import Test', () => {
     expect(screen.getByRole('button')).toBeInTheDocument();
   });
   it('should import Button components (default)', () => {
-    expect(ButtonDefault.Button).toBeDefined();
-    expect(ButtonDefault.PrimaryButton).toBeDefined();
-    expect(ButtonDefault.SecondaryButton).toBeDefined();
-    render(<ButtonDefault.Button>Test</ButtonDefault.Button>);
+    expect(ButtonDefault).toBeDefined();
+    expect(ButtonNamed.PrimaryButton).toBeDefined();
+    expect(ButtonNamed.SecondaryButton).toBeDefined();
+    render(<ButtonDefault>Test</ButtonDefault>);
     expect(screen.getByRole('button')).toBeInTheDocument();
   });
 });

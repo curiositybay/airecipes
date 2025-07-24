@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import Layout from './Layout';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 
 jest.mock('./Footer', () => {
   const MockFooter = () => <div data-testid='footer' />;
@@ -16,8 +17,12 @@ jest.mock('../UI/GitHubCorner', () => {
 
 // Remove the unused mock components
 describe('Layout', () => {
+  const renderWithTheme = (component: React.ReactElement) => {
+    return render(<ThemeProvider>{component}</ThemeProvider>);
+  };
+
   it('renders children inside main', () => {
-    render(
+    renderWithTheme(
       <Layout>
         <div data-testid='child'>Test Child</div>
       </Layout>
@@ -28,7 +33,7 @@ describe('Layout', () => {
   });
 
   it('renders Footer and GitHubCorner', () => {
-    render(
+    renderWithTheme(
       <Layout>
         <div>Child</div>
       </Layout>
@@ -38,7 +43,7 @@ describe('Layout', () => {
   });
 
   it('renders wrapper div with correct classes', () => {
-    render(
+    renderWithTheme(
       <Layout>
         <div>Child</div>
       </Layout>

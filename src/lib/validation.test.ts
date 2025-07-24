@@ -290,13 +290,11 @@ describe('validation', () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error).toBe(
-          'Invalid input: expected object, received null'
-        );
+        expect(result.error).toBe('Expected object, received null');
         expect(result.details).toHaveLength(1);
         expect(result.details[0]).toEqual({
           field: '',
-          message: 'Invalid input: expected object, received null',
+          message: 'Expected object, received null',
           code: 'invalid_type',
         });
       }
@@ -310,9 +308,7 @@ describe('validation', () => {
 
       expect(result.success).toBe(false);
       if (!result.success) {
-        expect(result.error).toBe(
-          'Invalid input: expected string, received number'
-        );
+        expect(result.error).toBe('Expected string, received number');
       }
     });
 

@@ -1,4 +1,5 @@
-import { oceanTheme, defaultTheme, themes, getTheme } from './theme';
+import { oceanTheme } from './themes';
+import { defaultTheme, themes, getTheme } from './theme';
 
 describe('Theme Configuration', () => {
   describe('Theme Registry', () => {
@@ -8,7 +9,7 @@ describe('Theme Configuration', () => {
   });
 
   describe('getTheme Function', () => {
-    it('should return ocean theme when no theme name is provided', () => {
+    it('should return desert theme when no theme name is provided', () => {
       const theme = getTheme();
       expect(theme).toBeDefined();
     });
