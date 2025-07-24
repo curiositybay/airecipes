@@ -19,10 +19,24 @@ export async function POST(request: NextRequest) {
     const data = await response.json();
     const responseHeaders = new Headers();
 
-    // Copy cookies from auth-service response
+    // Copy cookies from auth-service response and modify domain
     const setCookieHeader = response.headers.get('set-cookie');
     if (setCookieHeader) {
-      responseHeaders.set('set-cookie', setCookieHeader);
+      // Parse the cookie and modify the domain
+      const cookieParts = setCookieHeader.split(';');
+      const modifiedParts = cookieParts
+        .map(part => {
+          const trimmedPart = part.trim();
+          if (trimmedPart.toLowerCase().startsWith('domain=')) {
+            // Remove domain restriction to allow cross-subdomain sharing
+            return '';
+          }
+          return trimmedPart;
+        })
+        .filter(part => part !== '');
+
+      const modifiedCookie = modifiedParts.join('; ');
+      responseHeaders.set('set-cookie', modifiedCookie);
     }
 
     return NextResponse.json(data, {
@@ -36,4 +50,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-} 
+}

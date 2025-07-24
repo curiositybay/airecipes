@@ -25,4 +25,4 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       <div className='flex flex-col min-h-screen'>{children}</div>
     </div>
   );
-} 
+}

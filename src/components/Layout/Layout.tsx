@@ -14,8 +14,8 @@ function Layout({ children }: LayoutProps) {
       className='min-h-screen flex flex-col theme-bg relative'
       data-testid='layout-wrapper'
     >
-      {/* Floating Theme Switcher */}
-      <div className='absolute top-4 right-4 z-50'>
+      {/* Theme Switcher - Top Left */}
+      <div className='absolute top-4 left-4 z-50'>
         <ThemeSwitcher />
       </div>
 

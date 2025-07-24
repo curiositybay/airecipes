@@ -14,7 +14,8 @@ export const appConfig = {
   apiUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000',
 
   // Auth Service Configuration - only available on server side
-  authServiceUrl: typeof window === 'undefined' ? process.env.AUTH_SERVICE_URL : undefined,
+  authServiceUrl:
+    typeof window === 'undefined' ? process.env.AUTH_SERVICE_URL : undefined,
 
   domain: process.env.NEXT_PUBLIC_APP_DOMAIN || 'your-domain.com',
   url: process.env.NEXT_PUBLIC_APP_URL || 'https://your-domain.com',

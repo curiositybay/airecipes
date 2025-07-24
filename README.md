@@ -175,7 +175,10 @@ docker exec -it airecipes-app npm run db:setup
 # Generate Prisma client
 docker exec -it airecipes-app npx prisma generate
 
-# Run migrations
+# Run migrations (production)
+docker exec -it airecipes-app npx prisma migrate deploy
+
+# Run migrations (development only)
 docker exec -it airecipes-app npx prisma migrate dev
 
 # Open Prisma Studio

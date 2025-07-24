@@ -23,11 +23,11 @@ function getAuthServiceUrl(): string {
   if (typeof window !== 'undefined') {
     throw new Error('Auth service URL is only available on server side');
   }
-  
+
   if (!appConfig.authServiceUrl) {
     throw new Error('AUTH_SERVICE_URL environment variable is required');
   }
-  
+
   return appConfig.authServiceUrl;
 }
 
@@ -147,4 +147,4 @@ export async function loginAsDemoUser(): Promise<AuthResponse> {
       error: 'Demo login failed',
     };
   }
-} 
+}

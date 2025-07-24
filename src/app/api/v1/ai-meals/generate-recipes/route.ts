@@ -96,12 +96,12 @@ export async function POST(request: NextRequest) {
         { status: 401 }
       );
     }
-    
+
     logger.info('Recipe generation request', {
       user: authResult.user?.email,
       role: authResult.user?.role,
     });
-    
+
     // Get raw request data
     const body = await request.json();
 

@@ -17,9 +17,15 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+export function AuthProvider({
+  children,
+  initialUser = null,
+}: {
+  children: React.ReactNode;
+  initialUser?: AuthUser | null;
+}) {
+  const [user, setUser] = useState<AuthUser | null>(initialUser);
+  const [isLoading, setIsLoading] = useState(false); // Server has already determined user state
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -32,16 +38,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setIsLoading(true);
       setError(null);
 
-      // Check if we have an auth token on the client side first
-      const hasAuthToken = document.cookie.includes('auth_token=');
-      
-      if (!hasAuthToken) {
-        // No token, user is not authenticated
-        setUser(null);
-        return;
-      }
-
-      // Only make server verification call if we have a token
       const response = await fetch('/api/auth/verify', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -56,12 +52,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } else {
           setUser(null);
         }
+      } else if (response.status === 401) {
+        // User is not authenticated - this is expected for logged out users
+        setUser(null);
       } else {
+        // Other error status - log it
+        console.error('Auth verification failed with status:', response.status);
         setUser(null);
       }
     } catch (err) {
-      console.error('Auth check error:', err);
-      setError('Failed to check authentication status.');
+      // Only log network errors, not expected 401 responses
+      if (err instanceof TypeError && err.message.includes('fetch')) {
+        console.error('Auth check network error:', err);
+        setError('Failed to check authentication status.');
+      }
       setUser(null);
     } finally {
       setIsLoading(false);
@@ -150,22 +154,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  useEffect(() => {
-    checkAuthStatus();
-  }, []);
-
-  // Add focus event listener to re-check auth status when tab becomes active
+  // Only check auth status on focus (for session expiration), not on mount
   useEffect(() => {
     const handleFocus = () => {
-      // Only re-check if we're not currently loading
-      if (!isLoading) {
+      // Only re-check if we're not currently loading and we have a user
+      if (!isLoading && user) {
         checkAuthStatus();
       }
     };
 
     window.addEventListener('focus', handleFocus);
     return () => window.removeEventListener('focus', handleFocus);
-  }, [isLoading]);
+  }, [isLoading, user]);
 
   const value: AuthContextType = {
     user,
@@ -188,4 +188,4 @@ export function useAuth() {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
-} 
+}

@@ -6,7 +6,6 @@ import { appConfig } from '@/config/app';
 import StructuredData from '@/components/StructuredData';
 import Layout from '@/components/Layout/Layout';
 import { ThemeProvider } from '@/contexts/ThemeContext';
-import { AuthProvider } from '@/contexts/AuthContext';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -28,11 +27,9 @@ export default function RootLayout({
         <StructuredData />
       </head>
       <body className={inter.className}>
-        <AuthProvider>
-          <ThemeProvider initialTheme='desert'>
-            <Layout>{children}</Layout>
-          </ThemeProvider>
-        </AuthProvider>
+        <ThemeProvider initialTheme='desert'>
+          <Layout>{children}</Layout>
+        </ThemeProvider>
       </body>
     </html>
   );

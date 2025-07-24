@@ -16,7 +16,7 @@ async function setupDatabase() {
     execSync('npx prisma generate', { stdio: 'inherit' });
 
     console.log('Running database migrations...');
-    execSync('npx prisma migrate dev', { stdio: 'inherit' });
+    execSync('npx prisma migrate deploy', { stdio: 'inherit' });
 
     console.log('Database setup completed successfully!');
 

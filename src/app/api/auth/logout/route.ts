@@ -17,11 +17,11 @@ export async function POST(request: NextRequest) {
     const data = await response.json();
     const responseHeaders = new Headers();
 
-    // Copy cookies from auth-service response
-    const setCookieHeader = response.headers.get('set-cookie');
-    if (setCookieHeader) {
-      responseHeaders.set('set-cookie', setCookieHeader);
-    }
+    // Always clear the auth_token cookie by setting it to expire immediately
+    responseHeaders.set(
+      'set-cookie',
+      'auth_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; SameSite=Lax'
+    );
 
     return NextResponse.json(data, {
       status: response.status,
@@ -34,4 +34,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-} 
+}

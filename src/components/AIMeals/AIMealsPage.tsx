@@ -1,12 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { PrimaryButton, SecondaryButton, ButtonIcon } from '../UI/Button';
+import { PrimaryButton, SecondaryButton } from '../UI/Button';
 import IngredientInput from './IngredientInput';
 import RecipeResults from './RecipeResults';
 import { Recipe } from '@/types/ai-meals';
 import Swal from 'sweetalert2';
-import { appConfig } from '@/config/app';
+import AuthControls from '../UI/AuthControls';
+
 import { useAuth } from '@/contexts/AuthContext';
 
 function AIMealsPage() {
@@ -16,9 +17,9 @@ function AIMealsPage() {
   const [error, setError] = useState('');
   const [isFallbackRecipes, setIsFallbackRecipes] = useState(false);
   const [fallbackMessage, setFallbackMessage] = useState('');
-  
+
   // Use AuthContext instead of local state
-  const { user, isLoading: isAuthLoading, loginAsDemoUser } = useAuth();
+  const { user, loginAsDemoUser } = useAuth();
 
   // Loads recent ingredients from localStorage.
   useEffect(() => {
@@ -167,7 +168,12 @@ function AIMealsPage() {
   return (
     <>
       {/* Hero Section */}
-      <section className='ai-meals-hero bg-gradient-to-br from-slate-50 via-white to-slate-100'>
+      <section className='ai-meals-hero bg-gradient-to-br from-slate-50 via-white to-slate-100 relative'>
+        {/* Auth Controls - Top Right */}
+        <div className='absolute top-4 right-4 z-50'>
+          <AuthControls />
+        </div>
+
         <div className='ai-meals-hero-content'>
           <div className='ai-meals-icons'>
             <i className='fas fa-robot text-6xl md:text-8xl mr-8 theme-text-icon-primary'></i>
@@ -180,71 +186,27 @@ function AIMealsPage() {
             Turn your ingredients into delicious meals with AI-powered recipe
             suggestions
           </p>
-          
-          {/* Login/User Status Section */}
-          <div className='mt-6 flex justify-center'>
-            {isAuthLoading ? (
-              <div className='animate-spin rounded-full h-6 w-6 border-b-2 theme-text-icon-primary'></div>
-            ) : user ? (
-              <div className='flex items-center space-x-4'>
-                <span className='text-sm theme-text-muted'>
-                  Logged in as: {user.email}
-                </span>
-                <button
-                  onClick={async () => {
-                    try {
-                      await fetch(`${appConfig.authServiceUrl}/api/v1/auth/logout`, {
-                        method: 'POST',
-                        credentials: 'include',
-                      });
-                      // setUser(null); // This will be handled by AuthContext
-                    } catch (error) {
-                      console.error('Logout error:', error);
-                    }
-                  }}
-                  className='px-3 py-1 text-sm theme-btn-secondary rounded'
-                >
-                  Logout
-                </button>
-              </div>
-            ) : (
-              <button
-                onClick={async () => {
-                  await loginAsDemoUser();
-                }}
-                className='px-4 py-2 theme-btn-primary rounded-lg font-semibold'
-              >
-                <i className='fas fa-user mr-2'></i>
-                Login as Demo User
-              </button>
-            )}
-          </div>
         </div>
       </section>
+
       {/* Main Content */}
       <section className='ai-meals-main'>
         <div className='ai-meals-container'>
-          {/* Input Section */}
+          {/* Ingredient Input Section */}
           <div className='ai-meals-input-section'>
-            <h2 className='ai-meals-section-title'>
-              What ingredients do you have?
-            </h2>
-
             <IngredientInput
               ingredients={ingredients}
               setIngredients={setIngredients}
               setError={setError}
             />
 
+            {/* Action Buttons */}
             <div className='ai-meals-actions'>
               <PrimaryButton
                 onClick={() => handleGetRecipes()}
-                disabled={isLoading}
+                disabled={isLoading || ingredients.length === 0}
                 className='ai-meals-primary-btn'
               >
-                <ButtonIcon
-                  icon={isLoading ? 'fa-spinner fa-spin' : 'fa-magic'}
-                />
                 {isLoading ? 'Generating Recipes...' : 'Get Recipes'}
               </PrimaryButton>
 
@@ -252,7 +214,6 @@ function AIMealsPage() {
                 onClick={handleSurpriseMe}
                 className='ai-meals-secondary-btn'
               >
-                <ButtonIcon icon='fa-random' />
                 Surprise Me
               </SecondaryButton>
 
@@ -266,27 +227,27 @@ function AIMealsPage() {
               </button>
             </div>
 
+            {/* Error Display */}
             {error && (
               <div className='ai-meals-error'>
                 <i className='fas fa-exclamation-triangle mr-2'></i>
                 {error}
               </div>
             )}
+
+            {/* Fallback Message */}
+            {isFallbackRecipes && fallbackMessage && (
+              <div className='ai-meals-fallback'>
+                <i className='fas fa-info-circle mr-2'></i>
+                {fallbackMessage}
+              </div>
+            )}
           </div>
 
-          {/* Results Section */}
+          {/* Recipe Results Section */}
           {recipes.length > 0 && (
             <div className='ai-meals-results-section' id='recipe-suggestions'>
               <h2 className='ai-meals-section-title'>Recipe Suggestions</h2>
-
-              {/* Fallback recipes warning */}
-              {isFallbackRecipes && (
-                <div className='ai-meals-fallback-warning'>
-                  <i className='fas fa-info-circle mr-2 theme-text-icon-secondary'></i>
-                  {fallbackMessage}
-                </div>
-              )}
-
               <RecipeResults recipes={recipes} />
             </div>
           )}

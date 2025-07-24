@@ -88,4 +88,4 @@ export function canEditApps(userRole: UserRole): boolean {
 
 export function canDeleteApps(userRole: UserRole): boolean {
   return hasPermission(userRole, 'delete_apps');
-} 
+}

@@ -28,14 +28,17 @@ export default async function middleware(request: NextRequest) {
 
     // Verify the token with the auth service
     try {
-      const verifyResponse = await fetch(`${appConfig.authServiceUrl}/api/v1/auth/verify`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${authToken}`,
-        },
-        body: JSON.stringify({ app_name: 'airecipes' }),
-      });
+      const verifyResponse = await fetch(
+        `${appConfig.authServiceUrl}/api/v1/auth/verify`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${authToken}`,
+          },
+          body: JSON.stringify({ app_name: 'airecipes' }),
+        }
+      );
 
       if (!verifyResponse.ok) {
         // Token is invalid, redirect to login
@@ -64,6 +67,6 @@ export default async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     '/admin/:path*', // Protect all admin routes
-    '/api/:path*',   // Track API calls
+    '/api/:path*', // Track API calls
   ],
 };
