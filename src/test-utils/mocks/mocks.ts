@@ -9,6 +9,8 @@ import { setupValidationMocks } from './validation';
 import { setupAuthMocks } from './auth';
 import { setupMiddlewareCacheMocks } from './middleware-cache';
 import { setupMiddlewareLoggerMocks } from './middleware-logger';
+import { setupReactComponentMocks } from './react-components';
+import { setupNextAppMocks } from './next-app';
 
 // Import all mock utilities from submodules.
 import * as nextServerMocks from './next-server';
@@ -21,6 +23,8 @@ import * as validationMocks from './validation';
 import * as authMocks from './auth';
 import * as middlewareCacheMocks from './middleware-cache';
 import * as middlewareLoggerMocks from './middleware-logger';
+import * as reactComponentMocks from './react-components';
+import * as nextAppMocks from './next-app';
 
 // Create a single mocks object that contains everything.
 export const mocks = {
@@ -37,6 +41,8 @@ export const mocks = {
       setupAuthMocks();
       setupMiddlewareCacheMocks();
       setupMiddlewareLoggerMocks();
+      setupReactComponentMocks();
+      setupNextAppMocks();
     },
 
     clear: () => {
@@ -118,6 +124,16 @@ export const mocks = {
     // Middleware logger mocks.
     middlewareLogger: {
       ...middlewareLoggerMocks,
+    },
+
+    // React component mocks.
+    react: {
+      ...reactComponentMocks,
+    },
+
+    // Next.js app mocks.
+    nextApp: {
+      ...nextAppMocks,
     },
   },
 };

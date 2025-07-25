@@ -24,7 +24,7 @@ async function getServerSideUser(): Promise<AuthUser | null> {
       return null;
     }
 
-    // Check if the token is expired by decoding it (JWT tokens contain expiration info)
+    // Checks if the token is expired by decoding it (JWT tokens contain expiration info).
     try {
       const tokenParts = authToken.split('.');
       if (tokenParts.length === 3) {
@@ -34,16 +34,18 @@ async function getServerSideUser(): Promise<AuthUser | null> {
         const currentTime = Math.floor(Date.now() / 1000);
 
         if (payload.exp && payload.exp < currentTime) {
-          // Token is expired, return null immediately
+          // Token is expired, returns null immediately.
           return null;
         }
       }
     } catch {
-      // If we can't decode the token, proceed with the auth service call
-      // The auth service will handle invalid token formats
+      /**
+       * If we can't decode the token, proceeds with the auth service call.
+       * The auth service handles invalid token formats.
+       */
     }
 
-    // Verify the token with the auth service
+    // Verifies the token with the auth service.
     const response = await fetch(
       `${appConfig.authServiceUrl}/api/v1/auth/verify`,
       {
