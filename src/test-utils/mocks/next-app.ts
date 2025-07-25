@@ -20,9 +20,13 @@ export const mockCookies = jest.fn().mockResolvedValue({
   get: jest.fn().mockReturnValue(undefined),
 });
 
-export const mockNextLink = jest.fn().mockImplementation(({ href, children }: { href: string; children: React.ReactNode }) => {
-  return React.createElement('a', { href }, children);
-});
+export const mockNextLink = jest
+  .fn()
+  .mockImplementation(
+    ({ href, children }: { href: string; children: React.ReactNode }) => {
+      return React.createElement('a', { href }, children);
+    }
+  );
 
 export const mockInterFont = jest.fn().mockReturnValue({
   className: 'mocked-inter-font',
@@ -60,4 +64,4 @@ export const setupNextAppMocks = () => {
     },
     writable: true,
   });
-}; 
+};

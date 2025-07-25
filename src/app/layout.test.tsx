@@ -26,7 +26,7 @@ describe('RootLayout', () => {
     );
 
     expect(getByText('Test Content')).toBeInTheDocument();
-    
+
     // Test metadata exists (not specific values)
     expect(metadata).toBeDefined();
     expect(metadata).toHaveProperty('title');

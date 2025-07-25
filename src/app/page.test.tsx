@@ -13,8 +13,6 @@ afterAll(() => {
   console.error = originalConsoleError;
 });
 
-
-
 describe('Home Page', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -127,7 +125,9 @@ describe('Home Page', () => {
     });
 
     it('should handle cookie errors', async () => {
-      mocks.mock.nextApp.mockCookies.mockRejectedValue(new Error('Cookie error'));
+      mocks.mock.nextApp.mockCookies.mockRejectedValue(
+        new Error('Cookie error')
+      );
 
       const { default: Home } = await import('./page');
       const result = await Home();
@@ -137,4 +137,3 @@ describe('Home Page', () => {
     });
   });
 });
-

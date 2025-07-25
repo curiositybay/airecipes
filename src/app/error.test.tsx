@@ -2,7 +2,7 @@
 jest.mock('@/components/UI/ServerErrorPage', () => {
   return function MockServerErrorPage({ reset }: { reset: () => void }) {
     return (
-      <div data-testid="server-error-page">
+      <div data-testid='server-error-page'>
         <h1>Server Error</h1>
         <p>Something went wrong</p>
         <button onClick={reset}>Try Again</button>
@@ -29,16 +29,18 @@ describe('Error page', () => {
     jest.clearAllMocks();
   });
 
-
-
   it('renders error content and handles interactions', () => {
     render(<Error error={error} reset={reset} />);
-    
+
     // Test that content exists (not specific text)
     expect(screen.getByTestId('server-error-page')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Try Again/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Return to/ })).toBeInTheDocument();
-    
+    expect(
+      screen.getByRole('button', { name: /Try Again/i })
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /Return to/ })
+    ).toBeInTheDocument();
+
     // Test reset functionality
     fireEvent.click(screen.getByRole('button', { name: /Try Again/i }));
     expect(reset).toHaveBeenCalled();

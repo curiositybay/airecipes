@@ -20,10 +20,15 @@ describe('NotFound', () => {
 
   it('renders not found content with navigation', () => {
     render(<NotFound />);
-    
+
     // Test that content exists (not specific text)
     expect(screen.getByText('404')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Return to/ })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /Return to/ })).toHaveAttribute('href', '/');
+    expect(
+      screen.getByRole('button', { name: /Return to/ })
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Return to/ })).toHaveAttribute(
+      'href',
+      '/'
+    );
   });
 });
