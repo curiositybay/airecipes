@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import logger from '@/lib/logger';
 
 const prisma = new PrismaClient();
 
@@ -26,7 +27,7 @@ export async function GET() {
       lastDeployed: metadata.lastDeployed,
     });
   } catch (error) {
-    console.error('Failed to fetch metadata:', error);
+    logger.error('Failed to fetch metadata:', error);
 
     return NextResponse.json(
       {

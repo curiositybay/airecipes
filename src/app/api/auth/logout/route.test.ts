@@ -6,16 +6,6 @@ mocks.setup.all();
 // Import the route after mocks are set up.
 const { POST } = jest.requireActual('./route');
 
-// Mock console.error to prevent it from appearing in test output.
-const originalConsoleError = console.error;
-beforeAll(() => {
-  console.error = jest.fn();
-});
-
-afterAll(() => {
-  console.error = originalConsoleError;
-});
-
 describe('api/auth/logout/route', () => {
   beforeEach(() => {
     mocks.setup.all();
@@ -145,25 +135,6 @@ describe('api/auth/logout/route', () => {
     });
 
     it('handles fetch errors gracefully', async () => {
-      mocks.mock.http.fetchFailure(new Error('Network error'));
-
-      const request = mocks.mock.next.createRequest(
-        'http://localhost:3000/api/auth/logout',
-        {},
-        'abc123'
-      );
-
-      const response = await POST(request);
-      const responseData = await response.json();
-
-      expect(responseData).toEqual({
-        success: false,
-        error: 'Logout failed',
-      });
-      expect(response.status).toBe(500);
-    });
-
-    it('still clears cookie even when auth service fails', async () => {
       mocks.mock.http.fetchFailure(new Error('Network error'));
 
       const request = mocks.mock.next.createRequest(

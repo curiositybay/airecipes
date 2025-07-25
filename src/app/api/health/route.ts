@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
 import { appConfig } from '@/config/app';
+import logger from '@/lib/logger';
 
 export async function GET() {
   try {
-    // Basic health check - you can add more sophisticated checks here
-    // such as database connectivity, external service availability, etc.
+    // Basic health check - you can add more sophisticated checks here.
+    // Such as database connectivity, external service availability, etc.
 
     const healthData = {
       status: 'healthy',
@@ -16,7 +17,7 @@ export async function GET() {
 
     return NextResponse.json(healthData, { status: 200 });
   } catch (error) {
-    console.error('Health check failed:', error);
+    logger.error('Health check failed:', error);
 
     return NextResponse.json(
       {

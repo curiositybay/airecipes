@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { appConfig } from '@/config/app';
+import logger from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
 
-    // Proxy the request to the auth-service
+    // Proxy the request to the auth-service.
     const authServiceUrl = `${appConfig.authServiceUrl}/api/v1/auth/login`;
 
     const response = await fetch(authServiceUrl, {
@@ -19,16 +20,16 @@ export async function POST(request: NextRequest) {
     const data = await response.json();
     const responseHeaders = new Headers();
 
-    // Copy cookies from auth-service response and modify domain
+    // Copy cookies from auth-service response and modify domain.
     const setCookieHeader = response.headers.get('set-cookie');
     if (setCookieHeader) {
-      // Parse the cookie and modify the domain
+      // Parse the cookie and modify the domain.
       const cookieParts = setCookieHeader.split(';');
       const modifiedParts = cookieParts
         .map(part => {
           const trimmedPart = part.trim();
           if (trimmedPart.toLowerCase().startsWith('domain=')) {
-            // Remove domain restriction to allow cross-subdomain sharing
+            // Remove domain restriction to allow cross-subdomain sharing.
             return '';
           }
           return trimmedPart;
@@ -44,7 +45,7 @@ export async function POST(request: NextRequest) {
       headers: responseHeaders,
     });
   } catch (error) {
-    console.error('Login proxy error:', error);
+    logger.error('Login proxy error:', error);
     return NextResponse.json(
       { success: false, error: 'Login failed' },
       { status: 500 }

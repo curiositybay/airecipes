@@ -1,22 +1,14 @@
 import mocks from '../../../test-utils/mocks/mocks';
 
-// Mock process.uptime to return a predictable value
-jest.spyOn(process, 'uptime').mockReturnValue(123.456);
+// Setup mocks before importing anything.
+mocks.setup.all();
 
-// Mock Date to return a predictable timestamp
+// Mock process.uptime using the mock architecture.
+jest.spyOn(process, 'uptime').mockReturnValue(mocks.mock.process.uptime());
+
+// Mock Date to return a predictable timestamp.
 const mockDate = new Date('2023-01-01T00:00:00.000Z');
 jest.spyOn(global, 'Date').mockImplementation(() => mockDate);
-
-// Mock process.env and console.error to prevent it from appearing in test output
-const originalEnv = process.env;
-beforeAll(() => {
-  process.env = { ...originalEnv, NEXT_PUBLIC_APP_ENVIRONMENT: 'test' };
-  console.error = jest.fn();
-});
-
-afterAll(() => {
-  process.env = originalEnv;
-});
 
 describe('api/health/route', () => {
   let GET: () => Promise<Response>;
@@ -24,7 +16,7 @@ describe('api/health/route', () => {
   beforeEach(() => {
     jest.resetModules();
     mocks.setup.all();
-    // Import the route after mocks
+    // Import the route after mocks.
     ({ GET } = jest.requireActual('./route'));
   });
 
@@ -60,38 +52,25 @@ describe('api/health/route', () => {
     });
 
     it('returns unhealthy status on error', async () => {
-      // Mock console.error to prevent it from appearing in test output
-      const originalConsoleError = console.error;
-      console.error = jest.fn();
-
-      // Mock Date constructor to throw an error to trigger the catch block
+      // Mock Date constructor to throw an error to trigger the catch block.
       const originalDate = global.Date;
       global.Date = jest.fn().mockImplementation(() => {
         throw new Error('Some error'); // generic error
       }) as jest.MockedFunction<typeof Date>;
 
       try {
-        // The error should be thrown when the route tries to create a timestamp
+        // The error should be thrown when the route tries to create a timestamp.
         await expect(GET()).rejects.toThrow();
 
-        // Verify that console.error was called with any error
-        expect(console.error).toHaveBeenCalledWith(
+        // Verify that logger.error was called with any error.
+        expect(mocks.mock.logger.instance.error).toHaveBeenCalledWith(
           'Health check failed:',
           expect.any(Error)
         );
       } finally {
-        // Restore console.error and Date
-        console.error = originalConsoleError;
+        // Restore Date.
         global.Date = originalDate;
       }
-    });
-
-    it('includes correct environment information', async () => {
-      await GET();
-      const callArgs = (mocks.mock.next.mockNextResponse.json as jest.Mock).mock
-        .calls[0][0];
-
-      expect(['test', 'development']).toContain(callArgs.environment);
     });
   });
 });

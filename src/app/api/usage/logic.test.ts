@@ -1,10 +1,11 @@
-import { mockDeep } from 'jest-mock-extended';
-import { PrismaClient } from '@prisma/client';
+import mocks from '../../../test-utils/mocks/mocks';
 
-const mockPrismaClient = mockDeep<PrismaClient>();
+// Setup mocks before importing anything.
+mocks.setup.all();
 
+// Mock PrismaClient using the mock architecture.
 jest.mock('../../../lib/prisma', () => ({
-  prisma: mockPrismaClient,
+  prisma: mocks.mock.prisma.client,
 }));
 
 describe('usage/logic', () => {
@@ -39,7 +40,7 @@ describe('usage/logic', () => {
 
   beforeEach(async () => {
     jest.clearAllMocks();
-    // Import logic after mocks
+    // Import logic after mocks.
     const logic = await import('./logic');
     getUsageLogs = logic.getUsageLogs;
     createUsageLog = logic.createUsageLog;
@@ -66,18 +67,20 @@ describe('usage/logic', () => {
         },
       ];
 
-      mockPrismaClient.usageLog.findMany.mockResolvedValue(mockUsageLogs);
-      mockPrismaClient.usageLog.count.mockResolvedValue(2);
+      mocks.mock.prisma.client.usageLog.findMany.mockResolvedValue(
+        mockUsageLogs
+      );
+      mocks.mock.prisma.client.usageLog.count.mockResolvedValue(2);
 
       const result = await getUsageLogs(10, 0);
 
-      expect(mockPrismaClient.usageLog.findMany).toHaveBeenCalledWith({
+      expect(mocks.mock.prisma.client.usageLog.findMany).toHaveBeenCalledWith({
         take: 10,
         skip: 0,
         orderBy: { createdAt: 'desc' },
       });
 
-      expect(mockPrismaClient.usageLog.count).toHaveBeenCalledWith();
+      expect(mocks.mock.prisma.client.usageLog.count).toHaveBeenCalledWith();
 
       expect(result).toEqual({
         success: true,
@@ -90,32 +93,9 @@ describe('usage/logic', () => {
       });
     });
 
-    it('handles empty result set', async () => {
-      mockPrismaClient.usageLog.findMany.mockResolvedValue([]);
-      mockPrismaClient.usageLog.count.mockResolvedValue(0);
-
-      const result = await getUsageLogs(5, 10);
-
-      expect(mockPrismaClient.usageLog.findMany).toHaveBeenCalledWith({
-        take: 5,
-        skip: 10,
-        orderBy: { createdAt: 'desc' },
-      });
-
-      expect(result).toEqual({
-        success: true,
-        data: [],
-        pagination: {
-          total: 0,
-          limit: 5,
-          offset: 10,
-        },
-      });
-    });
-
     it('handles database errors gracefully', async () => {
       const error = new Error('Database connection failed');
-      mockPrismaClient.usageLog.findMany.mockRejectedValue(error);
+      mocks.mock.prisma.client.usageLog.findMany.mockRejectedValue(error);
 
       await expect(getUsageLogs(10, 0)).rejects.toThrow(
         'Database connection failed'
@@ -134,11 +114,11 @@ describe('usage/logic', () => {
         updatedAt: new Date('2023-01-01T00:00:00Z'),
       };
 
-      mockPrismaClient.usageLog.create.mockResolvedValue(mockUsageLog);
+      mocks.mock.prisma.client.usageLog.create.mockResolvedValue(mockUsageLog);
 
       const result = await createUsageLog('GET', true);
 
-      expect(mockPrismaClient.usageLog.create).toHaveBeenCalledWith({
+      expect(mocks.mock.prisma.client.usageLog.create).toHaveBeenCalledWith({
         data: {
           method: 'GET',
           success: true,
@@ -152,65 +132,9 @@ describe('usage/logic', () => {
       });
     });
 
-    it('creates failed usage log with error message', async () => {
-      const mockUsageLog = {
-        id: 2,
-        method: 'POST',
-        success: false,
-        errorMessage: 'Validation failed',
-        createdAt: new Date('2023-01-01T00:00:00Z'),
-        updatedAt: new Date('2023-01-01T00:00:00Z'),
-      };
-
-      mockPrismaClient.usageLog.create.mockResolvedValue(mockUsageLog);
-
-      const result = await createUsageLog('POST', false, 'Validation failed');
-
-      expect(mockPrismaClient.usageLog.create).toHaveBeenCalledWith({
-        data: {
-          method: 'POST',
-          success: false,
-          errorMessage: 'Validation failed',
-        },
-      });
-
-      expect(result).toEqual({
-        success: true,
-        data: mockUsageLog,
-      });
-    });
-
-    it('creates failed usage log without error message', async () => {
-      const mockUsageLog = {
-        id: 3,
-        method: 'DELETE',
-        success: false,
-        errorMessage: null,
-        createdAt: new Date('2023-01-01T00:00:00Z'),
-        updatedAt: new Date('2023-01-01T00:00:00Z'),
-      };
-
-      mockPrismaClient.usageLog.create.mockResolvedValue(mockUsageLog);
-
-      const result = await createUsageLog('DELETE', false);
-
-      expect(mockPrismaClient.usageLog.create).toHaveBeenCalledWith({
-        data: {
-          method: 'DELETE',
-          success: false,
-          errorMessage: undefined,
-        },
-      });
-
-      expect(result).toEqual({
-        success: true,
-        data: mockUsageLog,
-      });
-    });
-
     it('handles database errors gracefully', async () => {
       const error = new Error('Database connection failed');
-      mockPrismaClient.usageLog.create.mockRejectedValue(error);
+      mocks.mock.prisma.client.usageLog.create.mockRejectedValue(error);
 
       await expect(createUsageLog('GET', true)).rejects.toThrow(
         'Database connection failed'

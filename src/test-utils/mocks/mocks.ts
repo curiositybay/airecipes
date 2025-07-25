@@ -135,6 +135,12 @@ export const mocks = {
     nextApp: {
       ...nextAppMocks,
     },
+
+    // Process and console mocks.
+    process: {
+      uptime: jest.fn().mockReturnValue(123.456),
+      env: { ...process.env },
+    },
   },
 };
 

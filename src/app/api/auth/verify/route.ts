@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { appConfig } from '@/config/app';
+import logger from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -68,7 +69,7 @@ export async function POST(request: NextRequest) {
       status: response.status,
     });
   } catch (error) {
-    console.error('Verify proxy error:', error);
+    logger.error('Verify proxy error:', error);
     return NextResponse.json(
       { success: false, error: 'Verification failed' },
       { status: 500 }

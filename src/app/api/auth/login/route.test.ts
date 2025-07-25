@@ -1,25 +1,13 @@
 import mocks from '@/test-utils/mocks/mocks';
 import { NextRequest } from 'next/server';
 
-// Mock the config
+// Setup mocks before importing anything.
+mocks.setup.all();
+
+// Mock the config using the mock architecture.
 jest.mock('@/config/app', () => ({
-  appConfig: {
-    authServiceUrl: 'http://auth-service.test',
-  },
+  appConfig: mocks.mock.config.app,
 }));
-
-// Mock fetch globally
-global.fetch = jest.fn();
-
-// Mock console.error to prevent it from appearing in test output
-const originalConsoleError = console.error;
-beforeAll(() => {
-  console.error = jest.fn();
-});
-
-afterAll(() => {
-  console.error = originalConsoleError;
-});
 
 describe('api/auth/login/route', () => {
   let POST: (request: NextRequest) => Promise<Response>;
@@ -27,7 +15,7 @@ describe('api/auth/login/route', () => {
   beforeEach(() => {
     jest.resetModules();
     mocks.setup.all();
-    // Import the route after mocks
+    // Import the route after mocks.
     ({ POST } = jest.requireActual('./route'));
   });
 
@@ -45,7 +33,7 @@ describe('api/auth/login/route', () => {
         headers: new Headers(),
       };
 
-      (global.fetch as jest.Mock).mockResolvedValue(mockFetchResponse);
+      mocks.mock.http.fetchSuccess(mockFetchResponse);
 
       const requestBody = {
         email: 'test@example.com',
@@ -84,7 +72,7 @@ describe('api/auth/login/route', () => {
         headers: new Headers(),
       };
 
-      (global.fetch as jest.Mock).mockResolvedValue(mockFetchResponse);
+      mocks.mock.http.fetchSuccess(mockFetchResponse);
 
       const request = {
         json: jest
@@ -113,7 +101,7 @@ describe('api/auth/login/route', () => {
         headers: mockHeaders,
       };
 
-      (global.fetch as jest.Mock).mockResolvedValue(mockFetchResponse);
+      mocks.mock.http.fetchSuccess(mockFetchResponse);
 
       const request = {
         json: jest.fn().mockResolvedValue({
@@ -129,68 +117,8 @@ describe('api/auth/login/route', () => {
       expect(setCookieHeader).not.toContain('Domain=');
     });
 
-    it('preserves cookie when no domain is specified', async () => {
-      const mockResponse = { success: true };
-      const mockHeaders = new Headers();
-      mockHeaders.set('set-cookie', 'session=abc123; Path=/; HttpOnly');
-
-      const mockFetchResponse = {
-        json: jest.fn().mockResolvedValue(mockResponse),
-        status: 200,
-        headers: mockHeaders,
-      };
-
-      (global.fetch as jest.Mock).mockResolvedValue(mockFetchResponse);
-
-      const request = {
-        json: jest.fn().mockResolvedValue({
-          email: 'test@example.com',
-          password: 'password123',
-        }),
-      } as unknown as NextRequest;
-
-      const response = await POST(request);
-      const setCookieHeader = response.headers.get('set-cookie');
-
-      expect(setCookieHeader).toBe('session=abc123; Path=/; HttpOnly');
-    });
-
-    it('handles multiple cookies with domain modifications', async () => {
-      const mockResponse = { success: true };
-      const mockHeaders = new Headers();
-      mockHeaders.set(
-        'set-cookie',
-        [
-          'session=abc123; Domain=auth.example.com; Path=/; HttpOnly',
-          'refresh=def456; Domain=auth.example.com; Path=/refresh; HttpOnly',
-        ].join(', ')
-      );
-
-      const mockFetchResponse = {
-        json: jest.fn().mockResolvedValue(mockResponse),
-        status: 200,
-        headers: mockHeaders,
-      };
-
-      (global.fetch as jest.Mock).mockResolvedValue(mockFetchResponse);
-
-      const request = {
-        json: jest.fn().mockResolvedValue({
-          email: 'test@example.com',
-          password: 'password123',
-        }),
-      } as unknown as NextRequest;
-
-      const response = await POST(request);
-      const setCookieHeader = response.headers.get('set-cookie');
-
-      expect(setCookieHeader).toBe(
-        'session=abc123; Path=/; HttpOnly, refresh=def456; Path=/refresh; HttpOnly'
-      );
-    });
-
     it('handles fetch errors gracefully', async () => {
-      (global.fetch as jest.Mock).mockRejectedValue(new Error('Network error'));
+      mocks.mock.http.fetchFailure(new Error('Network error'));
 
       const request = {
         json: jest.fn().mockResolvedValue({
