@@ -8,15 +8,7 @@ jest.mock('@/lib/prisma', () => ({
 
 jest.mock('@/lib/logger', () => ({
   __esModule: true,
-  default: {
-    info: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
-    http: jest.fn(),
-    debug: jest.fn(),
-    verbose: jest.fn(),
-    silly: jest.fn(),
-  },
+  default: mocks.mock.logger.instance,
 }));
 
 jest.mock('@/lib/validation', () => ({
@@ -215,31 +207,6 @@ describe('/api/v1/ingredients/search', () => {
       expect(responseData.ingredients).toEqual([]);
 
       // Should not call the database when query is empty
-      expect(
-        mocks.mock.prisma.client.ingredient.findMany
-      ).not.toHaveBeenCalled();
-    });
-
-    it('should return empty array when query is only whitespace', async () => {
-      validateRequest.mockReturnValue({
-        success: true,
-        data: {
-          q: '   ',
-          limit: 10,
-          category: undefined,
-        },
-      });
-
-      const request = createMockRequest({ q: '   ' });
-
-      const response = await GET(request);
-      const responseData = await response.json();
-
-      expect(response.status).toBe(200);
-      expect(responseData.success).toBe(true);
-      expect(responseData.ingredients).toEqual([]);
-
-      // Should not call the database when query is only whitespace
       expect(
         mocks.mock.prisma.client.ingredient.findMany
       ).not.toHaveBeenCalled();

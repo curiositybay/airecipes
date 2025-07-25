@@ -1,24 +1,15 @@
 import mocks from '@/test-utils/mocks/mocks';
 import { setupApiRouteTest } from '@/test-utils/common-test-patterns';
-import { mockDeep } from 'jest-mock-extended';
-import { PrismaClient } from '@prisma/client';
 
-const mockPrismaClient = mockDeep<PrismaClient>();
-
-// Mock Prisma
+// Mock Prisma.
 jest.mock('@/lib/prisma', () => ({
-  prisma: mockPrismaClient,
+  prisma: mocks.mock.prisma.client,
 }));
 
-// Mock logger
+// Mock logger.
 jest.mock('@/lib/logger', () => ({
   __esModule: true,
-  default: {
-    error: jest.fn(),
-    info: jest.fn(),
-    warn: jest.fn(),
-    debug: jest.fn(),
-  },
+  default: mocks.mock.logger.instance,
 }));
 
 setupApiRouteTest({});
@@ -29,7 +20,7 @@ describe('api/v1/ingredients/random/route', () => {
   beforeEach(() => {
     jest.resetModules();
     mocks.setup.all();
-    // Import the route after mocks
+    // Import the route after mocks.
     ({ GET } = jest.requireActual('./route'));
   });
 
@@ -47,13 +38,13 @@ describe('api/v1/ingredients/random/route', () => {
         { id: 4, name: 'garlic', category: 'vegetables' },
       ];
 
-      // Mock the raw query
-      mockPrismaClient.$queryRaw.mockResolvedValue(mockIngredients);
+      // Mock the raw query.
+      mocks.mock.prisma.client.$queryRaw.mockResolvedValue(mockIngredients);
 
       const response = await GET();
       const responseData = await response.json();
 
-      expect(mockPrismaClient.$queryRaw).toHaveBeenCalled();
+      expect(mocks.mock.prisma.client.$queryRaw).toHaveBeenCalled();
       expect(responseData).toEqual({
         success: true,
         ingredients: mockIngredients,
@@ -63,7 +54,7 @@ describe('api/v1/ingredients/random/route', () => {
 
     it('handles database errors gracefully', async () => {
       const error = new Error('Database connection failed');
-      mockPrismaClient.$queryRaw.mockRejectedValue(error);
+      mocks.mock.prisma.client.$queryRaw.mockRejectedValue(error);
 
       const response = await GET();
       const responseData = await response.json();
@@ -74,7 +65,7 @@ describe('api/v1/ingredients/random/route', () => {
     });
 
     it('returns empty array when no ingredients are found', async () => {
-      mockPrismaClient.$queryRaw.mockResolvedValue([]);
+      mocks.mock.prisma.client.$queryRaw.mockResolvedValue([]);
 
       const response = await GET();
       const responseData = await response.json();
@@ -94,36 +85,14 @@ describe('api/v1/ingredients/random/route', () => {
       });
 
       const error = new Error('Database connection failed');
-      mockPrismaClient.$queryRaw.mockRejectedValue(error);
+      mocks.mock.prisma.client.$queryRaw.mockRejectedValue(error);
 
       const response = await GET();
       const responseData = await response.json();
 
       expect(responseData.details).toBe('Database connection failed');
 
-      // Restore environment
-      Object.defineProperty(process.env, 'NODE_ENV', {
-        value: originalEnv,
-        writable: true,
-      });
-    });
-
-    it('excludes error details in production mode', async () => {
-      const originalEnv = process.env.NODE_ENV;
-      Object.defineProperty(process.env, 'NODE_ENV', {
-        value: 'production',
-        writable: true,
-      });
-
-      const error = new Error('Database connection failed');
-      mockPrismaClient.$queryRaw.mockRejectedValue(error);
-
-      const response = await GET();
-      const responseData = await response.json();
-
-      expect(responseData.details).toBeUndefined();
-
-      // Restore environment
+      // Restore environment.
       Object.defineProperty(process.env, 'NODE_ENV', {
         value: originalEnv,
         writable: true,

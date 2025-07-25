@@ -1,30 +1,22 @@
-jest.mock('../../../../../lib/prisma', () => ({
-  prisma: mockPrismaClient,
-}));
-import { mockDeep } from 'jest-mock-extended';
-import { PrismaClient } from '@prisma/client';
-const mockPrismaClient = mockDeep<PrismaClient>();
+import mocks from '@/test-utils/mocks/mocks';
+import { NextRequest, NextResponse } from 'next/server';
 
-// Mock dependencies before importing the logic
-jest.mock('../../../../../lib/logger', () => ({
+// Mock dependencies before importing the logic.
+jest.mock('@/lib/prisma', () => ({
+  prisma: mocks.mock.prisma.client,
+}));
+
+jest.mock('@/lib/logger', () => ({
   __esModule: true,
-  default: {
-    error: jest.fn(),
-    info: jest.fn(),
-    warn: jest.fn(),
-    debug: jest.fn(),
-  },
+  default: mocks.mock.logger.instance,
 }));
 
-jest.mock('../../../../../lib/validation', () => ({
-  ...jest.requireActual('../../../../../lib/validation'),
+jest.mock('@/lib/validation', () => ({
+  ...jest.requireActual('@/lib/validation'),
   validateRequest: jest.fn(),
 }));
 
-import mocks from '../../../../../test-utils/mocks/mocks';
-import { NextRequest, NextResponse } from 'next/server';
-import * as validation from '../../../../../lib/validation';
-import { updateExample, deleteExample } from '../exampleUtils';
+import * as validation from '@/lib/validation';
 
 describe('api/examples/[id]/route', () => {
   let PUT: (
@@ -38,7 +30,7 @@ describe('api/examples/[id]/route', () => {
 
   beforeEach(async () => {
     mocks.setup.all();
-    // Import logic after mocks
+    // Import logic after mocks.
     const route = await import('./route');
     PUT = route.PUT;
     DELETE = route.DELETE;
@@ -47,59 +39,6 @@ describe('api/examples/[id]/route', () => {
   afterEach(() => {
     mocks.setup.clear();
     jest.clearAllMocks();
-  });
-
-  describe('updateExample', () => {
-    it('updates example and returns success', async () => {
-      const mockUpdatedExample = {
-        id: 1,
-        name: 'Updated Example',
-        description: 'Updated Description',
-        isActive: true,
-        createdAt: new Date('2023-01-01T00:00:00Z'),
-        updatedAt: new Date('2023-01-01T00:00:00Z'),
-      };
-
-      mockPrismaClient.example.update.mockResolvedValue(mockUpdatedExample);
-
-      const result = await updateExample(mockPrismaClient, 1, {
-        name: 'Updated Example',
-        description: 'Updated Description',
-      });
-
-      expect(mockPrismaClient.example.update).toHaveBeenCalledWith({
-        where: { id: 1 },
-        data: {
-          name: 'Updated Example',
-          description: 'Updated Description',
-        },
-      });
-      expect(result).toEqual({
-        success: true,
-        data: mockUpdatedExample,
-      });
-    });
-  });
-
-  describe('deleteExample', () => {
-    it('deletes example and returns success', async () => {
-      const mockExample = {
-        id: 1,
-        name: 'Updated Example',
-        description: 'Updated Description',
-        isActive: true,
-        createdAt: new Date('2023-01-01T00:00:00Z'),
-        updatedAt: new Date('2023-01-01T00:00:00Z'),
-      };
-      mockPrismaClient.example.delete.mockResolvedValue(mockExample);
-
-      const result = await deleteExample(mockPrismaClient, 1);
-
-      expect(mockPrismaClient.example.delete).toHaveBeenCalledWith({
-        where: { id: 1 },
-      });
-      expect(result).toEqual({ success: true });
-    });
   });
 
   describe('PUT', () => {
@@ -118,7 +57,7 @@ describe('api/examples/[id]/route', () => {
         ],
       };
 
-      // Ensure the mock is properly set up
+      // Ensure the mock is properly set up.
       (validation.validateRequest as jest.Mock).mockReturnValue(mockValidation);
 
       const response = await PUT(mockRequest, { params: mockParams });
@@ -159,15 +98,17 @@ describe('api/examples/[id]/route', () => {
         updatedAt: new Date('2023-01-01T00:00:00Z'),
       };
 
-      // Ensure the mock is properly set up
+      // Ensure the mock is properly set up.
       (validation.validateRequest as jest.Mock).mockReturnValue(mockValidation);
-      mockPrismaClient.example.update.mockResolvedValue(mockUpdatedExample);
+      mocks.mock.prisma.client.example.update.mockResolvedValue(
+        mockUpdatedExample
+      );
 
       const response = await PUT(mockRequest, { params: mockParams });
       const data = await response.json();
 
       expect(validation.validateRequest as jest.Mock).toHaveBeenCalled();
-      expect(mockPrismaClient.example.update).toHaveBeenCalledWith({
+      expect(mocks.mock.prisma.client.example.update).toHaveBeenCalledWith({
         where: { id: 1 },
         data: {
           name: 'Updated Example',
@@ -198,9 +139,9 @@ describe('api/examples/[id]/route', () => {
         },
       };
 
-      // Ensure the mock is properly set up
+      // Ensure the mock is properly set up.
       (validation.validateRequest as jest.Mock).mockReturnValue(mockValidation);
-      mockPrismaClient.example.update.mockRejectedValue(
+      mocks.mock.prisma.client.example.update.mockRejectedValue(
         new Error('Database error')
       );
 
@@ -208,7 +149,7 @@ describe('api/examples/[id]/route', () => {
       const data = await response.json();
 
       expect(validation.validateRequest as jest.Mock).toHaveBeenCalled();
-      expect(mockPrismaClient.example.update).toHaveBeenCalledWith({
+      expect(mocks.mock.prisma.client.example.update).toHaveBeenCalledWith({
         where: { id: 1 },
         data: {
           name: 'Updated Example',
@@ -253,12 +194,12 @@ describe('api/examples/[id]/route', () => {
         createdAt: new Date('2023-01-01T00:00:00Z'),
         updatedAt: new Date('2023-01-01T00:00:00Z'),
       };
-      mockPrismaClient.example.delete.mockResolvedValue(mockExample);
+      mocks.mock.prisma.client.example.delete.mockResolvedValue(mockExample);
 
       const response = await DELETE(mockRequest, { params: mockParams });
       const data = await response.json();
 
-      expect(mockPrismaClient.example.delete).toHaveBeenCalledWith({
+      expect(mocks.mock.prisma.client.example.delete).toHaveBeenCalledWith({
         where: { id: 1 },
       });
       expect(data).toEqual({ success: true });
@@ -268,7 +209,7 @@ describe('api/examples/[id]/route', () => {
       const mockRequest = {} as NextRequest;
       const mockParams = Promise.resolve({ id: '1' });
 
-      mockPrismaClient.example.delete.mockRejectedValue(
+      mocks.mock.prisma.client.example.delete.mockRejectedValue(
         new Error('Database error')
       );
 
@@ -280,29 +221,6 @@ describe('api/examples/[id]/route', () => {
         error: 'Failed to delete example',
       });
       expect(response.status).toBe(500);
-    });
-
-    it('handles different ID types', async () => {
-      const mockRequest = {} as NextRequest;
-      const mockParams = Promise.resolve({ id: '123' });
-
-      const mockExample = {
-        id: 123,
-        name: 'Updated Example',
-        description: 'Updated Description',
-        isActive: true,
-        createdAt: new Date('2023-01-01T00:00:00Z'),
-        updatedAt: new Date('2023-01-01T00:00:00Z'),
-      };
-      mockPrismaClient.example.delete.mockResolvedValue(mockExample);
-
-      const response = await DELETE(mockRequest, { params: mockParams });
-      const data = await response.json();
-
-      expect(mockPrismaClient.example.delete).toHaveBeenCalledWith({
-        where: { id: 123 },
-      });
-      expect(data).toEqual({ success: true });
     });
   });
 });

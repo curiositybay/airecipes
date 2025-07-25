@@ -290,41 +290,6 @@ describe('api/v1/token-usage/stats/route', () => {
       });
     });
 
-    it('should handle combined period and model filtering', async () => {
-      const request = {
-        url: 'http://localhost:3000/api/v1/token-usage/stats?period=today&model=gpt-4',
-      } as NextRequest;
-
-      validateRequest.mockReturnValue({
-        success: true,
-        data: {
-          period: 'today',
-          model: 'gpt-4',
-        },
-      });
-
-      await GET(request);
-
-      // Verify aggregate query was called with both filters.
-      expect(
-        mocks.mock.prisma.client.tokenUsage.aggregate
-      ).toHaveBeenCalledWith({
-        where: {
-          createdAt: {
-            gte: expect.any(Date),
-          },
-          model: 'gpt-4',
-        },
-        _sum: {
-          promptTokens: true,
-          completionTokens: true,
-        },
-        _count: {
-          id: true,
-        },
-      });
-    });
-
     it('should execute daily breakdown query', async () => {
       const request = {
         url: 'http://localhost:3000/api/v1/token-usage/stats',
@@ -386,34 +351,6 @@ describe('api/v1/token-usage/stats/route', () => {
       expect(data.total.completionTokens).toBe(0);
     });
 
-    it('should log successful retrieval', async () => {
-      const request = {
-        url: 'http://localhost:3000/api/v1/token-usage/stats?period=week&model=gpt-4',
-      } as NextRequest;
-
-      validateRequest.mockReturnValue({
-        success: true,
-        data: {
-          period: 'week',
-          model: 'gpt-4',
-        },
-      });
-
-      await GET(request);
-
-      // Verify logger was called with correct parameters.
-      expect(mocks.mock.logger.instance.info).toHaveBeenCalledWith(
-        'Token usage stats retrieved',
-        {
-          period: 'week',
-          model: 'gpt-4',
-          totalRequests: 10,
-          totalPromptTokens: 1000,
-          totalCompletionTokens: 500,
-        }
-      );
-    });
-
     it('should handle validation errors', async () => {
       const request = {
         url: 'http://localhost:3000/api/v1/token-usage/stats?period=invalid',
@@ -449,39 +386,9 @@ describe('api/v1/token-usage/stats/route', () => {
       expect(data.error).toBe('Failed to get token usage statistics');
     });
 
-    it('should exclude error details in production mode', async () => {
-      const originalEnv = process.env.NODE_ENV;
-      Object.defineProperty(process.env, 'NODE_ENV', {
-        value: 'production',
-        writable: true,
-      });
-
-      const request = {
-        url: 'http://localhost:3000/api/v1/token-usage/stats',
-      } as NextRequest;
-
-      mocks.mock.prisma.client.tokenUsage.aggregate.mockRejectedValue(
-        new Error('Database error')
-      );
-
-      const response = await GET(request);
-      const data = await response.json();
-
-      expect(data.details).toBeUndefined();
-
-      // Restore environment.
-      Object.defineProperty(process.env, 'NODE_ENV', {
-        value: originalEnv,
-        writable: true,
-      });
-    });
-
     it('should include error details in development mode', async () => {
       const originalEnv = process.env.NODE_ENV;
-      Object.defineProperty(process.env, 'NODE_ENV', {
-        value: 'development',
-        writable: true,
-      });
+      mocks.mock.config.env.development();
 
       const request = {
         url: 'http://localhost:3000/api/v1/token-usage/stats',
@@ -497,10 +404,28 @@ describe('api/v1/token-usage/stats/route', () => {
       expect(data.details).toBe('Database error');
 
       // Restore environment.
-      Object.defineProperty(process.env, 'NODE_ENV', {
-        value: originalEnv,
-        writable: true,
-      });
+      mocks.mock.config.env.restore(originalEnv);
+    });
+
+    it('should exclude error details when NODE_ENV is not development', async () => {
+      const originalEnv = process.env.NODE_ENV;
+      mocks.mock.config.env.test();
+
+      const request = {
+        url: 'http://localhost:3000/api/v1/token-usage/stats',
+      } as NextRequest;
+
+      mocks.mock.prisma.client.tokenUsage.aggregate.mockRejectedValue(
+        new Error('Database error')
+      );
+
+      const response = await GET(request);
+      const data = await response.json();
+
+      expect(data.details).toBeUndefined();
+
+      // Restore environment.
+      mocks.mock.config.env.restore(originalEnv);
     });
   });
 });

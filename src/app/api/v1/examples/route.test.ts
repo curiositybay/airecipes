@@ -1,41 +1,36 @@
-// Mock dependencies before importing the logic
-jest.mock('../../../../lib/logger', () => ({
+import mocks from '@/test-utils/mocks/mocks';
+import { NextRequest, NextResponse } from 'next/server';
+
+// Mock dependencies before importing the logic.
+jest.mock('@/lib/logger', () => ({
   __esModule: true,
-  default: {
-    error: jest.fn(),
-    info: jest.fn(),
-    warn: jest.fn(),
-    debug: jest.fn(),
-  },
+  default: mocks.mock.logger.instance,
 }));
 
-jest.mock('../../../../lib/validation', () => ({
-  ...jest.requireActual('../../../../lib/validation'),
+jest.mock('@/lib/validation', () => ({
+  ...jest.requireActual('@/lib/validation'),
   validateRequest: jest.fn(),
 }));
 
-import { mockDeep } from 'jest-mock-extended';
-import { PrismaClient } from '@prisma/client';
-const mockPrismaClient = mockDeep<PrismaClient>();
-
-jest.mock('../../../../lib/prisma', () => ({
-  prisma: mockPrismaClient,
+jest.mock('@/lib/prisma', () => ({
+  prisma: mocks.mock.prisma.client,
 }));
-
-import mocks from '../../../../test-utils/mocks/mocks';
-import { NextRequest, NextResponse } from 'next/server';
-import * as validation from '../../../../lib/validation';
 
 describe('api/examples/route', () => {
   let GET: () => Promise<NextResponse>;
   let POST: (request: NextRequest) => Promise<NextResponse>;
+  let validateRequest: jest.Mock;
 
   beforeEach(async () => {
     mocks.setup.all();
-    // Import logic after mocks
+    // Import logic after mocks.
     const route = await import('./route');
     GET = route.GET;
     POST = route.POST;
+
+    // Get mocked validation function.
+    const validationModule = await import('@/lib/validation');
+    validateRequest = validationModule.validateRequest as jest.Mock;
   });
 
   afterEach(() => {
@@ -64,12 +59,12 @@ describe('api/examples/route', () => {
         },
       ];
 
-      mockPrismaClient.example.findMany.mockResolvedValue(mockExamples);
+      mocks.mock.prisma.client.example.findMany.mockResolvedValue(mockExamples);
 
       const response = await GET();
       const data = await response.json();
 
-      expect(mockPrismaClient.example.findMany).toHaveBeenCalledWith({
+      expect(mocks.mock.prisma.client.example.findMany).toHaveBeenCalledWith({
         where: { isActive: true },
         orderBy: { createdAt: 'desc' },
       });
@@ -82,7 +77,7 @@ describe('api/examples/route', () => {
 
     it('returns 500 on error', async () => {
       const error = new Error('Database error');
-      mockPrismaClient.example.findMany.mockRejectedValue(error);
+      mocks.mock.prisma.client.example.findMany.mockRejectedValue(error);
 
       const response = await GET();
       expect(response.status).toBe(500);
@@ -103,16 +98,12 @@ describe('api/examples/route', () => {
         ],
       };
 
-      // Ensure the mock is properly set up
-      const mockValidateRequest =
-        validation.validateRequest as jest.MockedFunction<
-          typeof validation.validateRequest
-        >;
-      mockValidateRequest.mockReturnValue(mockValidation);
+      // Ensure the mock is properly set up.
+      validateRequest.mockReturnValue(mockValidation);
 
       const response = await POST(mockRequest);
 
-      expect(mockValidateRequest).toHaveBeenCalled();
+      expect(validateRequest).toHaveBeenCalled();
       expect(response.status).toBe(400);
     });
 
@@ -138,13 +129,11 @@ describe('api/examples/route', () => {
         updatedAt: new Date('2023-01-01T00:00:00Z'),
       };
 
-      // Ensure the mock is properly set up
-      const mockValidateRequest =
-        validation.validateRequest as jest.MockedFunction<
-          typeof validation.validateRequest
-        >;
-      mockValidateRequest.mockReturnValue(mockValidation);
-      mockPrismaClient.example.create.mockResolvedValue(mockCreatedExample);
+      // Ensure the mock is properly set up.
+      validateRequest.mockReturnValue(mockValidation);
+      mocks.mock.prisma.client.example.create.mockResolvedValue(
+        mockCreatedExample
+      );
 
       const response = await POST(mockRequest);
       expect(response.status).toBe(201);
@@ -163,13 +152,9 @@ describe('api/examples/route', () => {
         data: { name: 'Test Example', description: 'Test Description' },
       };
 
-      // Ensure the mock is properly set up
-      const mockValidateRequest =
-        validation.validateRequest as jest.MockedFunction<
-          typeof validation.validateRequest
-        >;
-      mockValidateRequest.mockReturnValue(mockValidation);
-      mockPrismaClient.example.create.mockRejectedValue(
+      // Ensure the mock is properly set up.
+      validateRequest.mockReturnValue(mockValidation);
+      mocks.mock.prisma.client.example.create.mockRejectedValue(
         new Error('Database error')
       );
 

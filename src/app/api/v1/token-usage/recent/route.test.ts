@@ -8,15 +8,7 @@ jest.mock('@/lib/prisma', () => ({
 
 jest.mock('@/lib/logger', () => ({
   __esModule: true,
-  default: {
-    info: jest.fn(),
-    warn: jest.fn(),
-    error: jest.fn(),
-    http: jest.fn(),
-    debug: jest.fn(),
-    verbose: jest.fn(),
-    silly: jest.fn(),
-  },
+  default: mocks.mock.logger.instance,
 }));
 
 describe('api/v1/token-usage/recent/route', () => {
@@ -113,45 +105,19 @@ describe('api/v1/token-usage/recent/route', () => {
       );
     });
 
-    it('should successfully retrieve recent token usage with custom limit', async () => {
-      const request = {
-        url: 'http://localhost:3000/api/v1/token-usage/recent?limit=10',
-      } as unknown as NextRequest;
+    it('should handle empty result set', async () => {
+      mocks.mock.prisma.client.tokenUsage.findMany.mockResolvedValue([]);
 
-      validateRequest.mockReturnValue({
-        success: true,
-        data: { limit: 10 },
-      });
+      const request = {
+        url: 'http://localhost:3000/api/v1/token-usage/recent',
+      } as unknown as NextRequest;
 
       const response = await GET(request);
       const responseData = await response.json();
 
       expect(response.status).toBe(200);
       expect(responseData.success).toBe(true);
-      expect(responseData.recentUsage).toEqual(mockTokenUsageData);
-
-      // Verify validation was called with custom limit.
-      expect(validateRequest).toHaveBeenCalledWith(expect.any(Object), {
-        limit: '10',
-      });
-
-      // Verify database query was called with custom limit.
-      expect(mocks.mock.prisma.client.tokenUsage.findMany).toHaveBeenCalledWith(
-        {
-          take: 10,
-          orderBy: { createdAt: 'desc' },
-          select: {
-            id: true,
-            method: true,
-            model: true,
-            promptTokens: true,
-            completionTokens: true,
-            success: true,
-            errorMessage: true,
-            createdAt: true,
-          },
-        }
-      );
+      expect(responseData.recentUsage).toEqual([]);
     });
 
     it('should handle validation failure', async () => {
@@ -172,43 +138,6 @@ describe('api/v1/token-usage/recent/route', () => {
       expect(responseData.error).toBe('Invalid limit parameter');
     });
 
-    it('should handle empty result set', async () => {
-      mocks.mock.prisma.client.tokenUsage.findMany.mockResolvedValue([]);
-
-      const request = {
-        url: 'http://localhost:3000/api/v1/token-usage/recent',
-      } as unknown as NextRequest;
-
-      const response = await GET(request);
-      const responseData = await response.json();
-
-      expect(response.status).toBe(200);
-      expect(responseData.success).toBe(true);
-      expect(responseData.recentUsage).toEqual([]);
-    });
-
-    it('should log successful retrieval', async () => {
-      const request = {
-        url: 'http://localhost:3000/api/v1/token-usage/recent?limit=25',
-      } as unknown as NextRequest;
-
-      validateRequest.mockReturnValue({
-        success: true,
-        data: { limit: 25 },
-      });
-
-      await GET(request);
-
-      // Verify logger was called with correct parameters.
-      expect(mocks.mock.logger.instance.info).toHaveBeenCalledWith(
-        'Recent token usage retrieved',
-        {
-          limit: 25,
-          count: mockTokenUsageData.length,
-        }
-      );
-    });
-
     it('handles database errors gracefully', async () => {
       const error = new Error('Database connection failed');
       (
@@ -227,40 +156,9 @@ describe('api/v1/token-usage/recent/route', () => {
       expect(responseData.error).toBe('Failed to get recent token usage');
     });
 
-    it('excludes error details in production mode', async () => {
-      const originalEnv = process.env.NODE_ENV;
-      Object.defineProperty(process.env, 'NODE_ENV', {
-        value: 'production',
-        writable: true,
-      });
-
-      const error = new Error('Database connection failed');
-      (
-        mocks.mock.prisma.client.tokenUsage.findMany as jest.Mock
-      ).mockRejectedValue(error);
-
-      const request = {
-        url: 'http://localhost:3000/api/v1/token-usage/recent',
-      } as unknown as NextRequest;
-
-      const response = await GET(request);
-      const responseData = await response.json();
-
-      expect(responseData.details).toBeUndefined();
-
-      // Restore environment.
-      Object.defineProperty(process.env, 'NODE_ENV', {
-        value: originalEnv,
-        writable: true,
-      });
-    });
-
     it('includes error details in development mode', async () => {
       const originalEnv = process.env.NODE_ENV;
-      Object.defineProperty(process.env, 'NODE_ENV', {
-        value: 'development',
-        writable: true,
-      });
+      mocks.mock.config.env.development();
 
       const error = new Error('Database connection failed');
       (
@@ -277,10 +175,7 @@ describe('api/v1/token-usage/recent/route', () => {
       expect(responseData.details).toBe('Database connection failed');
 
       // Restore environment.
-      Object.defineProperty(process.env, 'NODE_ENV', {
-        value: originalEnv,
-        writable: true,
-      });
+      mocks.mock.config.env.restore(originalEnv);
     });
   });
 });

@@ -79,6 +79,7 @@ export const mocks = {
     config: {
       ...configMocks,
       app: configMocks.mockAppConfig,
+      env: configMocks.mockEnvironment,
     },
 
     // Rate limit mocks.

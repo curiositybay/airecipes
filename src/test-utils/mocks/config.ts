@@ -28,3 +28,31 @@ export const mockAppConfigModule = () => {
     __esModule: true,
   }));
 };
+
+// Environment variable mocking utilities.
+export const mockEnvironment = {
+  development: () => {
+    Object.defineProperty(process.env, 'NODE_ENV', {
+      value: 'development',
+      writable: true,
+    });
+  },
+  production: () => {
+    Object.defineProperty(process.env, 'NODE_ENV', {
+      value: 'production',
+      writable: true,
+    });
+  },
+  test: () => {
+    Object.defineProperty(process.env, 'NODE_ENV', {
+      value: 'test',
+      writable: true,
+    });
+  },
+  restore: (originalEnv: string | undefined) => {
+    Object.defineProperty(process.env, 'NODE_ENV', {
+      value: originalEnv,
+      writable: true,
+    });
+  },
+};
