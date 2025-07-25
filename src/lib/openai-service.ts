@@ -38,13 +38,6 @@ export interface Preferences {
   maxTime?: string;
 }
 
-// Error types for better error handling
-// interface OpenAiError extends Error {
-//   status?: number;
-//   code?: string;
-//   type?: string;
-// }
-
 class OpenAiService {
   private apiKey: string;
   private model: string;
@@ -59,7 +52,7 @@ class OpenAiService {
   }
 
   private isCreditError(error: unknown): boolean {
-    // Check for various OpenAI credit-related error patterns
+    // Check for various OpenAI credit-related error patterns.
     const errorObj = error as {
       message?: string;
       code?: string;
@@ -225,7 +218,7 @@ class OpenAiService {
     } catch (error) {
       await this.logOpenAiUsage('generateRecipes', null, error as Error);
 
-      // Handle specific error types
+      // Handle specific error types.
       if (this.isCreditError(error)) {
         logger.error('OpenAI credit limit reached', { error });
         throw new Error(
@@ -247,7 +240,7 @@ class OpenAiService {
         );
       }
 
-      // For other errors, return fallback recipes
+      // For other errors, return fallback recipes.
       logger.error('OpenAI service error, using fallback recipes', { error });
       return getFallbackRecipes(ingredients);
     }

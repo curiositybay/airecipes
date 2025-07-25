@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { mockDeep } from 'jest-mock-extended';
 import { PrismaClient } from '@prisma/client';
-import { setupApiMocks, clearApiMocks } from './mocks';
+import { mocks } from './mocks';
 
 const mockPrismaClient = mockDeep<PrismaClient>();
 
@@ -44,14 +44,14 @@ export class DatabaseRouteTestHelper {
 
   setupTest = async () => {
     jest.resetModules();
-    setupApiMocks();
+    mocks.setup.all();
 
-    // Mock Prisma
+    // Mock Prisma.
     jest.mock('@/lib/prisma', () => ({
       prisma: mockPrismaClient,
     }));
 
-    // Mock logger
+    // Mock logger.
     jest.mock('@/lib/logger', () => ({
       __esModule: true,
       default: {
@@ -62,7 +62,7 @@ export class DatabaseRouteTestHelper {
       },
     }));
 
-    // Mock console.error to prevent it from appearing in test output
+    // Mock console.error to prevent it from appearing in test output.
     const originalConsoleError = console.error;
     beforeAll(() => {
       console.error = jest.fn();
@@ -72,13 +72,13 @@ export class DatabaseRouteTestHelper {
       console.error = originalConsoleError;
     });
 
-    // Import the route after mocks
+    // Import the route after mocks.
     const route = await import(this.routePath);
     this.routeHandler = route[this.method];
   };
 
   cleanupTest = () => {
-    clearApiMocks();
+    mocks.setup.clear();
     jest.clearAllMocks();
   };
 
@@ -97,7 +97,7 @@ export class DatabaseRouteTestHelper {
     config: DatabaseSuccessTestConfig
   ) => {
     it(description, async () => {
-      // Mock Prisma call
+      // Mock Prisma call.
       if (config.prismaCall) {
         const { method, args } = config.prismaCall;
         const mockMethod = mockPrismaClient[method as keyof PrismaClient] as {
@@ -124,7 +124,7 @@ export class DatabaseRouteTestHelper {
     config: DatabaseErrorTestConfig
   ) => {
     it(description, async () => {
-      // Mock Prisma call to throw error
+      // Mock Prisma call to throw error.
       if (config.prismaCall) {
         const { method } = config.prismaCall;
         const mockMethod = mockPrismaClient[method as keyof PrismaClient] as {
@@ -170,7 +170,7 @@ export class DatabaseRouteTestHelper {
     }
   ) => {
     it(description, async () => {
-      // Mock validation to return error
+      // Mock validation to return error.
       const validation = await import('@/lib/validation');
       validation.validateRequest = jest
         .fn()

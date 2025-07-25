@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { setupApiMocks, clearApiMocks } from './mocks';
+import { mocks } from './mocks';
 
 export interface ApiRouteTestConfig {
   routePath: string;
@@ -61,9 +61,9 @@ export class ApiRouteTestHelper {
 
   setupTest = async () => {
     jest.resetModules();
-    setupApiMocks();
+    mocks.setup.all();
 
-    // Setup common mocks
+    // Setup common mocks.
     if (this.mockConfig.authServiceUrl) {
       jest.mock('@/config/app', () => ({
         appConfig: {
@@ -72,16 +72,16 @@ export class ApiRouteTestHelper {
       }));
     }
 
-    // Mock fetch globally
+    // Mock fetch globally.
     global.fetch = jest.fn();
 
-    // Import the route after mocks
+    // Import the route after mocks.
     const route = await import(this.routePath);
     this.routeHandler = route[this.method];
   };
 
   cleanupTest = () => {
-    clearApiMocks();
+    mocks.setup.clear();
     jest.clearAllMocks();
   };
 
@@ -121,7 +121,7 @@ export class ApiRouteTestHelper {
       const response = await this.routeHandler(request);
       const responseData = await response.json();
 
-      // Verify fetch call if expected
+      // Verify fetch call if expected.
       if (config.expectedFetchCall) {
         expect(global.fetch).toHaveBeenCalledWith(
           config.expectedFetchCall.url,
@@ -175,8 +175,10 @@ export class ApiRouteTestHelper {
     config: DatabaseErrorTestConfig
   ) => {
     it(description, async () => {
-      // This would need to be customized based on the specific database operation
-      // For now, we'll provide a generic pattern
+      /**
+       * This would need to be customized based on the specific database operation.
+       * For now, we'll provide a generic pattern.
+       */
       const request = this.createRequest();
       const response = await this.routeHandler(request);
 
@@ -193,7 +195,7 @@ export class ApiRouteTestHelper {
     config: ValidationErrorTestConfig
   ) => {
     it(description, async () => {
-      // Mock validation to return error
+      // Mock validation to return error.
       const validation = await import('@/lib/validation');
       validation.validateRequest = jest
         .fn()
@@ -225,7 +227,7 @@ export class ApiRouteTestHelper {
 
   testAuthenticationRequired = async (description: string) => {
     it(description, async () => {
-      // Mock requireAuth to throw
+      // Mock requireAuth to throw.
       const auth = await import('@/lib/auth');
       auth.requireAuth = jest
         .fn()

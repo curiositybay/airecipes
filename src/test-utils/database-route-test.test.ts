@@ -3,10 +3,14 @@ import {
   createDatabaseRouteTest,
 } from './database-route-test';
 
-// Mock the mocks module
+// Mock the mocks module.
 jest.mock('./mocks', () => ({
-  setupApiMocks: jest.fn(),
-  clearApiMocks: jest.fn(),
+  mocks: {
+    setup: {
+      all: jest.fn(),
+      clear: jest.fn(),
+    },
+  },
 }));
 
 describe('DatabaseRouteTestHelper', () => {

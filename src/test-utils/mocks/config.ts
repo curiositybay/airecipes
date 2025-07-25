@@ -5,6 +5,7 @@ export const mockAppConfig = {
   description: 'Mock description',
   apiUrl: 'http://mock-api',
   authServiceUrl: 'http://mock-auth-service',
+  appSlug: 'mock-app',
   domain: 'mock-domain.com',
   url: 'https://mock-domain.com',
   githubRepo: 'https://github.com/mock/repo',
@@ -15,6 +16,9 @@ export const mockAppConfig = {
   errorMessages: {
     notFound: 'Mock not found',
     serverError: 'Mock server error',
+  },
+  middleware: {
+    apiCallTrackHeader: 'x-api-call-track',
   },
 } as const;
 

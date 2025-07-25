@@ -1,4 +1,4 @@
-// Validate required environment variables only on server side
+// Validate required environment variables only on server side.
 if (typeof window === 'undefined' && !process.env.AUTH_SERVICE_URL) {
   throw new Error('AUTH_SERVICE_URL environment variable is required');
 }
@@ -13,9 +13,24 @@ export const appConfig = {
 
   apiUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000',
 
-  // Auth Service Configuration - only available on server side
+  // Auth Service Configuration - only available on server side.
   authServiceUrl:
     typeof window === 'undefined' ? process.env.AUTH_SERVICE_URL : undefined,
+
+  // App identifier for external services.
+  appSlug: process.env.NEXT_PUBLIC_APP_SLUG || 'airecipes',
+
+  // Redis Configuration - only available on server side.
+  redis: {
+    url: typeof window === 'undefined' ? process.env.REDIS_URL : undefined,
+    password:
+      typeof window === 'undefined' ? process.env.REDIS_PASSWORD : undefined,
+  },
+
+  // Middleware Configuration.
+  middleware: {
+    apiCallTrackHeader: 'x-api-call-track',
+  },
 
   domain: process.env.NEXT_PUBLIC_APP_DOMAIN || 'your-domain.com',
   url: process.env.NEXT_PUBLIC_APP_URL || 'https://your-domain.com',

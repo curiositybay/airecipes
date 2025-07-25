@@ -35,7 +35,7 @@ const logger = winston.createLogger({
     winston.format.splat(),
     winston.format.json()
   ),
-  defaultMeta: { service: 'setlists-app' },
+  defaultMeta: { service: appConfig.appSlug },
   transports,
 });
 

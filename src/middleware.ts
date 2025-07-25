@@ -1,32 +1,57 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { appConfig } from '@/config/app';
+import logger from '@/lib/middleware-logger';
+import {
+  AuthVerificationRequest,
+  isAuthVerificationResponse,
+  isAuthUser,
+} from '@/types/auth';
+import {
+  getCachedAuthResult,
+  cacheAuthResult,
+  extractUserIdFromToken,
+} from '@/lib/middleware-cache';
 
-// Middleware that protects admin routes and marks API calls for tracking
+function redirectToAdmin(request: NextRequest) {
+  return NextResponse.redirect(new URL('/admin', request.url));
+}
+
 export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Mark API calls for tracking by adding a header
   if (pathname.startsWith('/api/')) {
-    // Create a response that will be modified
     const response = NextResponse.next();
-
-    // Add a header to indicate this is an API call that should be tracked
-    response.headers.set('x-api-call-track', 'true');
-
+    response.headers.set(appConfig.middleware.apiCallTrackHeader, 'true');
     return response;
   }
 
-  // Protect admin routes (except login page)
   if (pathname.startsWith('/admin/') && pathname !== '/admin') {
-    // Check for auth token in cookies
     const authToken = request.cookies.get('auth_token')?.value;
 
     if (!authToken) {
-      // Redirect to login page if no auth token
-      return NextResponse.redirect(new URL('/admin', request.url));
+      return redirectToAdmin(request);
     }
 
-    // Verify the token with the auth service
+    // Try to get cached auth result first.
+    const userId = extractUserIdFromToken(authToken);
+    if (userId) {
+      const cachedUser = await getCachedAuthResult(
+        appConfig.appSlug,
+        userId,
+        authToken
+      );
+
+      if (cachedUser) {
+        logger.info('Auth verification from cache', {
+          pathname,
+          userId: cachedUser.id,
+          userEmail: cachedUser.email,
+        });
+        return NextResponse.next();
+      }
+    }
+
+    // Cache miss - verify with auth service.
     try {
       const verifyResponse = await fetch(
         `${appConfig.authServiceUrl}/api/v1/auth/verify`,
@@ -36,37 +61,83 @@ export default async function middleware(request: NextRequest) {
             'Content-Type': 'application/json',
             Authorization: `Bearer ${authToken}`,
           },
-          body: JSON.stringify({ app_name: 'airecipes' }),
+          body: JSON.stringify({
+            app_name: appConfig.appSlug,
+          } as AuthVerificationRequest),
         }
       );
 
       if (!verifyResponse.ok) {
-        // Token is invalid, redirect to login
-        return NextResponse.redirect(new URL('/admin', request.url));
+        logger.warn('Auth verification failed', {
+          pathname,
+          status: verifyResponse.status,
+        });
+        return redirectToAdmin(request);
       }
 
-      const data = await verifyResponse.json();
-      if (!data.success || !data.user) {
-        // Token verification failed, redirect to login
-        return NextResponse.redirect(new URL('/admin', request.url));
+      let data: unknown;
+      try {
+        data = await verifyResponse.json();
+      } catch (parseError) {
+        logger.error('Failed to parse auth verification response', {
+          pathname,
+          error:
+            parseError instanceof Error
+              ? parseError.message
+              : 'Unknown parse error',
+        });
+        return redirectToAdmin(request);
       }
 
-      // Token is valid, allow the request to proceed
+      if (!isAuthVerificationResponse(data)) {
+        logger.error('Invalid auth verification response structure', {
+          pathname,
+          data: typeof data === 'object' ? JSON.stringify(data) : String(data),
+        });
+        return redirectToAdmin(request);
+      }
+
+      if (!data.success) {
+        logger.warn('Auth verification returned success: false', {
+          pathname,
+          status: data.status,
+          message: data.message,
+        });
+        return redirectToAdmin(request);
+      }
+
+      if (!data.user || !isAuthUser(data.user)) {
+        logger.warn('Auth verification succeeded but no valid user data', {
+          pathname,
+          hasUser: !!data.user,
+          userType: typeof data.user,
+        });
+        return redirectToAdmin(request);
+      }
+
+      // Cache the successful auth result.
+      await cacheAuthResult(appConfig.appSlug, data.user, authToken);
+
+      logger.info('Auth verification from service', {
+        pathname,
+        userId: data.user.id,
+        userEmail: data.user.email,
+        cached: true,
+      });
+
       return NextResponse.next();
     } catch (error) {
-      console.error('Auth verification error in middleware:', error);
-      // On error, redirect to login for safety
-      return NextResponse.redirect(new URL('/admin', request.url));
+      logger.error('Network error during auth verification', {
+        pathname,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      });
+      return redirectToAdmin(request);
     }
   }
 
-  // Allow all other requests
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: [
-    '/admin/:path*', // Protect all admin routes
-    '/api/:path*', // Track API calls
-  ],
+  matcher: ['/admin/:path*', '/api/:path*'],
 };

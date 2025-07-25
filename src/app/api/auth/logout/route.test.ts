@@ -1,10 +1,12 @@
 import mocks from '@/test-utils/mocks/mocks';
-import { NextRequest } from 'next/server';
 
-// Mock fetch globally
-global.fetch = jest.fn();
+// Setup mocks before importing anything.
+mocks.setup.all();
 
-// Mock console.error to prevent it from appearing in test output
+// Import the route after mocks are set up.
+const { POST } = jest.requireActual('./route');
+
+// Mock console.error to prevent it from appearing in test output.
 const originalConsoleError = console.error;
 beforeAll(() => {
   console.error = jest.fn();
@@ -15,13 +17,8 @@ afterAll(() => {
 });
 
 describe('api/auth/logout/route', () => {
-  let POST: (request: NextRequest) => Promise<Response>;
-
   beforeEach(() => {
-    jest.resetModules();
     mocks.setup.all();
-    // Import the route after mocks
-    ({ POST } = jest.requireActual('./route'));
   });
 
   afterEach(() => {
@@ -41,17 +38,18 @@ describe('api/auth/logout/route', () => {
         headers: new Headers(),
       };
 
-      (global.fetch as jest.Mock).mockResolvedValue(mockFetchResponse);
+      mocks.mock.http.fetchSuccess(mockFetchResponse);
 
-      const request = {
-        headers: {
-          get: jest.fn().mockReturnValue('auth_token=abc123'),
-        },
-      } as unknown as NextRequest;
+      const request = mocks.mock.next.createRequest(
+        'http://localhost:3000/api/auth/logout',
+        {},
+        'abc123'
+      );
 
       const response = await POST(request);
       const responseData = await response.json();
 
+      // Check that fetch was called with the expected parameters.
       expect(global.fetch).toHaveBeenCalledWith(
         'http://mock-auth-service/api/v1/auth/logout',
         {
@@ -75,13 +73,13 @@ describe('api/auth/logout/route', () => {
         headers: new Headers(),
       };
 
-      (global.fetch as jest.Mock).mockResolvedValue(mockFetchResponse);
+      mocks.mock.http.fetchSuccess(mockFetchResponse);
 
-      const request = {
-        headers: {
-          get: jest.fn().mockReturnValue('auth_token=expired'),
-        },
-      } as unknown as NextRequest;
+      const request = mocks.mock.next.createRequest(
+        'http://localhost:3000/api/auth/logout',
+        {},
+        'expired'
+      );
 
       const response = await POST(request);
       const responseData = await response.json();
@@ -98,13 +96,13 @@ describe('api/auth/logout/route', () => {
         headers: new Headers(),
       };
 
-      (global.fetch as jest.Mock).mockResolvedValue(mockFetchResponse);
+      mocks.mock.http.fetchSuccess(mockFetchResponse);
 
-      const request = {
-        headers: {
-          get: jest.fn().mockReturnValue('auth_token=abc123'),
-        },
-      } as unknown as NextRequest;
+      const request = mocks.mock.next.createRequest(
+        'http://localhost:3000/api/auth/logout',
+        {},
+        'abc123'
+      );
 
       const response = await POST(request);
       const setCookieHeader = response.headers.get('set-cookie');
@@ -122,13 +120,11 @@ describe('api/auth/logout/route', () => {
         headers: new Headers(),
       };
 
-      (global.fetch as jest.Mock).mockResolvedValue(mockFetchResponse);
+      mocks.mock.http.fetchSuccess(mockFetchResponse);
 
-      const request = {
-        headers: {
-          get: jest.fn().mockReturnValue(null),
-        },
-      } as unknown as NextRequest;
+      const request = mocks.mock.next.createRequest(
+        'http://localhost:3000/api/auth/logout'
+      );
 
       const response = await POST(request);
       const responseData = await response.json();
@@ -149,13 +145,13 @@ describe('api/auth/logout/route', () => {
     });
 
     it('handles fetch errors gracefully', async () => {
-      (global.fetch as jest.Mock).mockRejectedValue(new Error('Network error'));
+      mocks.mock.http.fetchFailure(new Error('Network error'));
 
-      const request = {
-        headers: {
-          get: jest.fn().mockReturnValue('auth_token=abc123'),
-        },
-      } as unknown as NextRequest;
+      const request = mocks.mock.next.createRequest(
+        'http://localhost:3000/api/auth/logout',
+        {},
+        'abc123'
+      );
 
       const response = await POST(request);
       const responseData = await response.json();
@@ -168,13 +164,13 @@ describe('api/auth/logout/route', () => {
     });
 
     it('still clears cookie even when auth service fails', async () => {
-      (global.fetch as jest.Mock).mockRejectedValue(new Error('Network error'));
+      mocks.mock.http.fetchFailure(new Error('Network error'));
 
-      const request = {
-        headers: {
-          get: jest.fn().mockReturnValue('auth_token=abc123'),
-        },
-      } as unknown as NextRequest;
+      const request = mocks.mock.next.createRequest(
+        'http://localhost:3000/api/auth/logout',
+        {},
+        'abc123'
+      );
 
       const response = await POST(request);
       const responseData = await response.json();

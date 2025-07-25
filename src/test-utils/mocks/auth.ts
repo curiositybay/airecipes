@@ -1,5 +1,4 @@
-// Auth mocks for testing
-
+// Auth mocks for testing.
 export const mockRequireAuth = jest.fn();
 
 export const mockAuthSuccess = {
@@ -14,11 +13,12 @@ export const mockAuthSuccess = {
 export const mockAuthFailure = new Error('Authentication failed');
 
 export const setupAuthMocks = () => {
-  mockRequireAuth.mockResolvedValue(mockAuthSuccess);
+  mockAuthModule();
 };
 
 export const mockAuthModule = () => {
   jest.mock('@/lib/auth', () => ({
     requireAuth: mockRequireAuth,
+    __esModule: true,
   }));
 };
