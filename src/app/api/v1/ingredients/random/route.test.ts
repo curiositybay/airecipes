@@ -1,4 +1,4 @@
-import { setupApiMocks, clearApiMocks } from '@/test-utils/mocks';
+import mocks from '@/test-utils/mocks/mocks';
 import { setupApiRouteTest } from '@/test-utils/common-test-patterns';
 import { mockDeep } from 'jest-mock-extended';
 import { PrismaClient } from '@prisma/client';
@@ -28,13 +28,13 @@ describe('api/v1/ingredients/random/route', () => {
 
   beforeEach(() => {
     jest.resetModules();
-    setupApiMocks();
+    mocks.setup.all();
     // Import the route after mocks
     ({ GET } = jest.requireActual('./route'));
   });
 
   afterEach(() => {
-    clearApiMocks();
+    mocks.setup.clear();
     jest.clearAllMocks();
   });
 

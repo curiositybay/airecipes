@@ -1,59 +1,45 @@
-import { setupApiMocks, clearApiMocks } from '@/test-utils/mocks';
-import { setupApiRouteTest } from '@/test-utils/common-test-patterns';
 import { NextRequest } from 'next/server';
-import { mockDeep } from 'jest-mock-extended';
-import { PrismaClient } from '@prisma/client';
+import mocks from '@/test-utils/mocks/mocks';
 
-const mockPrismaClient = mockDeep<PrismaClient>();
-
-// Mock Prisma
+// Mock dependencies
 jest.mock('@/lib/prisma', () => ({
-  prisma: mockPrismaClient,
+  prisma: mocks.mock.prisma.client,
 }));
 
-// Mock logger
 jest.mock('@/lib/logger', () => ({
   __esModule: true,
   default: {
-    error: jest.fn(),
     info: jest.fn(),
     warn: jest.fn(),
+    error: jest.fn(),
+    http: jest.fn(),
     debug: jest.fn(),
+    verbose: jest.fn(),
+    silly: jest.fn(),
   },
 }));
-
-// Mock validation to always succeed
-jest.mock('@/lib/validation', () => ({
-  ...jest.requireActual('@/lib/validation'),
-  validateRequest: jest.fn().mockReturnValue({
-    success: true,
-    data: { limit: 50 },
-  }),
-}));
-
-setupApiRouteTest({});
 
 describe('api/v1/token-usage/recent/route', () => {
   let GET: (request: NextRequest) => Promise<Response>;
 
   beforeEach(() => {
     jest.resetModules();
-    setupApiMocks();
+    mocks.setup.all();
     // Import the route after mocks
     ({ GET } = jest.requireActual('./route'));
   });
 
   afterEach(() => {
-    clearApiMocks();
+    mocks.setup.clear();
     jest.clearAllMocks();
   });
 
   describe('GET', () => {
     it('handles database errors gracefully', async () => {
       const error = new Error('Database connection failed');
-      (mockPrismaClient.tokenUsage.findMany as jest.Mock).mockRejectedValue(
-        error
-      );
+      (
+        mocks.mock.prisma.client.tokenUsage.findMany as jest.Mock
+      ).mockRejectedValue(error);
 
       const request = {
         url: 'http://localhost:3000/api/v1/token-usage/recent',
@@ -75,9 +61,9 @@ describe('api/v1/token-usage/recent/route', () => {
       });
 
       const error = new Error('Database connection failed');
-      (mockPrismaClient.tokenUsage.findMany as jest.Mock).mockRejectedValue(
-        error
-      );
+      (
+        mocks.mock.prisma.client.tokenUsage.findMany as jest.Mock
+      ).mockRejectedValue(error);
 
       const request = {
         url: 'http://localhost:3000/api/v1/token-usage/recent',

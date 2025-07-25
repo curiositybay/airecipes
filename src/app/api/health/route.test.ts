@@ -1,8 +1,4 @@
-import {
-  setupApiMocks,
-  clearApiMocks,
-  mockNextResponse,
-} from '../../../test-utils/mocks';
+import mocks from '../../../test-utils/mocks/mocks';
 
 // Mock process.uptime to return a predictable value
 jest.spyOn(process, 'uptime').mockReturnValue(123.456);
@@ -27,13 +23,13 @@ describe('api/health/route', () => {
 
   beforeEach(() => {
     jest.resetModules();
-    setupApiMocks();
+    mocks.setup.all();
     // Import the route after mocks
     ({ GET } = jest.requireActual('./route'));
   });
 
   afterEach(() => {
-    clearApiMocks();
+    mocks.setup.clear();
     jest.clearAllMocks();
   });
 
@@ -43,7 +39,7 @@ describe('api/health/route', () => {
       const response = await GET();
       const data = await response.json();
 
-      expect(mockNextResponse.json).toHaveBeenCalledWith(
+      expect(mocks.mock.next.mockNextResponse.json).toHaveBeenCalledWith(
         {
           status: 'healthy',
           timestamp: expect.any(String),
@@ -92,7 +88,8 @@ describe('api/health/route', () => {
 
     it('includes correct environment information', async () => {
       await GET();
-      const callArgs = (mockNextResponse.json as jest.Mock).mock.calls[0][0];
+      const callArgs = (mocks.mock.next.mockNextResponse.json as jest.Mock).mock
+        .calls[0][0];
 
       expect(['test', 'development']).toContain(callArgs.environment);
     });

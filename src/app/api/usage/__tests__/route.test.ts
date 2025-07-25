@@ -1,44 +1,48 @@
-// Mock dependencies before importing the logic
-jest.mock('../../../../lib/logger', () => ({
+import { NextRequest } from 'next/server';
+import mocks from '@/test-utils/mocks/mocks';
+
+// Mock dependencies
+jest.mock('@/lib/prisma', () => ({
+  prisma: mocks.mock.prisma.client,
+}));
+
+jest.mock('@/lib/logger', () => ({
   __esModule: true,
   default: {
-    error: jest.fn(),
     info: jest.fn(),
     warn: jest.fn(),
+    error: jest.fn(),
+    http: jest.fn(),
     debug: jest.fn(),
+    verbose: jest.fn(),
+    silly: jest.fn(),
   },
 }));
 
-// Mock validation
-jest.mock('../../../../lib/validation', () => ({
-  ...jest.requireActual('../../../../lib/validation'),
+jest.mock('@/lib/validation', () => ({
   validateRequest: jest.fn(),
 }));
 
-import {
-  setupApiMocks,
-  clearApiMocks,
-  mockPrismaClient,
-} from '../../../../test-utils/mocks';
-import * as validation from '../../../../lib/validation';
-
 describe('Usage Route Business Logic', () => {
-  let getUsageLogs: jest.MockedFunction<(...args: unknown[]) => unknown>;
-  let createUsageLog: jest.MockedFunction<(...args: unknown[]) => unknown>;
-  let GET: (request: unknown) => Promise<Response>;
-  let POST: (request: unknown) => Promise<Response>;
-  let validateRequest: jest.MockedFunction<(...args: unknown[]) => unknown>;
+  let GET: (request: NextRequest) => Promise<Response>;
+  let POST: (request: NextRequest) => Promise<Response>;
+  let getUsageLogs: (limit?: number, offset?: number) => Promise<unknown>;
+  let createUsageLog: (data: unknown) => Promise<unknown>;
+  let validateRequest: jest.Mock;
 
   beforeEach(() => {
-    setupApiMocks();
+    mocks.setup.all();
     // Import logic after mocks
     ({ getUsageLogs, createUsageLog } = jest.requireActual('../logic'));
     ({ GET, POST } = jest.requireActual('../route'));
-    validateRequest = validation.validateRequest as jest.Mock;
+
+    // Get mocked dependencies
+    const validationModule = jest.requireMock('@/lib/validation');
+    validateRequest = validationModule.validateRequest as jest.Mock;
   });
 
   afterEach(() => {
-    clearApiMocks();
+    mocks.setup.clear();
     jest.clearAllMocks();
   });
 
@@ -62,18 +66,20 @@ describe('Usage Route Business Logic', () => {
         },
       ];
 
-      mockPrismaClient.usageLog.findMany.mockResolvedValue(mockUsageLogs);
-      mockPrismaClient.usageLog.count.mockResolvedValue(2);
+      mocks.mock.prisma.client.usageLog.findMany.mockResolvedValue(
+        mockUsageLogs
+      );
+      mocks.mock.prisma.client.usageLog.count.mockResolvedValue(2);
 
       // Mock NextRequest
       const mockRequest = {
         url: 'http://localhost:3000/api/usage',
       };
 
-      const response = await GET(mockRequest);
+      const response = await GET(mockRequest as unknown as NextRequest);
       const data = await response.json();
 
-      expect(mockPrismaClient.usageLog.findMany).toHaveBeenCalledWith({
+      expect(mocks.mock.prisma.client.usageLog.findMany).toHaveBeenCalledWith({
         take: 50,
         skip: 0,
         orderBy: { createdAt: 'desc' },
@@ -94,18 +100,20 @@ describe('Usage Route Business Logic', () => {
         { id: 1, method: 'GET', success: true, createdAt: new Date() },
       ];
 
-      mockPrismaClient.usageLog.findMany.mockResolvedValue(mockUsageLogs);
-      mockPrismaClient.usageLog.count.mockResolvedValue(1);
+      mocks.mock.prisma.client.usageLog.findMany.mockResolvedValue(
+        mockUsageLogs
+      );
+      mocks.mock.prisma.client.usageLog.count.mockResolvedValue(1);
 
       // Mock NextRequest with query parameters
       const mockRequest = {
         url: 'http://localhost:3000/api/usage?limit=10&offset=5',
       };
 
-      const response = await GET(mockRequest);
+      const response = await GET(mockRequest as NextRequest);
       const data = await response.json();
 
-      expect(mockPrismaClient.usageLog.findMany).toHaveBeenCalledWith({
+      expect(mocks.mock.prisma.client.usageLog.findMany).toHaveBeenCalledWith({
         take: 10,
         skip: 5,
         orderBy: { createdAt: 'desc' },
@@ -123,13 +131,13 @@ describe('Usage Route Business Logic', () => {
 
     it('should handle database errors in GET', async () => {
       const error = new Error('Database connection failed');
-      mockPrismaClient.usageLog.findMany.mockRejectedValue(error);
+      mocks.mock.prisma.client.usageLog.findMany.mockRejectedValue(error);
 
       const mockRequest = {
         url: 'http://localhost:3000/api/usage',
       };
 
-      const response = await GET(mockRequest);
+      const response = await GET(mockRequest as NextRequest);
       const data = await response.json();
 
       expect(data).toEqual({
@@ -150,7 +158,7 @@ describe('Usage Route Business Logic', () => {
         createdAt: new Date(),
       };
 
-      mockPrismaClient.usageLog.create.mockResolvedValue(mockUsageLog);
+      mocks.mock.prisma.client.usageLog.create.mockResolvedValue(mockUsageLog);
       validateRequest.mockReturnValue({
         success: true,
         data: { method: 'GET', success: true, errorMessage: null },
@@ -163,14 +171,14 @@ describe('Usage Route Business Logic', () => {
         }),
       };
 
-      const response = await POST(mockRequest);
+      const response = await POST(mockRequest as NextRequest);
       const data = await response.json();
 
       expect(validateRequest).toHaveBeenCalledWith(
         expect.any(Object), // createUsageLogSchema
         { method: 'GET', success: true }
       );
-      expect(mockPrismaClient.usageLog.create).toHaveBeenCalledWith({
+      expect(mocks.mock.prisma.client.usageLog.create).toHaveBeenCalledWith({
         data: {
           method: 'GET',
           success: true,
@@ -186,11 +194,7 @@ describe('Usage Route Business Logic', () => {
 
     it('should handle POST request with validation error', async () => {
       // Ensure the mock is properly set up
-      const mockValidateRequest =
-        validation.validateRequest as jest.MockedFunction<
-          typeof validation.validateRequest
-        >;
-      mockValidateRequest.mockReturnValue({
+      validateRequest.mockReturnValue({
         success: false,
         error: 'Invalid request data',
         details: [
@@ -209,10 +213,10 @@ describe('Usage Route Business Logic', () => {
         }),
       };
 
-      const response = await POST(mockRequest);
+      const response = await POST(mockRequest as NextRequest);
       const data = await response.json();
 
-      expect(mockValidateRequest).toHaveBeenCalled();
+      expect(validateRequest).toHaveBeenCalled();
       expect(data).toEqual({
         success: false,
         error: 'Invalid request data',
@@ -222,7 +226,7 @@ describe('Usage Route Business Logic', () => {
 
     it('should handle POST request with database error', async () => {
       const error = new Error('Database connection failed');
-      mockPrismaClient.usageLog.create.mockRejectedValue(error);
+      mocks.mock.prisma.client.usageLog.create.mockRejectedValue(error);
       validateRequest.mockReturnValue({
         success: true,
         data: {
@@ -240,7 +244,7 @@ describe('Usage Route Business Logic', () => {
         }),
       };
 
-      const response = await POST(mockRequest);
+      const response = await POST(mockRequest as NextRequest);
       const data = await response.json();
 
       expect(data).toEqual({
@@ -255,7 +259,7 @@ describe('Usage Route Business Logic', () => {
         json: jest.fn().mockRejectedValue(new Error('Invalid JSON')),
       };
 
-      const response = await POST(mockRequest);
+      const response = await POST(mockRequest as NextRequest);
       const data = await response.json();
 
       expect(data).toEqual({
@@ -278,17 +282,19 @@ describe('Usage Route Business Logic', () => {
         },
       ];
 
-      mockPrismaClient.usageLog.findMany.mockResolvedValue(mockUsageLogs);
-      mockPrismaClient.usageLog.count.mockResolvedValue(2);
+      mocks.mock.prisma.client.usageLog.findMany.mockResolvedValue(
+        mockUsageLogs
+      );
+      mocks.mock.prisma.client.usageLog.count.mockResolvedValue(2);
 
       const result = await getUsageLogs(50, 0);
 
-      expect(mockPrismaClient.usageLog.findMany).toHaveBeenCalledWith({
+      expect(mocks.mock.prisma.client.usageLog.findMany).toHaveBeenCalledWith({
         take: 50,
         skip: 0,
         orderBy: { createdAt: 'desc' },
       });
-      expect(mockPrismaClient.usageLog.count).toHaveBeenCalled();
+      expect(mocks.mock.prisma.client.usageLog.count).toHaveBeenCalled();
       expect(result).toEqual({
         success: true,
         data: mockUsageLogs,
@@ -302,7 +308,7 @@ describe('Usage Route Business Logic', () => {
 
     it('should handle database errors', async () => {
       const error = new Error('Database connection failed');
-      mockPrismaClient.usageLog.findMany.mockRejectedValue(error);
+      mocks.mock.prisma.client.usageLog.findMany.mockRejectedValue(error);
 
       await expect(getUsageLogs(50, 0)).rejects.toThrow(
         'Database connection failed'
@@ -320,11 +326,11 @@ describe('Usage Route Business Logic', () => {
         createdAt: new Date(),
       };
 
-      mockPrismaClient.usageLog.create.mockResolvedValue(mockUsageLog);
+      mocks.mock.prisma.client.usageLog.create.mockResolvedValue(mockUsageLog);
 
       const result = await createUsageLog('GET', true);
 
-      expect(mockPrismaClient.usageLog.create).toHaveBeenCalledWith({
+      expect(mocks.mock.prisma.client.usageLog.create).toHaveBeenCalledWith({
         data: {
           method: 'GET',
           success: true,
@@ -346,11 +352,11 @@ describe('Usage Route Business Logic', () => {
         createdAt: new Date(),
       };
 
-      mockPrismaClient.usageLog.create.mockResolvedValue(mockUsageLog);
+      mocks.mock.prisma.client.usageLog.create.mockResolvedValue(mockUsageLog);
 
       const result = await createUsageLog('POST', false, 'Validation failed');
 
-      expect(mockPrismaClient.usageLog.create).toHaveBeenCalledWith({
+      expect(mocks.mock.prisma.client.usageLog.create).toHaveBeenCalledWith({
         data: {
           method: 'POST',
           success: false,

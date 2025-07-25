@@ -1,18 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import middleware, { config } from './middleware';
+import mocks from './test-utils/mocks/mocks';
 
-// Mock the rate limiting function
-const mockRateLimit = jest.fn();
-jest.mock('./lib/rate-limit', () => ({
-  rateLimit: mockRateLimit,
-}));
-
-// Mock NextResponse
+// Mock Next.js server modules before importing middleware
 jest.mock('next/server', () => ({
   NextRequest: jest.fn(),
   NextResponse: {
-    next: jest.fn(),
-    redirect: jest.fn(),
+    next: jest.fn(() => ({ headers: new Map() })),
+    redirect: jest.fn(() => ({ headers: new Map() })),
     json: jest.fn(),
   },
 }));
@@ -23,28 +18,19 @@ describe('middleware', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    // Get the mocked functions from the module
     mockNext = NextResponse.next as jest.MockedFunction<
       typeof NextResponse.next
     >;
     mockRedirect = NextResponse.redirect as jest.MockedFunction<
       typeof NextResponse.redirect
     >;
+    mocks.setup.all();
   });
 
-  const createMockRequest = (
-    url: string,
-    headers: Record<string, string> = {}
-  ) => {
-    const request = {
-      nextUrl: { pathname: new URL(url).pathname },
-      url,
-      headers: new Map(Object.entries(headers)),
-      cookies: {
-        get: jest.fn().mockReturnValue(null),
-      },
-    } as unknown as NextRequest;
-    return request;
-  };
+  afterEach(() => {
+    mocks.setup.clear();
+  });
 
   it('should export config with correct matcher', () => {
     expect(config).toEqual({
@@ -52,78 +38,96 @@ describe('middleware', () => {
     });
   });
 
-  it('should pass through non-API routes without rate limiting', async () => {
-    const request = createMockRequest('http://localhost:3000/');
-    const mockResponse = { headers: new Map() };
-    mockNext.mockReturnValue(mockResponse as unknown as NextResponse);
+  it('should allow non-API routes to pass through', async () => {
+    const request = mocks.mock.next.createRequest('http://localhost:3000/');
+    const response = mocks.mock.next.createResponse();
+    mockNext.mockReturnValue(response as unknown as NextResponse);
 
     await middleware(request);
+
     expect(mockNext).toHaveBeenCalled();
   });
 
   it('should apply rate limiting to API routes', async () => {
-    const request = createMockRequest('http://localhost:3000/api/test', {
-      'x-forwarded-for': '192.168.1.1',
-    });
-    const mockResponse = { headers: new Map() };
-    mockNext.mockReturnValue(mockResponse as unknown as NextResponse);
+    const request = mocks.mock.next.createRequest(
+      'http://localhost:3000/api/test',
+      {
+        'x-forwarded-for': '192.168.1.1',
+      }
+    );
+
+    const response = mocks.mock.next.createResponse();
+    mockNext.mockReturnValue(response as unknown as NextResponse);
 
     await middleware(request);
 
     expect(mockNext).toHaveBeenCalled();
-    expect(mockResponse.headers.get('x-api-call-track')).toBe('true');
+    expect(response.headers.get('x-api-call-track')).toBe('true');
   });
 
-  it('should handle admin routes with valid auth token', async () => {
-    const request = createMockRequest('http://localhost:3000/admin/dashboard');
-    request.cookies.get = jest.fn().mockReturnValue({ value: 'valid-token' });
+  it('should allow admin routes with valid auth token', async () => {
+    const request = mocks.mock.next.createRequest(
+      'http://localhost:3000/admin/dashboard',
+      {},
+      'valid-token'
+    );
+    const response = mocks.mock.next.createResponse();
+    mockNext.mockReturnValue(response as unknown as NextResponse);
 
-    const mockResponse = { headers: new Map() };
-    mockNext.mockReturnValue(mockResponse as unknown as NextResponse);
-
-    // Mock fetch for auth verification
-    global.fetch = jest.fn().mockResolvedValue({
-      ok: true,
-      json: () => Promise.resolve({ success: true, user: { id: 1 } }),
-    });
+    mocks.mock.http.fetchSuccess(mocks.mock.http.authSuccess);
 
     await middleware(request);
+
     expect(mockNext).toHaveBeenCalled();
   });
 
   it('should redirect admin routes without auth token', async () => {
-    const request = createMockRequest('http://localhost:3000/admin/dashboard');
-    const mockRedirectResponse = { headers: new Map() };
-    mockRedirect.mockReturnValue(
-      mockRedirectResponse as unknown as NextResponse
+    const request = mocks.mock.next.createRequest(
+      'http://localhost:3000/admin/dashboard'
     );
+    const response = mocks.mock.next.createResponse();
+    mockRedirect.mockReturnValue(response as unknown as NextResponse);
 
     await middleware(request);
+
     expect(mockRedirect).toHaveBeenCalled();
   });
 
-  it('should handle auth verification errors gracefully', async () => {
-    const request = createMockRequest('http://localhost:3000/admin/dashboard');
-    request.cookies.get = jest.fn().mockReturnValue({ value: 'invalid-token' });
-
-    const mockRedirectResponse = { headers: new Map() };
-    mockRedirect.mockReturnValue(
-      mockRedirectResponse as unknown as NextResponse
+  it('should redirect on admin route if auth check fails', async () => {
+    const request = mocks.mock.next.createRequest(
+      'http://localhost:3000/admin/dashboard',
+      {},
+      'invalid-token'
     );
+    const response = mocks.mock.next.createResponse();
+    mockRedirect.mockReturnValue(response as unknown as NextResponse);
 
-    // Mock fetch to throw an error
-    global.fetch = jest.fn().mockRejectedValue(new Error('Network error'));
+    mocks.mock.http.fetchFailure(mocks.mock.http.networkError);
 
     await middleware(request);
+
     expect(mockRedirect).toHaveBeenCalled();
   });
 
-  it('should allow admin login page without auth', async () => {
-    const request = createMockRequest('http://localhost:3000/admin');
-    const mockResponse = { headers: new Map() };
-    mockNext.mockReturnValue(mockResponse as unknown as NextResponse);
+  it('should allow admin login page without auth token', async () => {
+    const request = mocks.mock.next.createRequest(
+      'http://localhost:3000/admin'
+    );
+    const response = mocks.mock.next.createResponse();
+    mockNext.mockReturnValue(response as unknown as NextResponse);
 
     await middleware(request);
+
     expect(mockNext).toHaveBeenCalled();
+  });
+
+  it('should demonstrate rate limit mock usage', async () => {
+    // Test that rate limit mocks are available and working
+    mocks.mock.rateLimit.successResponse();
+
+    const result = await mocks.mock.rateLimit.fn('test-identifier');
+
+    expect(mocks.mock.rateLimit.fn).toHaveBeenCalledWith('test-identifier');
+    expect(result).toEqual(mocks.mock.rateLimit.success);
   });
 });

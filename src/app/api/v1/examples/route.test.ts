@@ -22,7 +22,7 @@ jest.mock('../../../../lib/prisma', () => ({
   prisma: mockPrismaClient,
 }));
 
-import { setupApiMocks, clearApiMocks } from '../../../../test-utils/mocks';
+import mocks from '../../../../test-utils/mocks/mocks';
 import { NextRequest, NextResponse } from 'next/server';
 import * as validation from '../../../../lib/validation';
 
@@ -31,7 +31,7 @@ describe('api/examples/route', () => {
   let POST: (request: NextRequest) => Promise<NextResponse>;
 
   beforeEach(async () => {
-    setupApiMocks();
+    mocks.setup.all();
     // Import logic after mocks
     const route = await import('./route');
     GET = route.GET;
@@ -39,7 +39,7 @@ describe('api/examples/route', () => {
   });
 
   afterEach(() => {
-    clearApiMocks();
+    mocks.setup.clear();
     jest.clearAllMocks();
   });
 

@@ -1,0 +1,55 @@
+export const mockPrismaClient = {
+  example: {
+    findMany: jest.fn(),
+    create: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
+    findUnique: jest.fn(),
+    findFirst: jest.fn(),
+    count: jest.fn(),
+  },
+  usageLog: {
+    findMany: jest.fn(),
+    create: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
+    findUnique: jest.fn(),
+    findFirst: jest.fn(),
+    count: jest.fn(),
+  },
+  ingredient: {
+    findMany: jest.fn(),
+    create: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
+    findUnique: jest.fn(),
+    findFirst: jest.fn(),
+    count: jest.fn(),
+  },
+  tokenUsage: {
+    findMany: jest.fn(),
+    create: jest.fn(),
+    update: jest.fn(),
+    delete: jest.fn(),
+    findUnique: jest.fn(),
+    findFirst: jest.fn(),
+    count: jest.fn(),
+  },
+  $connect: jest.fn(),
+  $disconnect: jest.fn(),
+  $transaction: jest.fn(),
+  $queryRaw: jest.fn(),
+  $executeRaw: jest.fn(),
+  $queryRawUnsafe: jest.fn(),
+  $executeRawUnsafe: jest.fn(),
+};
+
+export const mockPrismaModule = () => {
+  jest.doMock('@prisma/client', () => ({
+    PrismaClient: jest.fn(() => mockPrismaClient),
+  }));
+};
+
+export const setupPrismaMocks = () => {
+  mockPrismaModule();
+};

@@ -21,10 +21,10 @@ jest.mock('../../../../../lib/validation', () => ({
   validateRequest: jest.fn(),
 }));
 
-import { updateExample, deleteExample } from '../exampleUtils';
-import { setupApiMocks, clearApiMocks } from '../../../../../test-utils/mocks';
+import mocks from '../../../../../test-utils/mocks/mocks';
 import { NextRequest, NextResponse } from 'next/server';
 import * as validation from '../../../../../lib/validation';
+import { updateExample, deleteExample } from '../exampleUtils';
 
 describe('api/examples/[id]/route', () => {
   let PUT: (
@@ -37,7 +37,7 @@ describe('api/examples/[id]/route', () => {
   ) => Promise<NextResponse>;
 
   beforeEach(async () => {
-    setupApiMocks();
+    mocks.setup.all();
     // Import logic after mocks
     const route = await import('./route');
     PUT = route.PUT;
@@ -45,7 +45,7 @@ describe('api/examples/[id]/route', () => {
   });
 
   afterEach(() => {
-    clearApiMocks();
+    mocks.setup.clear();
     jest.clearAllMocks();
   });
 

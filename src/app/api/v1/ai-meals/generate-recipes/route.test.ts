@@ -1,13 +1,9 @@
 import { NextRequest } from 'next/server';
-import {
-  setupApiMocks,
-  clearApiMocks,
-  mockPrismaClient,
-} from '@/test-utils/mocks';
+import mocks from '@/test-utils/mocks/mocks';
 
 // Mock dependencies
 jest.mock('@/lib/prisma', () => ({
-  prisma: mockPrismaClient,
+  prisma: mocks.mock.prisma.client,
 }));
 
 jest.mock('@/lib/logger', () => ({
@@ -23,6 +19,10 @@ jest.mock('@/lib/logger', () => ({
   },
 }));
 
+jest.mock('@/lib/validation', () => ({
+  validateRequest: jest.fn(),
+}));
+
 const mockGenerateRecipes = jest.fn();
 jest.mock('@/lib/openai-service', () => ({
   __esModule: true,
@@ -31,39 +31,42 @@ jest.mock('@/lib/openai-service', () => ({
   })),
 }));
 
-jest.mock('@/lib/validation', () => ({
-  validateRequest: jest.fn(),
-}));
-
+// Mock auth module
 jest.mock('@/lib/auth', () => ({
   requireAuth: jest.fn(),
 }));
 
 describe('/api/v1/ai-meals/generate-recipes', () => {
   let POST: (request: NextRequest) => Promise<Response>;
-  let requireAuth: jest.Mock;
   let validateRequest: jest.Mock;
+  let requireAuth: jest.Mock;
 
   beforeEach(async () => {
-    setupApiMocks();
+    mocks.setup.all();
 
     // Import the actual route handler
     const routeModule = await import('./route');
     POST = routeModule.POST;
 
     // Get mocked dependencies
+    const validationModule = await import('@/lib/validation');
+    validateRequest = validationModule.validateRequest as jest.Mock;
+
     const authModule = await import('@/lib/auth');
     requireAuth = authModule.requireAuth as jest.Mock;
 
-    const validationModule = await import('@/lib/validation');
-    validateRequest = validationModule.validateRequest as jest.Mock;
+    // Set up auth to succeed by default
+    requireAuth.mockResolvedValue({
+      user: { id: 'test-user', email: 'test@example.com' },
+      token: 'mock-token',
+    });
 
     // Import the module to ensure mocks are applied
     await import('@/lib/openai-service');
   });
 
   afterEach(() => {
-    clearApiMocks();
+    mocks.setup.clear();
     jest.clearAllMocks();
   });
 
@@ -130,17 +133,6 @@ describe('/api/v1/ai-meals/generate-recipes', () => {
       // Reset all mocks
       jest.clearAllMocks();
 
-      // Mock successful authentication
-      requireAuth.mockResolvedValue({
-        success: true,
-        user: {
-          id: 'user-123',
-          email: 'test@example.com',
-          role: 'read-only',
-          app_name: 'airecipes',
-        },
-      });
-
       // Mock successful validation - return the actual request body
       validateRequest.mockImplementation((schema, body) => {
         return {
@@ -150,7 +142,7 @@ describe('/api/v1/ai-meals/generate-recipes', () => {
       });
 
       // Mock successful ingredient validation
-      mockPrismaClient.ingredient.findFirst.mockImplementation(args => {
+      mocks.mock.prisma.client.ingredient.findFirst.mockImplementation(args => {
         const ingredientName = args?.where?.name;
         if (
           ingredientName === 'chicken' ||
@@ -184,6 +176,7 @@ describe('/api/v1/ai-meals/generate-recipes', () => {
     });
 
     it('should handle authentication failure', async () => {
+      // Mock auth to fail
       requireAuth.mockRejectedValue(new Error('Authentication required'));
 
       const request = createMockRequest(mockValidRequest);
@@ -320,7 +313,7 @@ describe('/api/v1/ai-meals/generate-recipes', () => {
         },
       });
 
-      mockPrismaClient.ingredient.findFirst.mockResolvedValue(null);
+      mocks.mock.prisma.client.ingredient.findFirst.mockResolvedValue(null);
 
       const request = createMockRequest({
         ingredients: ['invalid-ingredient'],

@@ -1,13 +1,9 @@
 import { NextRequest } from 'next/server';
-import {
-  setupApiMocks,
-  clearApiMocks,
-  mockPrismaClient,
-} from '@/test-utils/mocks';
+import mocks from '@/test-utils/mocks/mocks';
 
 // Mock dependencies
 jest.mock('@/lib/prisma', () => ({
-  prisma: mockPrismaClient,
+  prisma: mocks.mock.prisma.client,
 }));
 
 jest.mock('@/lib/logger', () => ({
@@ -32,7 +28,7 @@ describe('/api/v1/ingredients/search', () => {
   let validateRequest: jest.Mock;
 
   beforeEach(async () => {
-    setupApiMocks();
+    mocks.setup.all();
 
     // Import the actual route handler
     const routeModule = await import('./route');
@@ -44,7 +40,7 @@ describe('/api/v1/ingredients/search', () => {
   });
 
   afterEach(() => {
-    clearApiMocks();
+    mocks.setup.clear();
     jest.clearAllMocks();
   });
 
@@ -96,7 +92,9 @@ describe('/api/v1/ingredients/search', () => {
       });
 
       // Mock successful database query
-      mockPrismaClient.ingredient.findMany.mockResolvedValue(mockIngredients);
+      mocks.mock.prisma.client.ingredient.findMany.mockResolvedValue(
+        mockIngredients
+      );
     });
 
     it('should successfully search ingredients with query parameter', async () => {
@@ -109,19 +107,21 @@ describe('/api/v1/ingredients/search', () => {
       expect(responseData.success).toBe(true);
       expect(responseData.ingredients).toEqual(mockIngredients);
 
-      expect(mockPrismaClient.ingredient.findMany).toHaveBeenCalledWith({
-        where: {
-          isActive: true,
-          name: { startsWith: 'apple' },
-        },
-        orderBy: [{ name: 'asc' }],
-        take: 10,
-        select: {
-          id: true,
-          name: true,
-          category: true,
-        },
-      });
+      expect(mocks.mock.prisma.client.ingredient.findMany).toHaveBeenCalledWith(
+        {
+          where: {
+            isActive: true,
+            name: { startsWith: 'apple' },
+          },
+          orderBy: [{ name: 'asc' }],
+          take: 10,
+          select: {
+            id: true,
+            name: true,
+            category: true,
+          },
+        }
+      );
     });
 
     it('should search ingredients with category filter', async () => {
@@ -142,20 +142,22 @@ describe('/api/v1/ingredients/search', () => {
       expect(response.status).toBe(200);
       expect(responseData.success).toBe(true);
 
-      expect(mockPrismaClient.ingredient.findMany).toHaveBeenCalledWith({
-        where: {
-          isActive: true,
-          name: { startsWith: 'apple' },
-          category: 'fruits',
-        },
-        orderBy: [{ name: 'asc' }],
-        take: 10,
-        select: {
-          id: true,
-          name: true,
-          category: true,
-        },
-      });
+      expect(mocks.mock.prisma.client.ingredient.findMany).toHaveBeenCalledWith(
+        {
+          where: {
+            isActive: true,
+            name: { startsWith: 'apple' },
+            category: 'fruits',
+          },
+          orderBy: [{ name: 'asc' }],
+          take: 10,
+          select: {
+            id: true,
+            name: true,
+            category: true,
+          },
+        }
+      );
     });
 
     it('should search ingredients with custom limit', async () => {
@@ -176,19 +178,21 @@ describe('/api/v1/ingredients/search', () => {
       expect(response.status).toBe(200);
       expect(responseData.success).toBe(true);
 
-      expect(mockPrismaClient.ingredient.findMany).toHaveBeenCalledWith({
-        where: {
-          isActive: true,
-          name: { startsWith: 'apple' },
-        },
-        orderBy: [{ name: 'asc' }],
-        take: 5,
-        select: {
-          id: true,
-          name: true,
-          category: true,
-        },
-      });
+      expect(mocks.mock.prisma.client.ingredient.findMany).toHaveBeenCalledWith(
+        {
+          where: {
+            isActive: true,
+            name: { startsWith: 'apple' },
+          },
+          orderBy: [{ name: 'asc' }],
+          take: 5,
+          select: {
+            id: true,
+            name: true,
+            category: true,
+          },
+        }
+      );
     });
 
     it('should return empty array when query is empty', async () => {
@@ -211,7 +215,9 @@ describe('/api/v1/ingredients/search', () => {
       expect(responseData.ingredients).toEqual([]);
 
       // Should not call the database when query is empty
-      expect(mockPrismaClient.ingredient.findMany).not.toHaveBeenCalled();
+      expect(
+        mocks.mock.prisma.client.ingredient.findMany
+      ).not.toHaveBeenCalled();
     });
 
     it('should return empty array when query is only whitespace', async () => {
@@ -234,7 +240,9 @@ describe('/api/v1/ingredients/search', () => {
       expect(responseData.ingredients).toEqual([]);
 
       // Should not call the database when query is only whitespace
-      expect(mockPrismaClient.ingredient.findMany).not.toHaveBeenCalled();
+      expect(
+        mocks.mock.prisma.client.ingredient.findMany
+      ).not.toHaveBeenCalled();
     });
 
     it('should handle validation failure', async () => {
@@ -261,7 +269,7 @@ describe('/api/v1/ingredients/search', () => {
         writable: true,
       });
 
-      mockPrismaClient.ingredient.findMany.mockRejectedValue(
+      mocks.mock.prisma.client.ingredient.findMany.mockRejectedValue(
         new Error('Database error')
       );
 
@@ -290,7 +298,7 @@ describe('/api/v1/ingredients/search', () => {
         writable: true,
       });
 
-      mockPrismaClient.ingredient.findMany.mockRejectedValue(
+      mocks.mock.prisma.client.ingredient.findMany.mockRejectedValue(
         new Error('Database error')
       );
 
@@ -329,19 +337,21 @@ describe('/api/v1/ingredients/search', () => {
       expect(response.status).toBe(200);
       expect(responseData.success).toBe(true);
 
-      expect(mockPrismaClient.ingredient.findMany).toHaveBeenCalledWith({
-        where: {
-          isActive: true,
-          name: { startsWith: 'apple' }, // Should be lowercase
-        },
-        orderBy: [{ name: 'asc' }],
-        take: 10,
-        select: {
-          id: true,
-          name: true,
-          category: true,
-        },
-      });
+      expect(mocks.mock.prisma.client.ingredient.findMany).toHaveBeenCalledWith(
+        {
+          where: {
+            isActive: true,
+            name: { startsWith: 'apple' }, // Should be lowercase
+          },
+          orderBy: [{ name: 'asc' }],
+          take: 10,
+          select: {
+            id: true,
+            name: true,
+            category: true,
+          },
+        }
+      );
     });
 
     it('should trim whitespace from search term', async () => {
@@ -362,19 +372,21 @@ describe('/api/v1/ingredients/search', () => {
       expect(response.status).toBe(200);
       expect(responseData.success).toBe(true);
 
-      expect(mockPrismaClient.ingredient.findMany).toHaveBeenCalledWith({
-        where: {
-          isActive: true,
-          name: { startsWith: 'apple' }, // Should be trimmed
-        },
-        orderBy: [{ name: 'asc' }],
-        take: 10,
-        select: {
-          id: true,
-          name: true,
-          category: true,
-        },
-      });
+      expect(mocks.mock.prisma.client.ingredient.findMany).toHaveBeenCalledWith(
+        {
+          where: {
+            isActive: true,
+            name: { startsWith: 'apple' }, // Should be trimmed
+          },
+          orderBy: [{ name: 'asc' }],
+          take: 10,
+          select: {
+            id: true,
+            name: true,
+            category: true,
+          },
+        }
+      );
     });
 
     it('should handle missing query parameter', async () => {
@@ -415,19 +427,21 @@ describe('/api/v1/ingredients/search', () => {
       expect(response.status).toBe(200);
       expect(responseData.success).toBe(true);
 
-      expect(mockPrismaClient.ingredient.findMany).toHaveBeenCalledWith({
-        where: {
-          isActive: true,
-          name: { startsWith: 'apple' },
-        },
-        orderBy: [{ name: 'asc' }],
-        take: 10, // Should use default limit
-        select: {
-          id: true,
-          name: true,
-          category: true,
-        },
-      });
+      expect(mocks.mock.prisma.client.ingredient.findMany).toHaveBeenCalledWith(
+        {
+          where: {
+            isActive: true,
+            name: { startsWith: 'apple' },
+          },
+          orderBy: [{ name: 'asc' }],
+          take: 10, // Should use default limit
+          select: {
+            id: true,
+            name: true,
+            category: true,
+          },
+        }
+      );
     });
 
     it('should handle missing category parameter', async () => {
@@ -448,24 +462,26 @@ describe('/api/v1/ingredients/search', () => {
       expect(response.status).toBe(200);
       expect(responseData.success).toBe(true);
 
-      expect(mockPrismaClient.ingredient.findMany).toHaveBeenCalledWith({
-        where: {
-          isActive: true,
-          name: { startsWith: 'apple' },
-          // Should not include category filter
-        },
-        orderBy: [{ name: 'asc' }],
-        take: 10,
-        select: {
-          id: true,
-          name: true,
-          category: true,
-        },
-      });
+      expect(mocks.mock.prisma.client.ingredient.findMany).toHaveBeenCalledWith(
+        {
+          where: {
+            isActive: true,
+            name: { startsWith: 'apple' },
+            // Should not include category filter
+          },
+          orderBy: [{ name: 'asc' }],
+          take: 10,
+          select: {
+            id: true,
+            name: true,
+            category: true,
+          },
+        }
+      );
     });
 
     it('should return empty array when no ingredients match', async () => {
-      mockPrismaClient.ingredient.findMany.mockResolvedValue([]);
+      mocks.mock.prisma.client.ingredient.findMany.mockResolvedValue([]);
 
       const request = createMockRequest({ q: 'nonexistent' });
 

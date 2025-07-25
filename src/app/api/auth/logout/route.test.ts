@@ -1,12 +1,5 @@
-import { setupApiMocks, clearApiMocks } from '@/test-utils/mocks';
+import mocks from '@/test-utils/mocks/mocks';
 import { NextRequest } from 'next/server';
-
-// Mock the config
-jest.mock('@/config/app', () => ({
-  appConfig: {
-    authServiceUrl: 'http://auth-service.test',
-  },
-}));
 
 // Mock fetch globally
 global.fetch = jest.fn();
@@ -26,13 +19,13 @@ describe('api/auth/logout/route', () => {
 
   beforeEach(() => {
     jest.resetModules();
-    setupApiMocks();
+    mocks.setup.all();
     // Import the route after mocks
     ({ POST } = jest.requireActual('./route'));
   });
 
   afterEach(() => {
-    clearApiMocks();
+    mocks.setup.clear();
     jest.clearAllMocks();
   });
 
@@ -60,7 +53,7 @@ describe('api/auth/logout/route', () => {
       const responseData = await response.json();
 
       expect(global.fetch).toHaveBeenCalledWith(
-        'http://auth-service.test/api/v1/auth/logout',
+        'http://mock-auth-service/api/v1/auth/logout',
         {
           method: 'POST',
           headers: {
@@ -141,7 +134,7 @@ describe('api/auth/logout/route', () => {
       const responseData = await response.json();
 
       expect(global.fetch).toHaveBeenCalledWith(
-        'http://auth-service.test/api/v1/auth/logout',
+        'http://mock-auth-service/api/v1/auth/logout',
         {
           method: 'POST',
           headers: {

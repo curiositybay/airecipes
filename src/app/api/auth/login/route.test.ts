@@ -1,4 +1,4 @@
-import { setupApiMocks, clearApiMocks } from '@/test-utils/mocks';
+import mocks from '@/test-utils/mocks/mocks';
 import { NextRequest } from 'next/server';
 
 // Mock the config
@@ -26,13 +26,13 @@ describe('api/auth/login/route', () => {
 
   beforeEach(() => {
     jest.resetModules();
-    setupApiMocks();
+    mocks.setup.all();
     // Import the route after mocks
     ({ POST } = jest.requireActual('./route'));
   });
 
   afterEach(() => {
-    clearApiMocks();
+    mocks.setup.clear();
     jest.clearAllMocks();
   });
 
@@ -59,7 +59,7 @@ describe('api/auth/login/route', () => {
       const responseData = await response.json();
 
       expect(global.fetch).toHaveBeenCalledWith(
-        'http://auth-service.test/api/v1/auth/login',
+        'http://mock-auth-service/api/v1/auth/login',
         {
           method: 'POST',
           headers: {
@@ -116,12 +116,10 @@ describe('api/auth/login/route', () => {
       (global.fetch as jest.Mock).mockResolvedValue(mockFetchResponse);
 
       const request = {
-        json: jest
-          .fn()
-          .mockResolvedValue({
-            email: 'test@example.com',
-            password: 'password123',
-          }),
+        json: jest.fn().mockResolvedValue({
+          email: 'test@example.com',
+          password: 'password123',
+        }),
       } as unknown as NextRequest;
 
       const response = await POST(request);
@@ -145,12 +143,10 @@ describe('api/auth/login/route', () => {
       (global.fetch as jest.Mock).mockResolvedValue(mockFetchResponse);
 
       const request = {
-        json: jest
-          .fn()
-          .mockResolvedValue({
-            email: 'test@example.com',
-            password: 'password123',
-          }),
+        json: jest.fn().mockResolvedValue({
+          email: 'test@example.com',
+          password: 'password123',
+        }),
       } as unknown as NextRequest;
 
       const response = await POST(request);
@@ -179,12 +175,10 @@ describe('api/auth/login/route', () => {
       (global.fetch as jest.Mock).mockResolvedValue(mockFetchResponse);
 
       const request = {
-        json: jest
-          .fn()
-          .mockResolvedValue({
-            email: 'test@example.com',
-            password: 'password123',
-          }),
+        json: jest.fn().mockResolvedValue({
+          email: 'test@example.com',
+          password: 'password123',
+        }),
       } as unknown as NextRequest;
 
       const response = await POST(request);
@@ -199,12 +193,10 @@ describe('api/auth/login/route', () => {
       (global.fetch as jest.Mock).mockRejectedValue(new Error('Network error'));
 
       const request = {
-        json: jest
-          .fn()
-          .mockResolvedValue({
-            email: 'test@example.com',
-            password: 'password123',
-          }),
+        json: jest.fn().mockResolvedValue({
+          email: 'test@example.com',
+          password: 'password123',
+        }),
       } as unknown as NextRequest;
 
       const response = await POST(request);

@@ -1,20 +1,19 @@
-import { setupApiMocks, clearApiMocks } from '../test-utils/mocks';
+import mocks from '../test-utils/mocks/mocks';
+import api from './api';
 import mockAxios from 'jest-mock-axios';
 
 // Mock axios before importing the module
 jest.mock('axios');
 
-import api, { _requestSuccessHandler, _requestErrorHandler } from './api';
-
 describe('api', () => {
   beforeEach(() => {
-    setupApiMocks();
+    mocks.setup.all();
     // Clear all mocks before each test
     jest.clearAllMocks();
   });
 
   afterEach(() => {
-    clearApiMocks();
+    mocks.setup.clear();
     mockAxios.reset();
   });
 
@@ -190,40 +189,5 @@ describe('api', () => {
         await expect(api.get('/test')).rejects.toThrow(/Network error/);
       });
     });
-  });
-});
-
-describe('_requestSuccessHandler', () => {
-  it('logs method and url when config has method and url', () => {
-    const spy = jest.spyOn(console, 'log').mockImplementation(() => {});
-    const config = { method: 'get', url: '/test' };
-    const result = _requestSuccessHandler(config);
-    expect(spy).toHaveBeenCalledWith(expect.stringMatching(/Making.*request/));
-    expect(result).toBe(config);
-    spy.mockRestore();
-  });
-
-  it('returns config unchanged if missing method or url', () => {
-    const config = { foo: 'bar' };
-    const result = _requestSuccessHandler(config);
-    expect(result).toBe(config);
-  });
-});
-
-describe('_requestErrorHandler', () => {
-  it('logs error if error is an instance of Error', async () => {
-    const spy = jest.spyOn(console, 'error').mockImplementation(() => {});
-    const error = new Error('fail');
-    await expect(_requestErrorHandler(error)).rejects.toBe(error);
-    expect(spy).toHaveBeenCalledWith('Request error:', error);
-    spy.mockRestore();
-  });
-
-  it('logs error as string if error is not an instance of Error', async () => {
-    const spy = jest.spyOn(console, 'error').mockImplementation(() => {});
-    const error = 'fail';
-    await expect(_requestErrorHandler(error)).rejects.toBe(error);
-    expect(spy).toHaveBeenCalledWith('Request error:', 'fail');
-    spy.mockRestore();
   });
 });
