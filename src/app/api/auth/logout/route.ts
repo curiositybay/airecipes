@@ -41,10 +41,16 @@ export async function POST(request: NextRequest) {
       try {
         await invalidateUserAuthCache(appConfig.appSlug, userId);
       } catch (cacheError) {
+        let errorMessage: string;
+        if (cacheError instanceof Error) {
+          errorMessage = cacheError.message;
+        } else {
+          errorMessage = 'Unknown error';
+        }
+
         logger.warn('Failed to invalidate auth cache on logout', {
           userId,
-          error:
-            cacheError instanceof Error ? cacheError.message : 'Unknown error',
+          error: errorMessage,
         });
       }
     }

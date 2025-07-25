@@ -34,6 +34,8 @@ export const mockPrismaClient = {
     findUnique: jest.fn(),
     findFirst: jest.fn(),
     count: jest.fn(),
+    aggregate: jest.fn(),
+    groupBy: jest.fn(),
   },
   $connect: jest.fn(),
   $disconnect: jest.fn(),

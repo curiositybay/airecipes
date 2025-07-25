@@ -10,36 +10,34 @@ const openAiService = new OpenAiService();
 
 /**
  * Validates ingredients against the database and all business rules.
+ * Returns sanitized ingredients if validation passes.
  */
 const validateIngredients = async (
-  ingredients: string[]
-): Promise<{ isValid: boolean; error?: string }> => {
+  ingredients: unknown[]
+): Promise<{
+  isValid: boolean;
+  error?: string;
+  sanitizedIngredients?: string[];
+}> => {
   const errors: string[] = [];
 
-  // Check if ingredients is an array
+  // Check if ingredients is an array.
   if (!Array.isArray(ingredients)) {
     return { isValid: false, error: 'Ingredients must be an array' };
   }
 
-  // Check for empty array
+  // Check for empty array.
   if (ingredients.length === 0) {
     return { isValid: false, error: 'At least one ingredient is required' };
   }
 
-  // Check for too many ingredients
+  // Check for too many ingredients.
   if (ingredients.length > 10) {
     return { isValid: false, error: 'Maximum 10 ingredients allowed' };
   }
 
-  // Check for duplicates
-  const uniqueIngredients = new Set(
-    ingredients.map(ing => ing.toLowerCase().trim())
-  );
-  if (uniqueIngredients.size !== ingredients.length) {
-    errors.push('Ingredient list contains duplicates');
-  }
-
-  // Validate each ingredient
+  // Validate each ingredient and collect sanitized versions.
+  const sanitizedIngredients: string[] = [];
   for (let i = 0; i < ingredients.length; i++) {
     const ingredient = ingredients[i];
     if (typeof ingredient !== 'string') {
@@ -55,7 +53,7 @@ const validateIngredients = async (
       errors.push(`Ingredient at position ${i + 1} is too long`);
       continue;
     }
-    // Check existence and activity in the database
+    // Check existence and activity in the database.
     const dbIngredient = await prisma.ingredient.findFirst({
       where: {
         name: trimmed.toLowerCase(),
@@ -66,13 +64,21 @@ const validateIngredients = async (
       errors.push(
         `Ingredient "${trimmed}" is not in our database or is inactive`
       );
+    } else {
+      sanitizedIngredients.push(trimmed.toLowerCase());
     }
+  }
+
+  // Check for duplicates in sanitized ingredients.
+  const uniqueIngredients = new Set(sanitizedIngredients);
+  if (uniqueIngredients.size !== sanitizedIngredients.length) {
+    errors.push('Ingredient list contains duplicates');
   }
 
   if (errors.length > 0) {
     return { isValid: false, error: errors.join(', ') };
   }
-  return { isValid: true };
+  return { isValid: true, sanitizedIngredients };
 };
 
 /**
@@ -80,13 +86,20 @@ const validateIngredients = async (
  */
 export async function POST(request: NextRequest) {
   try {
-    // Verify authentication
+    // Verify authentication.
     let authResult;
     try {
       authResult = await requireAuth(request);
     } catch (authError) {
+      let errorMessage: string;
+      if (authError instanceof Error) {
+        errorMessage = authError.message;
+      } else {
+        errorMessage = 'Unknown error';
+      }
+
       logger.warn('Authentication failed for recipe generation', {
-        error: authError instanceof Error ? authError.message : 'Unknown error',
+        error: errorMessage,
       });
       return NextResponse.json(
         {
@@ -102,10 +115,10 @@ export async function POST(request: NextRequest) {
       role: authResult.user?.role,
     });
 
-    // Get raw request data
+    // Get raw request data.
     const body = await request.json();
 
-    // Validate request structure
+    // Validate request structure.
     const validation = validateRequest(generateRecipesSchema, body);
     if (!validation.success) {
       return NextResponse.json(
@@ -119,7 +132,7 @@ export async function POST(request: NextRequest) {
 
     const { ingredients, preferences } = validation.data;
 
-    // Validate ingredients
+    // Validate ingredients and get sanitized versions.
     const ingredientValidation = await validateIngredients(ingredients);
     if (!ingredientValidation.isValid) {
       return NextResponse.json(
@@ -131,10 +144,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Sanitize and normalize ingredients
-    const sanitizedIngredients = ingredients.map((ing: string) =>
-      ing.toLowerCase().trim()
-    );
+    const sanitizedIngredients = ingredientValidation.sanitizedIngredients!;
 
     logger.info('Generating recipes', {
       ingredientCount: sanitizedIngredients.length,
@@ -142,7 +152,7 @@ export async function POST(request: NextRequest) {
       preferences: preferences || {},
     });
 
-    // Convert preferences to service preferences format
+    // Convert preferences to service preferences format.
     const servicePreferences: {
       dietary?: string[];
       cuisine?: string;
@@ -180,7 +190,7 @@ export async function POST(request: NextRequest) {
       filteredOut: result.recipes.length - validRecipes.length,
     });
 
-    // Check if we got fallback recipes (indicates OpenAI failure)
+    // Check if we got fallback recipes (indicates OpenAI failure).
     const isFallbackRecipes =
       validRecipes.length > 0 &&
       validRecipes[0] &&
@@ -199,7 +209,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     logger.error('Recipe generation failed', error as Error);
 
-    // Provide more specific error messages based on error type
+    // Provide more specific error messages based on error type.
     let errorMessage = 'Failed to generate recipes';
     let statusCode = 500;
 
@@ -212,13 +222,13 @@ export async function POST(request: NextRequest) {
       ) {
         errorMessage =
           'AI service is temporarily unavailable due to credit limits. Please try again later.';
-        statusCode = 503; // Service Unavailable
+        statusCode = 503; // Service Unavailable.
       } else if (
         errorMsg.includes('rate_limit') ||
         errorMsg.includes('too many requests')
       ) {
         errorMessage = 'Too many requests. Please wait a moment and try again.';
-        statusCode = 429; // Too Many Requests
+        statusCode = 429; // Too Many Requests.
       } else if (
         errorMsg.includes('invalid_api_key') ||
         errorMsg.includes('authentication')

@@ -181,5 +181,95 @@ describe('api/auth/logout/route', () => {
       });
       expect(response.status).toBe(500);
     });
+
+    it('handles cache invalidation errors gracefully', async () => {
+      const mockResponse = { success: true };
+      const mockFetchResponse = {
+        json: jest.fn().mockResolvedValue(mockResponse),
+        status: 200,
+        headers: new Headers(),
+      };
+
+      mocks.mock.http.fetchSuccess(mockFetchResponse);
+
+      // Mock the auth-cache module to throw an error during cache invalidation.
+      const mockInvalidateUserAuthCache = jest
+        .fn()
+        .mockRejectedValue(new Error('Cache service unavailable'));
+      const mockExtractUserIdFromToken = jest.fn().mockReturnValue('user123');
+
+      jest.mock('@/lib/auth-cache', () => ({
+        invalidateUserAuthCache: mockInvalidateUserAuthCache,
+        extractUserIdFromToken: mockExtractUserIdFromToken,
+      }));
+
+      // Re-import the route to get the mocked version.
+      jest.resetModules();
+      const { POST: POSTHandler } = await import('./route');
+
+      const request = mocks.mock.next.createRequest(
+        'http://localhost:3000/api/auth/logout',
+        {},
+        'abc123'
+      );
+
+      const response = await POSTHandler(request);
+      const responseData = await response.json();
+
+      // Verify the logout still succeeds despite cache error.
+      expect(responseData).toEqual(mockResponse);
+      expect(response.status).toBe(200);
+
+      // Verify cache invalidation was attempted.
+      expect(mockInvalidateUserAuthCache).toHaveBeenCalledWith(
+        'mock-app',
+        'user123'
+      );
+    });
+
+    it('handles cache invalidation errors with non-Error objects', async () => {
+      const mockResponse = { success: true };
+      const mockFetchResponse = {
+        json: jest.fn().mockResolvedValue(mockResponse),
+        status: 200,
+        headers: new Headers(),
+      };
+
+      mocks.mock.http.fetchSuccess(mockFetchResponse);
+
+      // Mock the auth-cache module to throw a non-Error object.
+      const mockInvalidateUserAuthCache = jest
+        .fn()
+        .mockRejectedValue('String error message');
+      const mockExtractUserIdFromToken = jest.fn().mockReturnValue('user456');
+
+      jest.mock('@/lib/auth-cache', () => ({
+        invalidateUserAuthCache: mockInvalidateUserAuthCache,
+        extractUserIdFromToken: mockExtractUserIdFromToken,
+      }));
+
+      // Re-import the route to get the mocked version.
+      jest.resetModules();
+      const { POST: POSTHandler } = await import('./route');
+
+      const request = mocks.mock.next.createRequest(
+        'http://localhost:3000/api/auth/logout',
+        {},
+        'abc123'
+      );
+
+      const response = await POSTHandler(request);
+      const responseData = await response.json();
+
+      // Verify the logout still succeeds despite cache error.
+      expect(responseData).toEqual(mockResponse);
+      expect(response.status).toBe(200);
+
+      // Verify cache invalidation was attempted.
+      expect(mockInvalidateUserAuthCache).toHaveBeenCalledWith(
+        'mock-app',
+        'user456'
+      );
+    });
   });
 });
