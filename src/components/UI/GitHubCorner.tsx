@@ -1,10 +1,9 @@
 'use client';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import { appConfig } from '@/config/app';
 
-const GITHUB_REPO =
-  process.env.NEXT_PUBLIC_GITHUB_REPO ||
-  'https://github.com/curiositybay/airecipes';
+const GITHUB_REPO = appConfig.githubRepo;
 
 export default function GitHubCorner() {
   const [isVisible, setIsVisible] = useState(true);

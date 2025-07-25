@@ -20,7 +20,12 @@ export const mockAppConfig = {
   middleware: {
     apiCallTrackHeader: 'x-api-call-track',
   },
-} as const;
+  nodeEnv: 'test' as string,
+  openai: {
+    apiKey: 'mock-openai-key',
+    model: 'gpt-4o-mini',
+  },
+};
 
 export const mockAppConfigModule = () => {
   jest.mock('@/config/app', () => ({
@@ -29,30 +34,23 @@ export const mockAppConfigModule = () => {
   }));
 };
 
+// Function to update the mock config dynamically.
+export const updateMockConfig = (updates: Partial<typeof mockAppConfig>) => {
+  Object.assign(mockAppConfig, updates);
+};
+
 // Environment variable mocking utilities.
 export const mockEnvironment = {
   development: () => {
-    Object.defineProperty(process.env, 'NODE_ENV', {
-      value: 'development',
-      writable: true,
-    });
+    updateMockConfig({ nodeEnv: 'development' });
   },
   production: () => {
-    Object.defineProperty(process.env, 'NODE_ENV', {
-      value: 'production',
-      writable: true,
-    });
+    updateMockConfig({ nodeEnv: 'production' });
   },
   test: () => {
-    Object.defineProperty(process.env, 'NODE_ENV', {
-      value: 'test',
-      writable: true,
-    });
+    updateMockConfig({ nodeEnv: 'test' });
   },
   restore: (originalEnv: string | undefined) => {
-    Object.defineProperty(process.env, 'NODE_ENV', {
-      value: originalEnv,
-      writable: true,
-    });
+    updateMockConfig({ nodeEnv: originalEnv || 'test' });
   },
 };

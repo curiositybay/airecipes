@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import { mocks } from '@/test-utils/mocks';
 
 // Mock the UnderConstructionClient component
 jest.mock('@/components/UI/UnderConstructionClient', () => {
@@ -19,19 +20,13 @@ jest.mock('@/components/UI/UnderConstructionClient', () => {
   };
 });
 
-// Mock the app config
-jest.mock('@/config/app', () => ({
-  appConfig: {
-    name: 'Test App',
-    description: 'Test description',
-  },
-}));
-
 describe('Examples Page', () => {
-  const originalEnv = process.env;
+  beforeEach(() => {
+    mocks.setup.all();
+  });
 
   afterEach(() => {
-    process.env = { ...originalEnv };
+    mocks.setup.clear();
     jest.resetModules();
   });
 
@@ -48,7 +43,6 @@ describe('Examples Page', () => {
 
   it('passes the correct app name to UnderConstructionClient (default)', () => {
     jest.resetModules();
-    delete process.env.NEXT_PUBLIC_APP_NAME;
     const Examples = jest.requireActual('./page').default;
     render(<Examples />);
     // Test that it displays some app name (not hardcoded)
@@ -57,24 +51,17 @@ describe('Examples Page', () => {
     expect(heading.textContent).toMatch(/.* is under construction/);
   });
 
-  it('passes the NEXT_PUBLIC_APP_NAME to UnderConstructionClient if set', () => {
+  it('passes the custom app name to UnderConstructionClient when set', () => {
     const customAppName = 'My Custom App';
-    process.env.NEXT_PUBLIC_APP_NAME = customAppName;
+    mocks.mock.config.updateMockConfig({ name: customAppName });
 
-    // Temporarily unmock the app config to test environment variable
-    jest.unmock('@/config/app');
     jest.resetModules();
-
     const Examples = jest.requireActual('./page').default;
     render(<Examples />);
     expect(screen.getByTestId('under-construction')).toBeInTheDocument();
-    // Re-mock the app config for other tests
-    jest.mock('@/config/app', () => ({
-      appConfig: {
-        name: 'Test App',
-        description: 'Test description',
-      },
-    }));
+    expect(
+      screen.getByText(`${customAppName} is under construction`)
+    ).toBeInTheDocument();
   });
 
   it('exports metadata', () => {

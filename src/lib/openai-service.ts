@@ -1,6 +1,7 @@
 import OpenAI from 'openai';
-import { prisma } from './prisma';
-import logger from './logger';
+import { prisma } from '@/lib/prisma';
+import logger from '@/lib/logger';
+import { appConfig } from '@/config/app';
 import { getFallbackRecipes } from './fallback-recipes';
 
 export interface Recipe {
@@ -44,8 +45,8 @@ class OpenAiService {
   private client: OpenAI;
 
   constructor() {
-    this.apiKey = process.env.OPENAI_API_KEY || '';
-    this.model = process.env.OPENAI_MODEL || 'gpt-4o-mini';
+    this.apiKey = appConfig.openai.apiKey || '';
+    this.model = appConfig.openai.model || 'gpt-4o-mini';
     this.client = new OpenAI({
       apiKey: this.apiKey,
     });

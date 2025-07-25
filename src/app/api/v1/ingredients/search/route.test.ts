@@ -230,11 +230,8 @@ describe('/api/v1/ingredients/search', () => {
 
     it('should handle database errors', async () => {
       // Ensure we're in development mode
-      const originalEnv = process.env.NODE_ENV;
-      Object.defineProperty(process.env, 'NODE_ENV', {
-        value: 'development',
-        writable: true,
-      });
+      const originalEnv = mocks.mock.config.app.nodeEnv;
+      mocks.mock.config.env.development();
 
       mocks.mock.prisma.client.ingredient.findMany.mockRejectedValue(
         new Error('Database error')
@@ -251,19 +248,13 @@ describe('/api/v1/ingredients/search', () => {
       expect(responseData.details).toBeDefined(); // Should include error details in development
 
       // Restore NODE_ENV
-      Object.defineProperty(process.env, 'NODE_ENV', {
-        value: originalEnv,
-        writable: true,
-      });
+      mocks.mock.config.env.restore(originalEnv);
     });
 
     it('should handle database errors in production without exposing details', async () => {
       // Mock NODE_ENV to production
-      const originalEnv = process.env.NODE_ENV;
-      Object.defineProperty(process.env, 'NODE_ENV', {
-        value: 'production',
-        writable: true,
-      });
+      const originalEnv = mocks.mock.config.app.nodeEnv;
+      mocks.mock.config.env.production();
 
       mocks.mock.prisma.client.ingredient.findMany.mockRejectedValue(
         new Error('Database error')
@@ -280,10 +271,7 @@ describe('/api/v1/ingredients/search', () => {
       expect(responseData.details).toBeUndefined(); // Should not include error details in production
 
       // Restore NODE_ENV
-      Object.defineProperty(process.env, 'NODE_ENV', {
-        value: originalEnv,
-        writable: true,
-      });
+      mocks.mock.config.env.restore(originalEnv);
     });
 
     it('should normalize search term to lowercase', async () => {

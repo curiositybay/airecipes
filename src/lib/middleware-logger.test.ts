@@ -100,10 +100,10 @@ describe('middleware-logger', () => {
 
     it('should filter debug messages in production environment', () => {
       // Save original environment.
-      const originalEnv = process.env.NEXT_PUBLIC_APP_ENVIRONMENT;
+      const originalEnv = mocks.mock.config.app.environment;
 
       // Set to production.
-      process.env.NEXT_PUBLIC_APP_ENVIRONMENT = 'production';
+      mocks.mock.config.updateMockConfig({ environment: 'production' });
 
       // Reset module to re-evaluate environment.
       jest.resetModules();
@@ -137,15 +137,15 @@ describe('middleware-logger', () => {
       expect(mockConsole.error).toHaveBeenCalled();
 
       // Restore original environment.
-      process.env.NEXT_PUBLIC_APP_ENVIRONMENT = originalEnv;
+      mocks.mock.config.updateMockConfig({ environment: originalEnv });
     });
 
     it('should handle missing environment variable', () => {
       // Save original environment.
-      const originalEnv = process.env.NEXT_PUBLIC_APP_ENVIRONMENT;
+      const originalEnv = mocks.mock.config.app.environment;
 
-      // Remove environment variable.
-      delete process.env.NEXT_PUBLIC_APP_ENVIRONMENT;
+      // Set environment to development to simulate default behavior.
+      mocks.mock.config.updateMockConfig({ environment: 'development' });
 
       // Reset module to re-evaluate environment.
       jest.resetModules();
@@ -156,7 +156,7 @@ describe('middleware-logger', () => {
       expect(mockConsole.debug).toHaveBeenCalled();
 
       // Restore original environment.
-      process.env.NEXT_PUBLIC_APP_ENVIRONMENT = originalEnv;
+      mocks.mock.config.updateMockConfig({ environment: originalEnv });
     });
 
     it('should test metadata handling', () => {
@@ -175,10 +175,10 @@ describe('middleware-logger', () => {
 
     it('should test shouldLog function directly', () => {
       // Save original environment.
-      const originalEnv = process.env.NEXT_PUBLIC_APP_ENVIRONMENT;
+      const originalEnv = mocks.mock.config.app.environment;
 
       // Test development environment.
-      process.env.NEXT_PUBLIC_APP_ENVIRONMENT = 'development';
+      mocks.mock.config.updateMockConfig({ environment: 'development' });
       jest.resetModules();
       const { shouldLog } = jest.requireActual('./middleware-logger');
 
@@ -189,7 +189,7 @@ describe('middleware-logger', () => {
       expect(shouldLog('error')).toBe(true);
 
       // Test production environment.
-      process.env.NEXT_PUBLIC_APP_ENVIRONMENT = 'production';
+      mocks.mock.config.updateMockConfig({ environment: 'production' });
       jest.resetModules();
       const { shouldLog: prodShouldLog } = jest.requireActual(
         './middleware-logger'
@@ -202,15 +202,15 @@ describe('middleware-logger', () => {
       expect(prodShouldLog('error')).toBe(true);
 
       // Restore original environment.
-      process.env.NEXT_PUBLIC_APP_ENVIRONMENT = originalEnv;
+      mocks.mock.config.updateMockConfig({ environment: originalEnv });
     });
 
     it('should test logger methods in different environments for complete branch coverage', () => {
       // Save original environment.
-      const originalEnv = process.env.NEXT_PUBLIC_APP_ENVIRONMENT;
+      const originalEnv = mocks.mock.config.app.environment;
 
       // Test error-only environment.
-      process.env.NEXT_PUBLIC_APP_ENVIRONMENT = 'error-only';
+      mocks.mock.config.updateMockConfig({ environment: 'error-only' });
       jest.resetModules();
       const errorOnlyLogger = jest.requireActual('./middleware-logger').default;
       jest.clearAllMocks();
@@ -230,7 +230,7 @@ describe('middleware-logger', () => {
       expect(mockConsole.error).toHaveBeenCalled();
 
       // Test staging environment (hits the else branch).
-      process.env.NEXT_PUBLIC_APP_ENVIRONMENT = 'staging';
+      mocks.mock.config.updateMockConfig({ environment: 'staging' });
       jest.resetModules();
       const stagingLogger = jest.requireActual('./middleware-logger').default;
       jest.clearAllMocks();
@@ -250,15 +250,15 @@ describe('middleware-logger', () => {
       expect(mockConsole.error).toHaveBeenCalled();
 
       // Restore original environment.
-      process.env.NEXT_PUBLIC_APP_ENVIRONMENT = originalEnv;
+      mocks.mock.config.updateMockConfig({ environment: originalEnv });
     });
 
     it('should test logger methods in none environment to hit all negative branches', () => {
       // Save original environment.
-      const originalEnv = process.env.NEXT_PUBLIC_APP_ENVIRONMENT;
+      const originalEnv = mocks.mock.config.app.environment;
 
       // Set to none environment (should hit all negative branches).
-      process.env.NEXT_PUBLIC_APP_ENVIRONMENT = 'none';
+      mocks.mock.config.updateMockConfig({ environment: 'none' });
 
       // Reset module to re-evaluate environment.
       jest.resetModules();
@@ -281,7 +281,7 @@ describe('middleware-logger', () => {
       expect(mockConsole.error).not.toHaveBeenCalled();
 
       // Restore original environment.
-      process.env.NEXT_PUBLIC_APP_ENVIRONMENT = originalEnv;
+      mocks.mock.config.updateMockConfig({ environment: originalEnv });
     });
   });
 });

@@ -157,7 +157,7 @@ describe('api/v1/token-usage/recent/route', () => {
     });
 
     it('includes error details in development mode', async () => {
-      const originalEnv = process.env.NODE_ENV;
+      const originalEnv = mocks.mock.config.app.nodeEnv;
       mocks.mock.config.env.development();
 
       const error = new Error('Database connection failed');

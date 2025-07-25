@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import logger from '@/lib/logger';
+import { appConfig } from '@/config/app';
 
 /**
  * Get random ingredients from the database
@@ -34,7 +35,7 @@ export async function GET() {
         success: false,
         error: 'Failed to fetch random ingredients',
         details:
-          process.env.NODE_ENV === 'development'
+          appConfig.nodeEnv === 'development'
             ? (error as Error).message
             : undefined,
       },

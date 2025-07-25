@@ -387,7 +387,7 @@ describe('api/v1/token-usage/stats/route', () => {
     });
 
     it('should include error details in development mode', async () => {
-      const originalEnv = process.env.NODE_ENV;
+      const originalEnv = mocks.mock.config.app.nodeEnv;
       mocks.mock.config.env.development();
 
       const request = {
@@ -408,7 +408,7 @@ describe('api/v1/token-usage/stats/route', () => {
     });
 
     it('should exclude error details when NODE_ENV is not development', async () => {
-      const originalEnv = process.env.NODE_ENV;
+      const originalEnv = mocks.mock.config.app.nodeEnv;
       mocks.mock.config.env.test();
 
       const request = {

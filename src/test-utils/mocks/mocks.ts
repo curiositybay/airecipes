@@ -140,7 +140,18 @@ export const mocks = {
     // Process and console mocks.
     process: {
       uptime: jest.fn().mockReturnValue(123.456),
-      env: { ...process.env },
+      env: {
+        NODE_ENV: 'test',
+        NEXT_PUBLIC_APP_NAME: 'Test App',
+        NEXT_PUBLIC_APP_VERSION: '0.0.1',
+        NEXT_PUBLIC_APP_ENVIRONMENT: 'test',
+        NEXT_PUBLIC_API_URL: 'http://localhost:3000',
+        OPENAI_API_KEY: 'test-openai-key',
+        OPENAI_MODEL: 'gpt-4o-mini',
+        AUTH_SERVICE_URL: 'http://test-auth-service',
+        REDIS_URL: 'redis://localhost:6379',
+        REDIS_PASSWORD: 'test-password',
+      },
     },
   },
 };

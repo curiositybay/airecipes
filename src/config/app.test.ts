@@ -1,6 +1,13 @@
 import { appConfig, AppConfig } from './app';
 
-describe('appConfig', () => {
+/**
+ * Integration tests for the app config file.
+ *
+ * These tests verify that the config file properly reads environment variables
+ * and provides appropriate defaults. Since this is testing the config file itself
+ * (which is allowed to use process.env), we test the actual integration.
+ */
+describe('appConfig Integration Tests', () => {
   const originalEnv = process.env;
 
   beforeEach(() => {
@@ -14,7 +21,7 @@ describe('appConfig', () => {
     process.env = originalEnv;
   });
 
-  describe('App Information', () => {
+  describe('Environment Variable Integration', () => {
     it('should use environment variables when provided', async () => {
       process.env.NEXT_PUBLIC_APP_NAME = 'Test App';
       process.env.NEXT_PUBLIC_APP_VERSION = '2.0.0';
@@ -49,7 +56,7 @@ describe('appConfig', () => {
     });
   });
 
-  describe('API Configuration', () => {
+  describe('API Configuration Integration', () => {
     it('should use environment variable for API URL when provided', async () => {
       process.env.NEXT_PUBLIC_API_URL = 'https://api.example.com';
 
@@ -69,7 +76,7 @@ describe('appConfig', () => {
     });
   });
 
-  describe('Domain and URLs', () => {
+  describe('Domain and URLs Integration', () => {
     it('should use environment variables for domain and URLs when provided', async () => {
       process.env.NEXT_PUBLIC_APP_DOMAIN = 'example.com';
       process.env.NEXT_PUBLIC_APP_URL = 'https://example.com';
@@ -97,7 +104,7 @@ describe('appConfig', () => {
     });
   });
 
-  describe('SEO and Social Media', () => {
+  describe('SEO and Social Media Integration', () => {
     it('should use environment variables for SEO and social media when provided', async () => {
       process.env.NEXT_PUBLIC_APP_AUTHOR = 'John Doe';
       process.env.NEXT_PUBLIC_APP_KEYWORDS = 'test, keywords';
@@ -129,7 +136,7 @@ describe('appConfig', () => {
     });
   });
 
-  describe('Error Messages', () => {
+  describe('Error Messages Integration', () => {
     it('should use environment variables for error messages when provided', async () => {
       process.env.NEXT_PUBLIC_404_MESSAGE = 'Custom 404 message';
       process.env.NEXT_PUBLIC_500_MESSAGE = 'Custom 500 message';
@@ -152,7 +159,15 @@ describe('appConfig', () => {
       expect(appConfig.errorMessages.serverError).toBeTruthy();
     });
   });
+});
 
+/**
+ * Structure tests for the app config.
+ *
+ * These tests verify the config structure and types without testing
+ * environment variable integration.
+ */
+describe('appConfig Structure Tests', () => {
   describe('Type exports', () => {
     it('should export AppConfig type', () => {
       // Type exports are checked at compile time, not runtime

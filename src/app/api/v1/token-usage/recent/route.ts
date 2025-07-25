@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import logger from '@/lib/logger';
 import { validateRequest } from '@/lib/validation';
 import { tokenUsageRecentSchema } from '@/lib/validation/token-usage';
+import { appConfig } from '@/config/app';
 
 /**
  * Retrieve recent token usage entries with configurable limit.
@@ -62,7 +63,7 @@ export async function GET(request: NextRequest) {
         success: false,
         error: 'Failed to get recent token usage',
         details:
-          process.env.NODE_ENV === 'development'
+          appConfig.nodeEnv === 'development'
             ? (error as Error).message
             : undefined,
       },

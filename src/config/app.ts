@@ -54,6 +54,19 @@ export const appConfig = {
       process.env.NEXT_PUBLIC_500_MESSAGE ||
       'Something went wrong on our end. Please try again later.',
   },
+
+  // Node environment - only available on server side.
+  nodeEnv: typeof window === 'undefined' ? process.env.NODE_ENV : undefined,
+
+  // OpenAI Configuration - only available on server side.
+  openai: {
+    apiKey:
+      typeof window === 'undefined' ? process.env.OPENAI_API_KEY : undefined,
+    model:
+      typeof window === 'undefined'
+        ? process.env.OPENAI_MODEL || 'gpt-4o-mini'
+        : undefined,
+  },
 } as const;
 
 export type AppConfig = typeof appConfig;

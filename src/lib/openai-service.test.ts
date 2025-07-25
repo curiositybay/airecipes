@@ -4,6 +4,7 @@ import OpenAiService, {
 } from './openai-service';
 import { prisma } from './prisma';
 import { getFallbackRecipes } from './fallback-recipes';
+import { mocks } from '@/test-utils/mocks';
 
 // Mock dependencies
 jest.mock('./prisma', () => ({
@@ -90,8 +91,14 @@ describe('OpenAiService', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    process.env.OPENAI_API_KEY = 'test-api-key';
-    process.env.OPENAI_MODEL = 'gpt-4o-mini';
+    mocks.setup.all();
+
+    mocks.mock.config.updateMockConfig({
+      openai: {
+        apiKey: 'test-api-key',
+        model: 'gpt-4o-mini',
+      },
+    });
 
     service = new OpenAiService();
     mockPrisma = prisma as jest.Mocked<typeof prisma>;
@@ -101,21 +108,36 @@ describe('OpenAiService', () => {
   });
 
   afterEach(() => {
-    delete process.env.OPENAI_API_KEY;
-    delete process.env.OPENAI_MODEL;
+    // Reset mock config to defaults
+    mocks.mock.config.updateMockConfig({
+      openai: {
+        apiKey: 'mock-openai-key',
+        model: 'gpt-4o-mini',
+      },
+    });
+    mocks.setup.clear();
   });
 
   describe('constructor', () => {
     it('should initialize with environment variables', () => {
-      process.env.OPENAI_API_KEY = 'test-key';
-      process.env.OPENAI_MODEL = 'gpt-4';
+      mocks.mock.config.updateMockConfig({
+        openai: {
+          apiKey: 'test-key',
+          model: 'gpt-4',
+        },
+      });
 
       const newService = new OpenAiService();
       expect(newService).toBeInstanceOf(OpenAiService);
     });
 
     it('should use default model when OPENAI_MODEL is not set', () => {
-      delete process.env.OPENAI_MODEL;
+      mocks.mock.config.updateMockConfig({
+        openai: {
+          apiKey: 'test-key',
+          model: 'gpt-4o-mini', // Use default instead of undefined
+        },
+      });
 
       const newService = new OpenAiService();
       expect(newService).toBeInstanceOf(OpenAiService);
@@ -328,7 +350,7 @@ describe('OpenAiService', () => {
         },
       } as MockOpenAIResponse);
 
-      mockPrisma.tokenUsage.create.mockRejectedValue(
+      mocks.mock.prisma.client.tokenUsage.create.mockRejectedValue(
         new Error('Database error')
       );
 

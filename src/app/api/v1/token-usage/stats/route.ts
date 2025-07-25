@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import logger from '@/lib/logger';
 import { validateRequest } from '@/lib/validation';
 import { tokenUsageStatsSchema } from '@/lib/validation/token-usage';
+import { appConfig } from '@/config/app';
 
 interface DailyBreakdownItem {
   date: Date;
@@ -135,7 +136,7 @@ export async function GET(request: NextRequest) {
         success: false,
         error: 'Failed to get token usage statistics',
         details:
-          process.env.NODE_ENV === 'development'
+          appConfig.nodeEnv === 'development'
             ? (error as Error).message
             : undefined,
       },

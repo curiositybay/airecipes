@@ -78,11 +78,8 @@ describe('api/v1/ingredients/random/route', () => {
     });
 
     it('includes development error details in development mode', async () => {
-      const originalEnv = process.env.NODE_ENV;
-      Object.defineProperty(process.env, 'NODE_ENV', {
-        value: 'development',
-        writable: true,
-      });
+      const originalEnv = mocks.mock.config.app.nodeEnv;
+      mocks.mock.config.env.development();
 
       const error = new Error('Database connection failed');
       mocks.mock.prisma.client.$queryRaw.mockRejectedValue(error);
@@ -93,10 +90,7 @@ describe('api/v1/ingredients/random/route', () => {
       expect(responseData.details).toBe('Database connection failed');
 
       // Restore environment.
-      Object.defineProperty(process.env, 'NODE_ENV', {
-        value: originalEnv,
-        writable: true,
-      });
+      mocks.mock.config.env.restore(originalEnv);
     });
   });
 });

@@ -43,8 +43,6 @@ describe('ExamplesPage', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    // Reset environment variable
-    delete process.env.NEXT_PUBLIC_API_URL;
   });
 
   afterEach(() => {
@@ -299,9 +297,7 @@ describe('ExamplesPage', () => {
     });
   });
 
-  it('uses custom API URL from environment variable', () => {
-    process.env.NEXT_PUBLIC_API_URL = 'https://api.example.com';
-
+  it('uses correct API endpoint', () => {
     mockApi.get.mockResolvedValueOnce({ data: [] });
 
     render(<ExamplesPage />);

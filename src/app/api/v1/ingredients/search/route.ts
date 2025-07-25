@@ -4,6 +4,7 @@ import { Prisma } from '@prisma/client';
 import logger from '@/lib/logger';
 import { validateRequest } from '@/lib/validation';
 import { ingredientSearchSchema } from '@/lib/validation/ai-meals';
+import { appConfig } from '@/config/app';
 
 /**
  * Search ingredients using prefix matching with alphabetical ordering.
@@ -84,7 +85,7 @@ export async function GET(request: NextRequest) {
         success: false,
         error: 'Failed to search ingredients',
         details:
-          process.env.NODE_ENV === 'development'
+          appConfig.nodeEnv === 'development'
             ? (error as Error).message
             : undefined,
       },

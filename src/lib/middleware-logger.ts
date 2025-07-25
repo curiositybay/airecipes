@@ -1,5 +1,7 @@
 // Middleware-compatible logger that doesn't use Node.js APIs.
-const environment = process.env.NEXT_PUBLIC_APP_ENVIRONMENT || 'development';
+import { appConfig } from '@/config/app';
+
+const environment = appConfig.environment;
 
 interface LogLevel {
   debug: number;
