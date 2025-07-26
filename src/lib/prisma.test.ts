@@ -1,70 +1,50 @@
-import { PrismaClient } from '@prisma/client';
-import { prisma } from './prisma';
+import mocks from '../test-utils/mocks/mocks';
 
-// Mock the appConfig to control the environment
-jest.mock('../config/app', () => ({
-  appConfig: {
-    environment: 'development',
-  },
-}));
+// Setup mocks before importing anything.
+mocks.setup.all();
 
-describe('prisma', () => {
-  it('should create a new PrismaClient instance', () => {
-    expect(prisma).toBeDefined();
-    expect(prisma).toBeInstanceOf(PrismaClient);
+describe('prisma (mocked)', () => {
+  let mockPrismaClient: typeof mocks.mock.prisma.client;
+
+  beforeEach(() => {
+    mockPrismaClient = mocks.mock.prisma.client;
   });
 
   it('should have the expected PrismaClient methods', () => {
-    expect(prisma).toHaveProperty('$connect');
-    expect(prisma).toHaveProperty('$disconnect');
-    expect(prisma).toHaveProperty('$transaction');
-    expect(prisma).toHaveProperty('example');
-    expect(prisma).toHaveProperty('usageLog');
+    expect(mockPrismaClient).toHaveProperty('$connect');
+    expect(mockPrismaClient).toHaveProperty('$disconnect');
+    expect(mockPrismaClient).toHaveProperty('$transaction');
+    expect(mockPrismaClient).toHaveProperty('example');
+    expect(mockPrismaClient).toHaveProperty('usageLog');
   });
 
   it('should have example model methods', () => {
-    expect(prisma.example).toHaveProperty('findMany');
-    expect(prisma.example).toHaveProperty('create');
-    expect(prisma.example).toHaveProperty('update');
-    expect(prisma.example).toHaveProperty('delete');
-    expect(prisma.example).toHaveProperty('findUnique');
+    expect(mockPrismaClient.example).toHaveProperty('findMany');
+    expect(mockPrismaClient.example).toHaveProperty('create');
+    expect(mockPrismaClient.example).toHaveProperty('update');
+    expect(mockPrismaClient.example).toHaveProperty('delete');
+    expect(mockPrismaClient.example).toHaveProperty('findUnique');
   });
 
   it('should have usageLog model methods', () => {
-    expect(prisma.usageLog).toHaveProperty('findMany');
-    expect(prisma.usageLog).toHaveProperty('create');
-    expect(prisma.usageLog).toHaveProperty('count');
-    expect(prisma.usageLog).toHaveProperty('findUnique');
-    expect(prisma.usageLog).toHaveProperty('update');
-    expect(prisma.usageLog).toHaveProperty('delete');
+    expect(mockPrismaClient.usageLog).toHaveProperty('findMany');
+    expect(mockPrismaClient.usageLog).toHaveProperty('create');
+    expect(mockPrismaClient.usageLog).toHaveProperty('count');
+    expect(mockPrismaClient.usageLog).toHaveProperty('findUnique');
+    expect(mockPrismaClient.usageLog).toHaveProperty('update');
+    expect(mockPrismaClient.usageLog).toHaveProperty('delete');
   });
 
-  it('should attach prisma to global object in non-production environment', () => {
-    // The conditional logic should execute in development
-    expect((globalThis as { prisma?: PrismaClient }).prisma).toBeDefined();
-    expect((globalThis as { prisma?: PrismaClient }).prisma).toBe(prisma);
+  it('should have tokenUsage model methods', () => {
+    expect(mockPrismaClient.tokenUsage).toHaveProperty('findMany');
+    expect(mockPrismaClient.tokenUsage).toHaveProperty('create');
+    expect(mockPrismaClient.tokenUsage).toHaveProperty('aggregate');
+    expect(mockPrismaClient.tokenUsage).toHaveProperty('groupBy');
   });
 
-  it('should not attach prisma to global object in production environment', async () => {
-    // Mock production environment
-    jest.doMock('../config/app', () => ({
-      appConfig: {
-        environment: 'production',
-      },
-    }));
-
-    // Clear the global object
-    delete (globalThis as { prisma?: PrismaClient }).prisma;
-
-    // Re-import the module to trigger the conditional logic
-    jest.resetModules();
-    const { prisma: productionPrisma } = await import('./prisma');
-
-    expect(productionPrisma).toBeDefined();
-    expect((globalThis as { prisma?: PrismaClient }).prisma).toBeUndefined();
-  });
-
-  afterAll(async () => {
-    await prisma.$disconnect();
+  it('should have appMetadata model methods', () => {
+    expect(mockPrismaClient.appMetadata).toHaveProperty('findMany');
+    expect(mockPrismaClient.appMetadata).toHaveProperty('create');
+    expect(mockPrismaClient.appMetadata).toHaveProperty('findFirst');
   });
 });

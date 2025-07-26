@@ -51,17 +51,6 @@ export class DatabaseRouteTestHelper {
       prisma: mockPrismaClient,
     }));
 
-    // Mock logger.
-    jest.mock('@/lib/logger', () => ({
-      __esModule: true,
-      default: {
-        error: jest.fn(),
-        info: jest.fn(),
-        warn: jest.fn(),
-        debug: jest.fn(),
-      },
-    }));
-
     // Mock console.error to prevent it from appearing in test output.
     const originalConsoleError = console.error;
     beforeAll(() => {

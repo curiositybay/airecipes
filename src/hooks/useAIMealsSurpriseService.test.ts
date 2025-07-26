@@ -1,5 +1,6 @@
 import { renderHook, act } from '@testing-library/react';
 import { useAIMealsSurpriseService } from './useAIMealsSurpriseService';
+import { setupLocalStorageMock } from '@/test-utils/mocks/mocks';
 
 // Mock fetch
 global.fetch = jest.fn();
@@ -11,6 +12,7 @@ describe('useAIMealsSurpriseService', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (global.fetch as jest.Mock).mockClear();
+    setupLocalStorageMock();
   });
 
   it('should initialize with default state', () => {

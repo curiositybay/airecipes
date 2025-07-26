@@ -1,5 +1,8 @@
 import React from 'react';
 import { render, screen, act } from '@testing-library/react';
+
+// Unmock AuthContext for this test to test the actual implementation
+jest.unmock('@/contexts/AuthContext');
 import { AuthProvider, useAuth } from './AuthContext';
 
 // Mock fetch

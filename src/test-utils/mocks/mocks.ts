@@ -4,8 +4,9 @@ import { mockNextServerModule } from './next-server';
 import { setupFetchMocks } from './http';
 import { setupRateLimitMocks } from './rate-limit';
 import { setupPrismaMocks } from './prisma';
-import { setupLoggerMocks } from './logger';
+
 import { setupValidationMocks } from './validation';
+import * as validationMocks from './validation';
 import { setupAuthMocks } from './auth';
 import { setupMiddlewareCacheMocks } from './middleware-cache';
 import { setupMiddlewareLoggerMocks } from './middleware-logger';
@@ -18,13 +19,32 @@ import * as httpMocks from './http';
 import * as configMocks from './config';
 import * as rateLimitMocks from './rate-limit';
 import * as prismaMocks from './prisma';
-import * as loggerMocks from './logger';
-import * as validationMocks from './validation';
+
+// Validation mocks are now automatically handled by Jest
 import * as authMocks from './auth';
 import * as middlewareCacheMocks from './middleware-cache';
 import * as middlewareLoggerMocks from './middleware-logger';
 import * as reactComponentMocks from './react-components';
 import * as nextAppMocks from './next-app';
+
+// Frontend-specific mocks
+export const localStorageMock = {
+  getItem: jest.fn(),
+  setItem: jest.fn(),
+  removeItem: jest.fn(),
+  clear: jest.fn(),
+};
+
+export const setupLocalStorageMock = () => {
+  Object.defineProperty(window, 'localStorage', {
+    value: localStorageMock,
+  });
+  return localStorageMock;
+};
+
+export const setupScrollIntoViewMock = () => {
+  Element.prototype.scrollIntoView = jest.fn();
+};
 
 // Create a single mocks object that contains everything.
 export const mocks = {
@@ -36,7 +56,6 @@ export const mocks = {
       setupFetchMocks();
       setupRateLimitMocks();
       setupPrismaMocks();
-      setupLoggerMocks();
       setupValidationMocks();
       setupAuthMocks();
       setupMiddlewareCacheMocks();
@@ -47,6 +66,10 @@ export const mocks = {
 
     clear: () => {
       jest.clearAllMocks();
+      localStorageMock.getItem.mockClear();
+      localStorageMock.setItem.mockClear();
+      localStorageMock.removeItem.mockClear();
+      localStorageMock.clear.mockClear();
     },
 
     // Convenience method that returns cleanup function.
@@ -99,12 +122,6 @@ export const mocks = {
       client: prismaMocks.mockPrismaClient,
     },
 
-    // Logger mocks.
-    logger: {
-      ...loggerMocks,
-      instance: loggerMocks.mockLogger,
-    },
-
     // Validation mocks.
     validation: {
       ...validationMocks,
@@ -135,6 +152,13 @@ export const mocks = {
     // Next.js app mocks.
     nextApp: {
       ...nextAppMocks,
+    },
+
+    // Frontend mocks.
+    frontend: {
+      localStorage: localStorageMock,
+      setupLocalStorage: setupLocalStorageMock,
+      setupScrollIntoView: setupScrollIntoViewMock,
     },
 
     // Process and console mocks.

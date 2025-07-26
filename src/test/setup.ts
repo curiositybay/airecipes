@@ -9,6 +9,21 @@ jest.mock('*.svg', () => 'mocked-svg');
 jest.mock('*.png', () => 'mocked-png');
 jest.mock('*.jpg', () => 'mocked-jpg');
 
+// Module-level mocks for React components and hooks
+// These get hoisted properly by Jest
+
+// Mock AuthContext
+jest.mock('@/contexts/AuthContext', () => ({
+  useAuth: jest.fn(),
+}));
+
+// Note: Component mocks are handled by individual test files
+// to allow testing of the actual component implementations
+// Only external libraries and contexts are mocked here
+
+// Note: Hook mocks are handled by individual test files
+// to allow testing of the actual hook implementations
+
 // Global test utilities.
 global.ResizeObserver = jest.fn().mockImplementation(() => ({
   observe: jest.fn(),

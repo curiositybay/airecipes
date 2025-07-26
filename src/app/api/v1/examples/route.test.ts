@@ -2,10 +2,6 @@ import mocks from '@/test-utils/mocks/mocks';
 import { NextRequest, NextResponse } from 'next/server';
 
 // Mock dependencies before importing the logic.
-jest.mock('@/lib/logger', () => ({
-  __esModule: true,
-  default: mocks.mock.logger.instance,
-}));
 
 jest.mock('@/lib/validation', () => ({
   ...jest.requireActual('@/lib/validation'),

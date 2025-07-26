@@ -15,6 +15,7 @@ jest.mock('@/hooks/useAIMealsSurpriseService', () => ({
   useAIMealsSurpriseService: jest.fn(),
 }));
 
+// Mock child components
 jest.mock('./AIMealsHero', () => {
   return function MockAIMealsHero() {
     return <div data-testid='ai-meals-hero'>AI Meals Hero</div>;

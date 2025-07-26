@@ -1,26 +1,4 @@
-import { mockLogger } from '../test-utils/mocks';
-
-// Mock winston with spies before any imports
-const mockFileTransport = jest.fn();
-const mockConsoleTransport = jest.fn();
-const mockWinston = {
-  createLogger: jest.fn(() => mockLogger),
-  transports: {
-    Console: mockConsoleTransport,
-    File: mockFileTransport,
-  },
-  format: {
-    combine: jest.fn((...args) => args),
-    timestamp: jest.fn(() => ({})),
-    errors: jest.fn(() => ({})),
-    json: jest.fn(() => ({})),
-    colorize: jest.fn(() => ({})),
-    simple: jest.fn(() => ({})),
-    splat: jest.fn(() => ({})),
-  },
-};
-
-jest.mock('winston', () => mockWinston);
+import winston from 'winston';
 
 // Mock appConfig for production environment
 jest.mock('../config/app', () => ({
@@ -38,11 +16,11 @@ describe('logger (production environment)', () => {
     // Import the logger module - this will execute the production code
     await import('./logger');
 
-    expect(mockFileTransport).toHaveBeenCalledWith({
+    expect(winston.transports.File).toHaveBeenCalledWith({
       filename: 'logs/error.log',
       level: 'error',
     });
-    expect(mockFileTransport).toHaveBeenCalledWith({
+    expect(winston.transports.File).toHaveBeenCalledWith({
       filename: 'logs/combined.log',
     });
   });

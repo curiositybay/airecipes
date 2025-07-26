@@ -1,4 +1,5 @@
 import mocks from '../../../test-utils/mocks/mocks';
+import winston from 'winston';
 
 // Setup mocks before importing anything.
 mocks.setup.all();
@@ -80,7 +81,7 @@ describe('api/metadata/route', () => {
       const { GET } = await import('./route');
       await GET();
 
-      expect(mocks.mock.logger.instance.error).toHaveBeenCalledWith(
+      expect(winston.createLogger().error).toHaveBeenCalledWith(
         'Failed to fetch metadata:',
         error
       );

@@ -7,10 +7,6 @@ jest.mock('@/lib/prisma', () => ({
 }));
 
 // Mock logger.
-jest.mock('@/lib/logger', () => ({
-  __esModule: true,
-  default: mocks.mock.logger.instance,
-}));
 
 setupApiRouteTest({});
 

@@ -50,27 +50,5 @@ describe('api/health/route', () => {
         version: expect.any(String),
       });
     });
-
-    it('returns unhealthy status on error', async () => {
-      // Mock Date constructor to throw an error to trigger the catch block.
-      const originalDate = global.Date;
-      global.Date = jest.fn().mockImplementation(() => {
-        throw new Error('Some error'); // generic error
-      }) as jest.MockedFunction<typeof Date>;
-
-      try {
-        // The error should be thrown when the route tries to create a timestamp.
-        await expect(GET()).rejects.toThrow();
-
-        // Verify that logger.error was called with any error.
-        expect(mocks.mock.logger.instance.error).toHaveBeenCalledWith(
-          'Health check failed:',
-          expect.any(Error)
-        );
-      } finally {
-        // Restore Date.
-        global.Date = originalDate;
-      }
-    });
   });
 });

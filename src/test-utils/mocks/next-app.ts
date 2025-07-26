@@ -55,7 +55,6 @@ export const setupNextAppMocks = () => {
 
   // Mock CSS imports.
   jest.mock('./globals.css', () => ({}));
-  jest.mock('@fortawesome/fontawesome-free/css/all.min.css', () => ({}));
 
   // Mock window.history for components that check browser history.
   Object.defineProperty(window, 'history', {

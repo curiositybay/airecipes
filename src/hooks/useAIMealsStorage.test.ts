@@ -1,20 +1,14 @@
 import { renderHook, act } from '@testing-library/react';
 import { useAIMealsStorage } from './useAIMealsStorage';
-
-// Mock localStorage
-const localStorageMock = {
-  getItem: jest.fn(),
-  setItem: jest.fn(),
-  removeItem: jest.fn(),
-  clear: jest.fn(),
-};
-Object.defineProperty(window, 'localStorage', {
-  value: localStorageMock,
-});
+import {
+  localStorageMock,
+  setupLocalStorageMock,
+} from '@/test-utils/mocks/mocks';
 
 describe('useAIMealsStorage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    setupLocalStorageMock();
   });
 
   it('should initialize with empty ingredients', () => {

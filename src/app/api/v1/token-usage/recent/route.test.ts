@@ -6,11 +6,6 @@ jest.mock('@/lib/prisma', () => ({
   prisma: mocks.mock.prisma.client,
 }));
 
-jest.mock('@/lib/logger', () => ({
-  __esModule: true,
-  default: mocks.mock.logger.instance,
-}));
-
 describe('api/v1/token-usage/recent/route', () => {
   let GET: (request: NextRequest) => Promise<Response>;
   let validateRequest: jest.Mock;

@@ -1,7 +1,4 @@
-import OpenAiService, {
-  RecipeGenerationResponse,
-  Preferences,
-} from './openai-service';
+import type { RecipeGenerationResponse, Preferences } from './openai-service';
 import { prisma } from './prisma';
 import { getFallbackRecipes } from './fallback-recipes';
 import { mocks } from '@/test-utils/mocks';
@@ -27,21 +24,69 @@ jest.mock('./fallback-recipes', () => ({
   getFallbackRecipes: jest.fn(),
 }));
 
-// Mock OpenAI
-const mockOpenAI = {
+// Use Jest's automatic mock for openai.
+jest.mock('openai', () => {
+  const mockOpenAI = {
+    chat: {
+      completions: {
+        create: jest.fn(),
+      },
+    },
+    models: {
+      list: jest.fn(),
+    },
+  };
+
+  const OpenAI = jest.fn(() => mockOpenAI);
+
+  return {
+    __esModule: true,
+    default: OpenAI,
+    mockOpenAI,
+  };
+});
+
+// OpenAI library provides AI service functionality.
+
+// Type for the OpenAI mock instance.
+type MockOpenAIInstance = {
   chat: {
     completions: {
-      create: jest.fn(),
-    },
-  },
+      create: jest.MockedFunction<() => Promise<MockOpenAIResponse>>;
+    };
+  };
+  models: {
+    list: jest.MockedFunction<() => Promise<unknown>>;
+  };
 };
 
-jest.mock('openai', () => ({
-  __esModule: true,
-  default: jest.fn().mockImplementation(() => mockOpenAI),
-}));
+// Type for the OpenAiService class.
+type OpenAiServiceType = {
+  new (): {
+    generateRecipes: (
+      ingredients: string[],
+      preferences?: Preferences
+    ) => Promise<RecipeGenerationResponse>;
+    buildRecipePrompt: (
+      ingredients: string[],
+      preferences?: Preferences
+    ) => string;
+    isCreditError: (
+      error: Error | ErrorWithStatus | { status: number }
+    ) => boolean;
+    isAuthenticationError: (
+      error: Error | ErrorWithStatus | { status: number }
+    ) => boolean;
+    isRateLimitError: (
+      error: Error | ErrorWithStatus | { status: number }
+    ) => boolean;
+  };
+};
 
-// Type for mock OpenAI response
+// Access the automatic mock instance.
+let mockOpenAI: MockOpenAIInstance;
+
+// Type for mock OpenAI response.
 type MockOpenAIResponse = {
   choices: Array<{
     message: {
@@ -55,12 +100,12 @@ type MockOpenAIResponse = {
   };
 };
 
-// Type for errors with status property
+// Type for errors with status property.
 interface ErrorWithStatus extends Error {
   status?: number;
 }
 
-// Type for accessing private methods in tests
+// Type for accessing private methods in tests.
 type OpenAiServiceWithPrivateMethods = {
   buildRecipePrompt: (
     ingredients: string[],
@@ -77,7 +122,7 @@ type OpenAiServiceWithPrivateMethods = {
   ) => boolean;
 };
 
-// Helper function to access private methods
+// Helper function to access private methods.
 function getPrivateMethods(
   service: OpenAiService
 ): OpenAiServiceWithPrivateMethods {
@@ -85,11 +130,12 @@ function getPrivateMethods(
 }
 
 describe('OpenAiService', () => {
-  let service: OpenAiService;
+  let service: InstanceType<OpenAiServiceType>;
   let mockPrisma: jest.Mocked<typeof prisma>;
   let mockGetFallbackRecipes: jest.MockedFunction<typeof getFallbackRecipes>;
+  let OpenAiService: OpenAiServiceType;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     jest.clearAllMocks();
     mocks.setup.all();
 
@@ -100,11 +146,19 @@ describe('OpenAiService', () => {
       },
     });
 
+    // Import the service after mocks are set up.
+    const serviceModule = await import('./openai-service');
+    OpenAiService = serviceModule.default;
+
     service = new OpenAiService();
     mockPrisma = prisma as jest.Mocked<typeof prisma>;
     mockGetFallbackRecipes = getFallbackRecipes as jest.MockedFunction<
       typeof getFallbackRecipes
     >;
+
+    // Access the automatic mock instance directly.
+    const openaiModule = jest.requireMock('openai');
+    mockOpenAI = openaiModule.mockOpenAI;
   });
 
   afterEach(() => {
@@ -135,7 +189,7 @@ describe('OpenAiService', () => {
       mocks.mock.config.updateMockConfig({
         openai: {
           apiKey: 'test-key',
-          model: 'gpt-4o-mini', // Use default instead of undefined
+          model: 'gpt-4o-mini', // Use default instead of undefined.
         },
       });
 
@@ -280,12 +334,12 @@ describe('OpenAiService', () => {
         },
       } as MockOpenAIResponse);
 
-      // Mock fallback recipes to be returned
+      // Mock fallback recipes to be returned.
       mockGetFallbackRecipes.mockReturnValue(mockRecipeResponse);
 
       const result = await service.generateRecipes(mockIngredients);
 
-      // Should return fallback recipes instead of throwing
+      // Should return fallback recipes instead of throwing.
       expect(result).toEqual(mockRecipeResponse);
       expect(mockGetFallbackRecipes).toHaveBeenCalledWith(mockIngredients);
     });
@@ -314,7 +368,7 @@ describe('OpenAiService', () => {
 
     it('should handle rate limit errors', async () => {
       const rateLimitError = new Error('rate_limit_exceeded');
-      // Don't set status to 429 since that would be caught by credit error handler
+      // Don't set status to 429 since that would be caught by credit error handler.
 
       mockOpenAI.chat.completions.create.mockRejectedValue(rateLimitError);
 
@@ -357,7 +411,7 @@ describe('OpenAiService', () => {
       const result = await service.generateRecipes(mockIngredients);
 
       expect(result).toEqual(mockRecipeResponse);
-      // Should not throw even if logging fails
+      // Should not throw even if logging fails.
     });
   });
 
@@ -371,7 +425,7 @@ describe('OpenAiService', () => {
         maxTime: '30 minutes',
       };
 
-      // Access the private method through the service instance
+      // Access the private method through the service instance.
       const prompt = (
         service as unknown as {
           buildRecipePrompt: (

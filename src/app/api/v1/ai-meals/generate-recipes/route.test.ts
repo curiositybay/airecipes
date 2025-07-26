@@ -5,11 +5,6 @@ jest.mock('@/lib/prisma', () => ({
   prisma: mocks.mock.prisma.client,
 }));
 
-jest.mock('@/lib/logger', () => ({
-  __esModule: true,
-  default: mocks.mock.logger.instance,
-}));
-
 jest.mock('@/lib/validation', () => ({
   validateRequest: jest.fn(),
 }));

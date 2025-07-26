@@ -117,8 +117,8 @@ export const mockPrismaClient = {
 };
 
 export const mockPrismaModule = () => {
-  jest.doMock('@prisma/client', () => ({
-    PrismaClient: jest.fn(() => mockPrismaClient),
+  jest.doMock('@/lib/prisma', () => ({
+    prisma: mockPrismaClient,
   }));
 };
 
