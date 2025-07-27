@@ -24,12 +24,6 @@ function IngredientInput({
   // Debounced search function for ingredient suggestions.
   const searchIngredientsDebounced = useCallback(
     async (query: string): Promise<void> => {
-      if (!query.trim()) {
-        setSuggestions([]);
-        setShowSuggestions(false);
-        return;
-      }
-
       setIsLoading(true);
       try {
         const response = await fetch(
@@ -93,8 +87,8 @@ function IngredientInput({
           'Search is temporarily limited. Please wait a moment before adding ingredients.'
         );
       }
+      return false;
     }
-    return false;
   };
 
   // Debounced search effect for ingredient suggestions.
@@ -119,13 +113,21 @@ function IngredientInput({
       switch (e.key) {
         case 'ArrowDown':
           e.preventDefault();
-          setSelectedSuggestionIndex(prev =>
-            prev < suggestions.length - 1 ? prev + 1 : prev
-          );
+          setSelectedSuggestionIndex(prev => {
+            if (prev < suggestions.length - 1) {
+              return prev + 1;
+            }
+            return prev;
+          });
           break;
         case 'ArrowUp':
           e.preventDefault();
-          setSelectedSuggestionIndex(prev => (prev > 0 ? prev - 1 : -1));
+          setSelectedSuggestionIndex(prev => {
+            if (prev > 0) {
+              return prev - 1;
+            }
+            return -1;
+          });
           break;
         case 'Escape':
           setShowSuggestions(false);

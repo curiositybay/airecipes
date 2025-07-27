@@ -50,5 +50,26 @@ describe('api/health/route', () => {
         version: expect.any(String),
       });
     });
+
+    it('returns unhealthy status on error', async () => {
+      // Mock process.uptime to throw an error to trigger the catch block.
+      const originalUptime = process.uptime;
+      process.uptime = jest.fn().mockImplementation(() => {
+        throw new Error('Uptime error');
+      });
+
+      try {
+        const response = await GET();
+        const data = await response.json();
+
+        expect(response.status).toBe(503);
+        expect(data.status).toBe('unhealthy');
+        expect(data.error).toBe('Health check failed');
+        expect(data.timestamp).toBeDefined();
+      } finally {
+        // Restore the original process.uptime.
+        process.uptime = originalUptime;
+      }
+    });
   });
 });

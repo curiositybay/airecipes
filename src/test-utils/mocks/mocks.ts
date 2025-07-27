@@ -19,6 +19,7 @@ import * as httpMocks from './http';
 import * as configMocks from './config';
 import * as rateLimitMocks from './rate-limit';
 import * as prismaMocks from './prisma';
+import * as ingredientMocks from './ingredients';
 
 // Validation mocks are now automatically handled by Jest
 import * as authMocks from './auth';
@@ -132,6 +133,11 @@ export const mocks = {
     auth: {
       ...authMocks,
       requireAuth: authMocks.mockRequireAuth,
+    },
+
+    // Ingredient mocks.
+    ingredients: {
+      ...ingredientMocks,
     },
 
     // Middleware cache mocks.
