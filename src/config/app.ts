@@ -1,8 +1,3 @@
-// Validate required environment variables only on server side.
-if (typeof window === 'undefined' && !process.env.AUTH_SERVICE_URL) {
-  throw new Error('AUTH_SERVICE_URL environment variable is required');
-}
-
 export const appConfig = {
   name: process.env.NEXT_PUBLIC_APP_NAME || 'AI Recipes by Curiosity Bay',
   version: process.env.NEXT_PUBLIC_APP_VERSION || '1.0.0',
