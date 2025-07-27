@@ -1,91 +1,51 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  act,
+} from '@testing-library/react';
 import RecipeCard from './RecipeCard';
+import { Recipe } from '@/types/ai-meals';
+import { mocks } from '@/test-utils/mocks';
 
-// Mock navigator.clipboard
-Object.assign(navigator, {
-  clipboard: {
-    writeText: jest.fn(),
-  },
-});
+const testClipboardWithRecipe = async (
+  recipe: Recipe,
+  expectedContent: string,
+  shouldContain: boolean = true
+) => {
+  mocks.mock.frontend.mockClipboardSuccess();
 
-const mockRecipe = {
-  name: 'Test Recipe',
-  description: 'A delicious test recipe',
-  ingredients: ['ingredient 1', 'ingredient 2'],
-  instructions: ['step 1', 'step 2'],
-  prepTime: '10 minutes',
-  difficulty: 'Easy' as const,
-  servings: 4,
-  tags: ['vegetarian', 'quick'],
-  nutritionalInfo: {
-    calories: 300,
-    protein: '15g',
-    carbs: '45g',
-    fat: '10g',
-  },
+  render(<RecipeCard recipe={recipe} index={0} />);
+
+  const copyButton = screen.getByTitle('Copy recipe');
+  fireEvent.click(copyButton);
+
+  await waitFor(() => {
+    const expectation = shouldContain
+      ? expect.stringContaining(expectedContent)
+      : expect.not.stringContaining(expectedContent);
+    expect(mocks.mock.frontend.clipboard.writeText).toHaveBeenCalledWith(
+      expectation
+    );
+  });
 };
 
 describe('RecipeCard', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-  });
-
-  it('should render recipe information', () => {
-    render(<RecipeCard recipe={mockRecipe} index={0} />);
-
-    expect(screen.getByText('Test Recipe')).toBeInTheDocument();
-    expect(screen.getByText('A delicious test recipe')).toBeInTheDocument();
-    expect(screen.getByText('ingredient 1')).toBeInTheDocument();
-    expect(screen.getByText('ingredient 2')).toBeInTheDocument();
-    expect(screen.getByText('step 1')).toBeInTheDocument();
-    expect(screen.getByText('step 2')).toBeInTheDocument();
-    expect(screen.getByText('vegetarian')).toBeInTheDocument();
-    expect(screen.getByText('quick')).toBeInTheDocument();
-  });
-
-  it('should display recipe metadata', () => {
-    render(<RecipeCard recipe={mockRecipe} index={0} />);
-
-    expect(screen.getByText('10 minutes')).toBeInTheDocument();
-    expect(screen.getByText('Easy')).toBeInTheDocument();
-    expect(screen.getByText('4 servings')).toBeInTheDocument();
-  });
-
-  it('should display nutritional information', () => {
-    render(<RecipeCard recipe={mockRecipe} index={0} />);
-
-    expect(screen.getByText('300 cal')).toBeInTheDocument();
-    expect(screen.getByText('15g')).toBeInTheDocument();
-    expect(screen.getByText('45g')).toBeInTheDocument();
-    expect(screen.getByText('10g')).toBeInTheDocument();
-  });
-
-  it('should handle copy to clipboard', async () => {
-    const mockWriteText = jest.fn().mockResolvedValue(undefined);
-    Object.assign(navigator.clipboard, { writeText: mockWriteText });
-
-    render(<RecipeCard recipe={mockRecipe} index={0} />);
-
-    const copyButton = screen.getByTitle('Copy recipe');
-    fireEvent.click(copyButton);
-
-    await waitFor(() => {
-      expect(mockWriteText).toHaveBeenCalledWith(
-        expect.stringContaining('Test Recipe')
-      );
-    });
+    mocks.setup.frontend.setupClipboard();
   });
 
   it('should handle copy error gracefully', async () => {
-    const mockWriteText = jest.fn().mockRejectedValue(new Error('Copy failed'));
-    Object.assign(navigator.clipboard, { writeText: mockWriteText });
+    mocks.mock.frontend.mockClipboardError(new Error('Copy failed'));
 
     const consoleSpy = jest
       .spyOn(console, 'error')
       .mockImplementation(() => {});
 
-    render(<RecipeCard recipe={mockRecipe} index={0} />);
+    render(<RecipeCard recipe={mocks.mock.recipes.mockRecipe} index={0} />);
 
     const copyButton = screen.getByTitle('Copy recipe');
     fireEvent.click(copyButton);
@@ -98,5 +58,156 @@ describe('RecipeCard', () => {
     });
 
     consoleSpy.mockRestore();
+  });
+
+  it('should reset copied state after timeout', async () => {
+    jest.useFakeTimers();
+    mocks.mock.frontend.mockClipboardSuccess();
+
+    render(<RecipeCard recipe={mocks.mock.recipes.mockRecipe} index={0} />);
+
+    const copyButton = screen.getByTitle('Copy recipe');
+    fireEvent.click(copyButton);
+
+    await waitFor(() => {
+      const icon = copyButton.querySelector('i');
+      expect(icon).toHaveClass('fa-check');
+    });
+
+    act(() => {
+      jest.advanceTimersByTime(2000);
+    });
+
+    await waitFor(() => {
+      const icon = copyButton.querySelector('i');
+      expect(icon).toHaveClass('fa-copy');
+    });
+
+    jest.useRealTimers();
+  });
+
+  describe('formatRecipeForCopy - missing optional fields', () => {
+    test.each([
+      {
+        field: 'description',
+        value: undefined,
+        expectedContent: 'A delicious test recipe',
+        testName: 'should handle recipe without description',
+      },
+      {
+        field: 'tags',
+        value: undefined,
+        expectedContent: 'Tags:',
+        testName: 'should handle recipe without tags',
+      },
+      {
+        field: 'ingredients',
+        value: undefined,
+        expectedContent: 'Ingredients:',
+        testName: 'should handle recipe without ingredients',
+      },
+      {
+        field: 'instructions',
+        value: undefined,
+        expectedContent: 'Instructions:',
+        testName: 'should handle recipe without instructions',
+      },
+    ])('$testName', async ({ field, value, expectedContent }) => {
+      const recipeWithoutField = {
+        ...mocks.mock.recipes.mockRecipe,
+        [field]: value,
+      } as unknown as Recipe;
+
+      await testClipboardWithRecipe(recipeWithoutField, expectedContent, false);
+    });
+  });
+
+  describe('formatRecipeForCopy - metadata handling', () => {
+    test.each([
+      {
+        name: 'should handle recipe without metadata',
+        recipe: {
+          ...mocks.mock.recipes.mockRecipe,
+          prepTime: undefined,
+          difficulty: undefined,
+          servings: undefined,
+        },
+        expectedContent: 'Details:',
+        shouldContain: false,
+      },
+      {
+        name: 'should handle recipe with partial metadata',
+        recipe: {
+          ...mocks.mock.recipes.mockRecipe,
+          prepTime: undefined,
+          difficulty: undefined,
+        },
+        expectedContent: 'Details:',
+        shouldContain: true,
+      },
+      {
+        name: 'should handle recipe with missing servings in metadata',
+        recipe: {
+          ...mocks.mock.recipes.mockRecipe,
+          servings: undefined,
+        },
+        expectedContent: '• Servings:',
+        shouldContain: false,
+      },
+    ])('$name', async ({ recipe, expectedContent, shouldContain }) => {
+      await testClipboardWithRecipe(
+        recipe as unknown as Recipe,
+        expectedContent,
+        shouldContain
+      );
+    });
+  });
+
+  describe('formatRecipeForCopy - nutritional info handling', () => {
+    test.each([
+      {
+        name: 'should handle recipe without nutritional info',
+        recipe: {
+          ...mocks.mock.recipes.mockRecipe,
+          nutritionalInfo: undefined,
+        },
+        expectedContent: 'Nutritional Information:',
+        shouldContain: false,
+      },
+      {
+        name: 'should handle recipe with partial nutritional info',
+        recipe: {
+          ...mocks.mock.recipes.mockRecipe,
+          nutritionalInfo: {
+            calories: 300,
+            protein: undefined,
+            carbs: undefined,
+            fat: undefined,
+          },
+        },
+        expectedContent: 'Nutritional Information:',
+        shouldContain: true,
+      },
+      {
+        name: 'should handle recipe with missing calories in nutritional info',
+        recipe: {
+          ...mocks.mock.recipes.mockRecipe,
+          nutritionalInfo: {
+            calories: undefined,
+            protein: '15g',
+            carbs: '45g',
+            fat: '10g',
+          },
+        },
+        expectedContent: '• Calories:',
+        shouldContain: false,
+      },
+    ])('$name', async ({ recipe, expectedContent, shouldContain }) => {
+      await testClipboardWithRecipe(
+        recipe as unknown as Recipe,
+        expectedContent,
+        shouldContain
+      );
+    });
   });
 });

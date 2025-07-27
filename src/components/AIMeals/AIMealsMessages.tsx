@@ -14,7 +14,6 @@ export default function AIMealsMessages({
 }: AIMealsMessagesProps) {
   return (
     <>
-      {/* Error Display */}
       {error && (
         <div className='ai-meals-error'>
           <i className='fas fa-exclamation-triangle mr-2'></i>
@@ -22,7 +21,6 @@ export default function AIMealsMessages({
         </div>
       )}
 
-      {/* Fallback Message */}
       {isFallbackRecipes && fallbackMessage && (
         <div className='ai-meals-fallback'>
           <i className='fas fa-info-circle mr-2'></i>

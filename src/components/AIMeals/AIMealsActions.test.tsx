@@ -2,8 +2,6 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import AIMealsActions from './AIMealsActions';
 
-// Mock dependencies - Button components are mocked here since they're UI components
-// that should be tested with their actual implementations in their own test files
 jest.mock('../UI/Button', () => ({
   PrimaryButton: ({
     children,

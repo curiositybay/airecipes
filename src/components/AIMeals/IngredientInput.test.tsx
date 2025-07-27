@@ -9,10 +9,8 @@ import {
 import IngredientInput from './IngredientInput';
 import { mocks } from '@/test-utils/mocks';
 
-// Mock fetch
 global.fetch = jest.fn();
 
-// Mock console.error to avoid noise in tests
 const originalConsoleError = console.error;
 beforeAll(() => {
   console.error = jest.fn();
@@ -22,7 +20,6 @@ afterAll(() => {
   console.error = originalConsoleError;
 });
 
-// Setup utility functions
 function setup(customProps = {}) {
   const props = {
     ingredients: ['tomato', 'onion'],
@@ -128,12 +125,12 @@ describe('IngredientInput', () => {
         suggestions: mocks.mock.ingredients.mockSuggestions.basic,
         input: 'garlic',
         actions: [
-          { key: 'ArrowDown' }, // index 0
-          { key: 'ArrowDown' }, // index 1
-          { key: 'ArrowDown' }, // index 2
-          { key: 'ArrowUp' }, // index 1
-          { key: 'ArrowUp' }, // index 0
-          { key: 'ArrowUp' }, // index -1
+          { key: 'ArrowDown' },
+          { key: 'ArrowDown' },
+          { key: 'ArrowDown' },
+          { key: 'ArrowUp' },
+          { key: 'ArrowUp' },
+          { key: 'ArrowUp' },
         ],
       },
       {
@@ -141,10 +138,10 @@ describe('IngredientInput', () => {
         suggestions: mocks.mock.ingredients.mockSuggestions.carrot,
         input: 'garlic',
         actions: [
-          { key: 'ArrowDown' }, // index 0
-          { key: 'ArrowDown' }, // index 1
-          { key: 'ArrowDown', expectHighlighted: 'carrot' }, // index 2
-          { key: 'ArrowUp', expectHighlighted: 'ginger' }, // index 1 (prev > 0 branch)
+          { key: 'ArrowDown' },
+          { key: 'ArrowDown' },
+          { key: 'ArrowDown', expectHighlighted: 'carrot' },
+          { key: 'ArrowUp', expectHighlighted: 'ginger' },
         ],
       },
       {
@@ -152,10 +149,10 @@ describe('IngredientInput', () => {
         suggestions: mocks.mock.ingredients.mockSuggestions.chicken,
         input: 'chicken',
         actions: [
-          { key: 'ArrowDown', expectHighlighted: 'chicken' }, // index 0
-          { key: 'ArrowDown', expectHighlighted: 'chicken breast' }, // index 1
-          { key: 'ArrowDown', expectHighlighted: 'chicken eggs' }, // index 2
-          { key: 'ArrowUp', expectHighlighted: 'chicken breast' }, // index 1 (prev > 0 branch)
+          { key: 'ArrowDown', expectHighlighted: 'chicken' },
+          { key: 'ArrowDown', expectHighlighted: 'chicken breast' },
+          { key: 'ArrowDown', expectHighlighted: 'chicken eggs' },
+          { key: 'ArrowUp', expectHighlighted: 'chicken breast' },
         ],
       },
     ])('$name', async ({ suggestions, input, actions }) => {
@@ -214,10 +211,8 @@ describe('IngredientInput', () => {
       const { input, props } = setup();
       await typeAndWait(input, 'garlic');
 
-      // Select first suggestion
       fireEvent.keyDown(document, { key: 'ArrowDown' });
 
-      // Press Enter
       fireEvent.keyDown(input, { key: 'Enter' });
 
       await waitFor(() => {
@@ -242,14 +237,12 @@ describe('IngredientInput', () => {
       const { input, props } = setup();
       await typeAndWait(input, 'garlic');
 
-      // Hide suggestions by pressing Escape
       fireEvent.keyDown(document, { key: 'Escape' });
 
       await waitFor(() => {
         expect(screen.queryByText('garlic')).not.toBeInTheDocument();
       });
 
-      // Mock fetch for ingredient existence check
       mocks.mock.ingredients.mockFetchSequence({
         ok: true,
         json: () =>
@@ -259,7 +252,6 @@ describe('IngredientInput', () => {
           }),
       });
 
-      // Now press Enter when suggestions are hidden
       fireEvent.keyDown(input, { key: 'Enter' });
 
       await waitFor(() => {
@@ -284,7 +276,6 @@ describe('IngredientInput', () => {
       const { input, props } = setup();
       fireEvent.change(input, { target: { value: 'garlic' } });
 
-      // Press Enter immediately without waiting for suggestions to appear
       fireEvent.keyDown(input, { key: 'Enter' });
 
       await waitFor(() => {
@@ -299,11 +290,8 @@ describe('IngredientInput', () => {
     it('should handle non-Enter key press in input (cover false branch of Enter check)', async () => {
       const { input, props } = setup();
 
-      // Press a non-Enter key (like 'Tab' or 'Space')
       fireEvent.keyDown(input, { key: 'Tab' });
 
-      // The function should complete without any side effects
-      // No ingredients should be added
       expect(props.setIngredients).not.toHaveBeenCalled();
     });
   });
@@ -398,7 +386,6 @@ describe('IngredientInput', () => {
     });
 
     it('should handle 429 rate limit error in checkIngredientExists', async () => {
-      // Mock successful search for suggestions first
       mocks.mock.ingredients.mockFetchSequence(
         {
           ok: true,
@@ -424,7 +411,6 @@ describe('IngredientInput', () => {
     });
 
     it('should handle non-200 response in checkIngredientExists', async () => {
-      // Mock successful search for suggestions
       mocks.mock.ingredients.mockFetchSequence(
         {
           ok: true,
@@ -465,10 +451,8 @@ describe('IngredientInput', () => {
 
       fireEvent.blur(input);
 
-      // Should still show suggestions immediately after blur
       expect(screen.getByText('garlic')).toBeInTheDocument();
 
-      // Should hide suggestions after timeout
       advanceTimers(200);
 
       await waitFor(() => {

@@ -21,7 +21,6 @@ function IngredientInput({
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
 
-  // Debounced search function for ingredient suggestions.
   const searchIngredientsDebounced = useCallback(
     async (query: string): Promise<void> => {
       setIsLoading(true);
@@ -63,7 +62,6 @@ function IngredientInput({
     [ingredients, setError]
   );
 
-  // Checks if ingredient exists in database.
   const checkIngredientExists = async (
     ingredientName: string
   ): Promise<boolean> => {
@@ -91,7 +89,6 @@ function IngredientInput({
     }
   };
 
-  // Debounced search effect for ingredient suggestions.
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       if (inputValue.trim()) {
@@ -100,12 +97,11 @@ function IngredientInput({
         setSuggestions([]);
         setShowSuggestions(false);
       }
-    }, 500); // 500ms debounce delay.
+    }, 500);
 
     return () => clearTimeout(timeoutId);
   }, [inputValue, ingredients, searchIngredientsDebounced]);
 
-  // Handles keyboard navigation for suggestions only (not Enter).
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (!showSuggestions) return;
@@ -143,14 +139,12 @@ function IngredientInput({
   const addIngredient = async (ingredient: string): Promise<void> => {
     const trimmedIngredient = ingredient.trim().toLowerCase();
     if (trimmedIngredient && !ingredients.includes(trimmedIngredient)) {
-      // Limits to 10 ingredients.
       if (ingredients.length >= 10) {
         setError(
           'You can add up to 10 ingredients only. Please remove one before adding another.'
         );
         return;
       }
-      // Checks if ingredient exists in database.
       const existsInDb = await checkIngredientExists(trimmedIngredient);
 
       if (!existsInDb) {
@@ -164,7 +158,7 @@ function IngredientInput({
       setInputValue('');
       setShowSuggestions(false);
       setSelectedSuggestionIndex(-1);
-      setError(''); // Clears any existing error.
+      setError('');
     }
   };
 
@@ -176,7 +170,7 @@ function IngredientInput({
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     setInputValue(e.target.value);
-    setError(''); // Clears error when user starts typing.
+    setError('');
   };
 
   const handleInputKeyDown = (
@@ -197,7 +191,6 @@ function IngredientInput({
   };
 
   const handleInputBlur = (): void => {
-    // Delays hiding suggestions to allow for clicks.
     setTimeout(() => {
       setShowSuggestions(false);
       setSelectedSuggestionIndex(-1);
@@ -206,7 +199,6 @@ function IngredientInput({
 
   return (
     <div className='space-y-4'>
-      {/* Ingredient Pills */}
       {ingredients.length > 0 && (
         <div className='flex flex-wrap gap-2'>
           {ingredients.map((ingredient, index) => (
@@ -227,7 +219,6 @@ function IngredientInput({
         </div>
       )}
 
-      {/* Input Field and Suggestions Dropdown */}
       <div className='relative'>
         <input
           ref={inputRef}
@@ -245,7 +236,6 @@ function IngredientInput({
             <i className='fas fa-spinner fa-spin theme-text-icon-primary'></i>
           </div>
         )}
-        {/* Suggestions Dropdown */}
         {showSuggestions && suggestions.length > 0 && (
           <div
             ref={suggestionsRef}

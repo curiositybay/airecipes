@@ -12,6 +12,12 @@ import { setupMiddlewareCacheMocks } from './middleware-cache';
 import { setupMiddlewareLoggerMocks } from './middleware-logger';
 import { setupReactComponentMocks } from './react-components';
 import { setupNextAppMocks } from './next-app';
+import {
+  setupClipboardMock,
+  clipboardMock,
+  mockClipboardSuccess,
+  mockClipboardError,
+} from './frontend';
 
 // Import all mock utilities from submodules.
 import * as nextServerMocks from './next-server';
@@ -20,6 +26,7 @@ import * as configMocks from './config';
 import * as rateLimitMocks from './rate-limit';
 import * as prismaMocks from './prisma';
 import * as ingredientMocks from './ingredients';
+import * as recipeMocks from './recipes';
 
 // Validation mocks are now automatically handled by Jest
 import * as authMocks from './auth';
@@ -77,6 +84,13 @@ export const mocks = {
     withCleanup: () => {
       mocks.setup.all();
       return () => mocks.setup.clear();
+    },
+
+    // Frontend-specific setup methods.
+    frontend: {
+      setupLocalStorage: setupLocalStorageMock,
+      setupScrollIntoView: setupScrollIntoViewMock,
+      setupClipboard: setupClipboardMock,
     },
   },
 
@@ -140,6 +154,11 @@ export const mocks = {
       ...ingredientMocks,
     },
 
+    // Recipe mocks.
+    recipes: {
+      ...recipeMocks,
+    },
+
     // Middleware cache mocks.
     middlewareCache: {
       ...middlewareCacheMocks,
@@ -165,6 +184,10 @@ export const mocks = {
       localStorage: localStorageMock,
       setupLocalStorage: setupLocalStorageMock,
       setupScrollIntoView: setupScrollIntoViewMock,
+      clipboard: clipboardMock,
+      setupClipboard: setupClipboardMock,
+      mockClipboardSuccess,
+      mockClipboardError,
     },
 
     // Process and console mocks.

@@ -42,12 +42,11 @@ function AIMealsPage() {
     <>
       <AIMealsHero />
       <AIMealsLayout>
-        {/* Ingredient Input Section */}
         <div className='ai-meals-input-section'>
           <IngredientInput
             ingredients={ingredients}
             setIngredients={setIngredients}
-            setError={() => {}} // Error handling is now managed by the recipe service
+            setError={() => {}} // Error handling is now managed by the recipe service.
           />
 
           <AIMealsActions
@@ -65,10 +64,8 @@ function AIMealsPage() {
           />
         </div>
 
-        {/* Recipe Results Section */}
         {recipes.length > 0 && (
           <div className='ai-meals-results-section' id='recipe-suggestions'>
-            {/* Safety Disclaimer */}
             <div className='mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg'>
               <div className='flex items-start'>
                 <i className='fas fa-exclamation-triangle text-amber-600 mt-1 mr-3 flex-shrink-0'></i>

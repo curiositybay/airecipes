@@ -15,7 +15,6 @@ function RecipeCard({ recipe, index }: RecipeCardProps) {
       await navigator.clipboard.writeText(recipeText);
       setCopiedIndex(index);
 
-      // Resets copied state after 2 seconds.
       setTimeout(() => {
         setCopiedIndex(null);
       }, 2000);
@@ -27,17 +26,14 @@ function RecipeCard({ recipe, index }: RecipeCardProps) {
   const formatRecipeForCopy = (recipe: Recipe): string => {
     let recipeText = `${recipe.name}\n\n`;
 
-    // Recipe description.
     if (recipe.description) {
       recipeText += `${recipe.description}\n\n`;
     }
 
-    // Recipe tags.
     if (recipe.tags && recipe.tags.length > 0) {
       recipeText += `Tags: ${recipe.tags.join(', ')}\n\n`;
     }
 
-    // Recipe ingredients.
     if (recipe.ingredients && recipe.ingredients.length > 0) {
       recipeText += `Ingredients:\n`;
       recipe.ingredients.forEach((ingredient: string) => {
@@ -46,7 +42,6 @@ function RecipeCard({ recipe, index }: RecipeCardProps) {
       recipeText += '\n';
     }
 
-    // Recipe instructions.
     if (recipe.instructions && recipe.instructions.length > 0) {
       recipeText += `Instructions:\n`;
       recipe.instructions.forEach((instruction: string, index: number) => {
@@ -55,7 +50,6 @@ function RecipeCard({ recipe, index }: RecipeCardProps) {
       recipeText += '\n';
     }
 
-    // Recipe metadata.
     if (recipe.prepTime || recipe.difficulty || recipe.servings) {
       recipeText += `Details:\n`;
       if (recipe.prepTime) recipeText += `• Prep Time: ${recipe.prepTime}\n`;
@@ -65,7 +59,6 @@ function RecipeCard({ recipe, index }: RecipeCardProps) {
       recipeText += '\n';
     }
 
-    // Nutritional information.
     if (recipe.nutritionalInfo) {
       recipeText += `Nutritional Information:\n`;
       if (recipe.nutritionalInfo.calories)
@@ -84,13 +77,11 @@ function RecipeCard({ recipe, index }: RecipeCardProps) {
   return (
     <div className='theme-bg-surface theme-border rounded-lg shadow-sm hover:shadow-md transition-all duration-300 p-6 flex flex-col border hover:theme-border-hover hover:theme-bg-surface-hover'>
       <div className='flex-1'>
-        {/* Recipe Header */}
         <div className='flex items-start justify-between mb-4'>
           <div className='flex-1 mr-4'>
             <h3 className='text-xl font-semibold theme-text-primary mb-2'>
               {recipe.name}
             </h3>
-            {/* Recipe Metadata */}
             <div className='flex flex-wrap gap-3'>
               {recipe.prepTime && (
                 <span className='text-sm theme-text-secondary flex items-center'>
@@ -125,12 +116,10 @@ function RecipeCard({ recipe, index }: RecipeCardProps) {
           </div>
         </div>
 
-        {/* Recipe Description */}
         <p className='theme-text-secondary mb-4 leading-relaxed'>
           {recipe.description}
         </p>
 
-        {/* Recipe Tags */}
         {recipe.tags && recipe.tags.length > 0 && (
           <div className='flex flex-wrap gap-2 mb-4'>
             {recipe.tags.map((tag, tagIndex) => (
@@ -144,7 +133,6 @@ function RecipeCard({ recipe, index }: RecipeCardProps) {
           </div>
         )}
 
-        {/* Recipe Ingredients */}
         {recipe.ingredients && recipe.ingredients.length > 0 && (
           <div className='space-y-2 mb-4'>
             <h4 className='text-sm font-semibold theme-text-primary mb-2'>
@@ -163,7 +151,6 @@ function RecipeCard({ recipe, index }: RecipeCardProps) {
           </div>
         )}
 
-        {/* Recipe Instructions */}
         {recipe.instructions && recipe.instructions.length > 0 && (
           <div className='space-y-2 mb-4'>
             <h4 className='text-sm font-semibold theme-text-primary mb-2'>
@@ -183,7 +170,6 @@ function RecipeCard({ recipe, index }: RecipeCardProps) {
         )}
       </div>
 
-      {/* Nutritional Information - Footer */}
       {recipe.nutritionalInfo && (
         <div className='mt-4 pt-4 theme-border-light border-t'>
           <h4 className='text-sm font-semibold theme-text-primary mb-2'>

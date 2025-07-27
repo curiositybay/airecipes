@@ -2,7 +2,6 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import AIMealsPage from './AIMealsPage';
 
-// Mock dependencies
 jest.mock('@/hooks/useAIMealsStorage', () => ({
   useAIMealsStorage: jest.fn(),
 }));
@@ -15,7 +14,6 @@ jest.mock('@/hooks/useAIMealsSurpriseService', () => ({
   useAIMealsSurpriseService: jest.fn(),
 }));
 
-// Mock child components
 jest.mock('./AIMealsHero', () => {
   return function MockAIMealsHero() {
     return <div data-testid='ai-meals-hero'>AI Meals Hero</div>;
@@ -283,11 +281,8 @@ describe('AIMealsPage', () => {
   it('should pass empty function to IngredientInput setError', () => {
     render(<AIMealsPage />);
 
-    // The setError function should be called when the Set Error button is clicked
-    // but since we're passing an empty function, it should not affect the error state
     fireEvent.click(screen.getByText('Set Error'));
 
-    // The error should not be displayed because setError is an empty function
     expect(screen.queryByTestId('error-message')).not.toBeInTheDocument();
   });
 });
