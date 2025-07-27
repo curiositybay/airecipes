@@ -1,13 +1,16 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
+import { mocks } from '@/test-utils/mocks';
 import VersionDisplay from './VersionDisplay';
-
-// Mock fetch
-global.fetch = jest.fn();
 
 describe('VersionDisplay', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mocks.setup.all();
+  });
+
+  afterEach(() => {
+    mocks.setup.clear();
   });
 
   it('should display version when API call succeeds', async () => {
@@ -17,9 +20,10 @@ describe('VersionDisplay', () => {
       lastDeployed: '2025-07-13T05:45:56.627Z',
     };
 
-    (fetch as jest.Mock).mockResolvedValueOnce({
+    mocks.mock.http.fetchSuccess({
       ok: true,
-      json: async () => mockMetadata,
+      status: 200,
+      json: () => Promise.resolve(mockMetadata),
     });
 
     render(<VersionDisplay />);
@@ -30,7 +34,7 @@ describe('VersionDisplay', () => {
   });
 
   it('should not display anything when API call fails', async () => {
-    (fetch as jest.Mock).mockRejectedValueOnce(new Error('Network error'));
+    mocks.mock.http.fetchFailure();
 
     render(<VersionDisplay />);
 
@@ -40,9 +44,10 @@ describe('VersionDisplay', () => {
   });
 
   it('should not display anything when API returns error', async () => {
-    (fetch as jest.Mock).mockResolvedValueOnce({
+    mocks.mock.http.fetchSuccess({
       ok: false,
       status: 500,
+      json: () => Promise.resolve({ error: 'Internal server error' }),
     });
 
     render(<VersionDisplay />);
@@ -53,9 +58,10 @@ describe('VersionDisplay', () => {
   });
 
   it('should not display anything when metadata is null', async () => {
-    (fetch as jest.Mock).mockResolvedValueOnce({
+    mocks.mock.http.fetchSuccess({
       ok: true,
-      json: async () => null,
+      status: 200,
+      json: () => Promise.resolve(null),
     });
 
     render(<VersionDisplay />);
@@ -66,7 +72,17 @@ describe('VersionDisplay', () => {
   });
 
   it('should handle non-Error exceptions', async () => {
-    (fetch as jest.Mock).mockRejectedValueOnce('String error');
+    mocks.mock.http.fetchFailure(new Error('String error'));
+
+    render(<VersionDisplay />);
+
+    await waitFor(() => {
+      expect(screen.queryByText(/v\d+\.\d+\.\d+/)).not.toBeInTheDocument();
+    });
+  });
+
+  it('should handle string errors', async () => {
+    mocks.mock.http.fetchFailure('String error' as unknown as Error);
 
     render(<VersionDisplay />);
 

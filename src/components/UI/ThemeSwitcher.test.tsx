@@ -1,42 +1,43 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { useTheme } from '@/contexts/ThemeContext';
+import ThemeSwitcher from './ThemeSwitcher';
 
-// Mock the useTheme hook
+// Mock the useTheme hook.
 jest.mock('@/contexts/ThemeContext', () => ({
   useTheme: jest.fn(),
 }));
 
-const mockUseTheme = jest.requireMock('@/contexts/ThemeContext').useTheme;
-
-// Simple ThemeSwitcher component for testing
-function ThemeSwitcher() {
-  const { themeName, setTheme } = mockUseTheme();
-
-  const isDarkMode = themeName === 'desert-night';
-  const nextTheme = isDarkMode ? 'desert' : 'desert-night';
-  const nextThemeIcon = isDarkMode ? 'fa-sun' : 'fa-moon';
-  const nextThemeLabel = isDarkMode
-    ? 'Switch to Light Mode'
-    : 'Switch to Dark Mode';
-
-  const handleToggle = () => {
-    setTheme(nextTheme);
-  };
-
-  return (
+// Mock the ToggleButton component.
+jest.mock('./ToggleButton', () => ({
+  ToggleButton: ({
+    onClick,
+    icon,
+    ariaLabel,
+    title,
+    className,
+  }: {
+    onClick?: () => void;
+    icon?: string;
+    ariaLabel?: string;
+    title?: string;
+    className?: string;
+  }) => (
     <button
-      onClick={handleToggle}
+      onClick={onClick}
       data-testid='theme-toggle'
-      aria-label={nextThemeLabel}
-      title={nextThemeLabel}
+      aria-label={ariaLabel}
+      title={title}
+      className={className}
     >
-      <i className={`fas ${nextThemeIcon}`} data-testid='theme-icon'></i>
-      <span data-testid='current-theme'>{themeName}</span>
+      <i className={icon} data-testid='theme-icon'></i>
     </button>
-  );
-}
+  ),
+}));
 
 describe('ThemeSwitcher', () => {
+  const mockUseTheme = useTheme as jest.Mock;
+
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -49,10 +50,7 @@ describe('ThemeSwitcher', () => {
 
     render(<ThemeSwitcher />);
 
-    expect(screen.getByTestId('current-theme')).toHaveTextContent(
-      'desert-night'
-    );
-    expect(screen.getByTestId('theme-icon')).toHaveClass('fa-sun');
+    expect(screen.getByTestId('theme-icon')).toHaveClass('fas fa-sun');
     expect(screen.getByTestId('theme-toggle')).toHaveAttribute(
       'aria-label',
       'Switch to Light Mode'
@@ -67,8 +65,7 @@ describe('ThemeSwitcher', () => {
 
     render(<ThemeSwitcher />);
 
-    expect(screen.getByTestId('current-theme')).toHaveTextContent('desert');
-    expect(screen.getByTestId('theme-icon')).toHaveClass('fa-moon');
+    expect(screen.getByTestId('theme-icon')).toHaveClass('fas fa-moon');
     expect(screen.getByTestId('theme-toggle')).toHaveAttribute(
       'aria-label',
       'Switch to Dark Mode'

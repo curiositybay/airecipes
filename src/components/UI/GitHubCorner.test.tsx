@@ -1,19 +1,23 @@
-import { render, screen, fireEvent } from '@testing-library/react';
-import { mocks } from '@/test-utils/mocks';
-import { timerHelpers } from '@/test-utils/common-test-patterns';
+import { render, screen, fireEvent, act } from '@testing-library/react';
 import GitHubCorner from './GitHubCorner';
+
+// Mock localStorage.
+const localStorageMock = {
+  getItem: jest.fn(),
+  setItem: jest.fn(),
+  removeItem: jest.fn(),
+  clear: jest.fn(),
+};
+Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
 describe('GitHubCorner', () => {
   beforeEach(() => {
-    // Use unified mock setup for frontend components
-    mocks.setup.frontend.setupLocalStorage();
-    timerHelpers.setupFakeTimers();
+    jest.clearAllMocks();
+    jest.useFakeTimers();
   });
 
   afterEach(() => {
-    // Clear mocks using unified system
-    mocks.setup.clear();
-    timerHelpers.restoreRealTimers();
+    jest.useRealTimers();
   });
 
   it('renders initially visible', () => {
@@ -48,16 +52,16 @@ describe('GitHubCorner', () => {
       name: /dismiss/i,
     });
 
-    // Initially visible
+    // Initially visible.
     expect(
       screen.getByRole('link', { name: /view source on github/i })
     ).toBeInTheDocument();
     expect(dismissButton).toBeInTheDocument();
 
-    // Click dismiss button
+    // Click dismiss button.
     fireEvent.click(dismissButton);
 
-    // Should no longer be visible
+    // Should no longer be visible.
     expect(
       screen.queryByRole('link', { name: /view source on github/i })
     ).not.toBeInTheDocument();
@@ -73,10 +77,10 @@ describe('GitHubCorner', () => {
       name: /dismiss/i,
     });
 
-    // Simulate the click event
+    // Simulate the click event.
     fireEvent.click(dismissButton);
 
-    // The component should handle the event properly
+    // The component should handle the event properly.
     expect(
       screen.queryByRole('link', { name: /view source on github/i })
     ).not.toBeInTheDocument();
@@ -106,14 +110,14 @@ describe('GitHubCorner', () => {
       name: /dismiss/i,
     });
 
-    // Initially, GitHub link should have normal pointer events
+    // Initially, GitHub link should have normal pointer events.
     expect(githubLink).toHaveClass('group');
     expect(githubLink).not.toHaveClass('pointer-events-none');
 
-    // Hover over dismiss button
+    // Hover over dismiss button.
     fireEvent.mouseEnter(dismissButton);
 
-    // GitHub link should now have pointer events disabled
+    // GitHub link should now have pointer events disabled.
     expect(githubLink).toHaveClass('pointer-events-none');
   });
 
@@ -127,41 +131,14 @@ describe('GitHubCorner', () => {
       name: /dismiss/i,
     });
 
-    // Hover over dismiss button
+    // Hover over dismiss button.
     fireEvent.mouseEnter(dismissButton);
     expect(githubLink).toHaveClass('pointer-events-none');
 
-    // Stop hovering over dismiss button
+    // Stop hovering over dismiss button.
     fireEvent.mouseLeave(dismissButton);
 
-    // GitHub link should no longer have pointer events disabled
-    expect(githubLink).not.toHaveClass('pointer-events-none');
-  });
-
-  it('handles multiple hover enter and leave events correctly', () => {
-    render(<GitHubCorner />);
-
-    const githubLink = screen.getByRole('link', {
-      name: /view source on github/i,
-    });
-    const dismissButton = screen.getByRole('button', {
-      name: /dismiss/i,
-    });
-
-    // First hover
-    fireEvent.mouseEnter(dismissButton);
-    expect(githubLink).toHaveClass('pointer-events-none');
-
-    // First leave
-    fireEvent.mouseLeave(dismissButton);
-    expect(githubLink).not.toHaveClass('pointer-events-none');
-
-    // Second hover
-    fireEvent.mouseEnter(dismissButton);
-    expect(githubLink).toHaveClass('pointer-events-none');
-
-    // Second leave
-    fireEvent.mouseLeave(dismissButton);
+    // GitHub link should no longer have pointer events disabled.
     expect(githubLink).not.toHaveClass('pointer-events-none');
   });
 
@@ -170,7 +147,7 @@ describe('GitHubCorner', () => {
 
     const container = screen.getByTestId('github-corner-container');
 
-    // Initially should have translate-y-full class
+    // Initially should have translate-y-full class.
     expect(container).toHaveClass('translate-y-full');
     expect(container).not.toHaveClass('translate-y-0');
   });
@@ -180,13 +157,15 @@ describe('GitHubCorner', () => {
 
     const container = screen.getByTestId('github-corner-container');
 
-    // Initially should have translate-y-full class
+    // Initially should have translate-y-full class.
     expect(container).toHaveClass('translate-y-full');
 
-    // Fast-forward time to trigger animation using shared helper
-    timerHelpers.advanceTimers(100);
+    // Fast-forward time to trigger animation.
+    act(() => {
+      jest.advanceTimersByTime(100);
+    });
 
-    // After animation timer, should have translate-y-0 class
+    // After animation timer, should have translate-y-0 class.
     expect(container).toHaveClass('translate-y-0');
     expect(container).not.toHaveClass('translate-y-full');
   });

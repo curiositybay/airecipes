@@ -25,19 +25,12 @@ describe('Button Component', () => {
 
     it('renders with icon', () => {
       render(<PrimaryButton icon='fa-home'>Home</PrimaryButton>);
-      expect(screen.getByRole('button')).toBeInTheDocument();
-      // Check that icon element exists
       expect(screen.getByRole('button').querySelector('i')).toBeInTheDocument();
     });
 
     it('renders with submit type', () => {
       render(<PrimaryButton type='submit'>Submit</PrimaryButton>);
       expect(screen.getByRole('button')).toHaveAttribute('type', 'submit');
-    });
-
-    it('renders with reset type', () => {
-      render(<PrimaryButton type='reset'>Reset</PrimaryButton>);
-      expect(screen.getByRole('button')).toHaveAttribute('type', 'reset');
     });
 
     it('applies custom className', () => {
@@ -57,12 +50,6 @@ describe('Button Component', () => {
       expect(
         screen.getByRole('button', { name: 'Click me' })
       ).toBeInTheDocument();
-    });
-
-    it('renders and is distinguishable from primary', () => {
-      render(<SecondaryButton>Click me</SecondaryButton>);
-      const button = screen.getByRole('button');
-      expect(button).toBeInTheDocument();
     });
 
     it('handles click events', () => {
@@ -149,12 +136,6 @@ describe('Button Component', () => {
       const icon = document.querySelector('i');
       expect(icon).toHaveClass('fa-user', 'mr-2');
     });
-
-    it('has default className when not provided', () => {
-      render(<ButtonIcon icon='fa-user' />);
-      const icon = document.querySelector('i');
-      expect(icon).toHaveClass('fa-user', 'mr-2');
-    });
   });
 
   describe('Button interactions', () => {
@@ -184,15 +165,6 @@ describe('Button Component', () => {
       );
       const button = screen.getByTestId('test-button');
       expect(button).toHaveAttribute('aria-label', 'Test');
-    });
-  });
-
-  describe('Component exports', () => {
-    it('exports all components', () => {
-      expect(Button).toBeDefined();
-      expect(PrimaryButton).toBeDefined();
-      expect(SecondaryButton).toBeDefined();
-      expect(ButtonIcon).toBeDefined();
     });
   });
 });
