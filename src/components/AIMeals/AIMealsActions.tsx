@@ -24,6 +24,7 @@ export default function AIMealsActions({
         onClick={onGetRecipes}
         disabled={isLoading}
         className='ai-meals-primary-btn'
+        icon={isLoading ? 'fas fa-spinner fa-spin' : undefined}
       >
         {isLoading ? 'Generating Recipes...' : 'Get Recipes'}
       </PrimaryButton>

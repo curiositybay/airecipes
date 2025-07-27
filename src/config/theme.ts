@@ -81,12 +81,11 @@ export interface Theme {
 }
 
 // Import themes from the themes directory
-import { oceanTheme, desertTheme, desertNightTheme } from './themes';
+import { desertTheme, desertNightTheme } from './themes';
 
 export const defaultTheme = desertTheme;
 
 export const themes: Record<string, Theme> = {
-  ocean: oceanTheme,
   desert: desertTheme,
   'desert-night': desertNightTheme,
   // Add more themes here as needed.

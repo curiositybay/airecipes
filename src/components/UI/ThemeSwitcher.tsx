@@ -2,28 +2,31 @@
 
 import React from 'react';
 import { useTheme } from '@/contexts/ThemeContext';
+import { ToggleButton } from './ToggleButton';
 
 export default function ThemeSwitcher() {
-  const { currentTheme, themeName, setTheme, availableThemes } = useTheme();
+  const { themeName, setTheme } = useTheme();
+
+  const isDarkMode = themeName === 'desert-night';
+  const nextTheme = isDarkMode ? 'desert' : 'desert-night';
+  const nextThemeIcon = isDarkMode ? 'fa-sun' : 'fa-moon';
+  const nextThemeLabel = isDarkMode
+    ? 'Switch to Light Mode'
+    : 'Switch to Dark Mode';
+
+  const handleToggle = () => {
+    setTheme(nextTheme);
+  };
 
   return (
-    <div className='flex flex-col space-y-2'>
-      <label
-        className={`text-sm font-medium ${currentTheme.colors.text.secondary}`}
-      >
-        Theme:
-      </label>
-      <select
-        value={themeName}
-        onChange={e => setTheme(e.target.value)}
-        className={`px-3 py-2 border rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 theme-text-icon-primary theme-border-input theme-bg-input transition-colors duration-200`}
-      >
-        {availableThemes.map(theme => (
-          <option key={theme} value={theme}>
-            {theme.charAt(0).toUpperCase() + theme.slice(1)}
-          </option>
-        ))}
-      </select>
-    </div>
+    <ToggleButton
+      onClick={handleToggle}
+      icon={`fas ${nextThemeIcon}`}
+      variant='ghost'
+      size='md'
+      ariaLabel={nextThemeLabel}
+      title={nextThemeLabel}
+      className='hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2'
+    />
   );
 }

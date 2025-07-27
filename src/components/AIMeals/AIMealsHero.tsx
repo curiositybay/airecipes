@@ -8,7 +8,7 @@ export default function AIMealsHero() {
   return (
     <section className='ai-meals-hero bg-gradient-to-br from-slate-50 via-white to-slate-100 relative'>
       {/* Auth Controls - Top Right */}
-      <div className='absolute top-4 right-4 z-50'>
+      <div className='absolute top-4 right-4 z-50 flex justify-end'>
         <AuthControls />
       </div>
 

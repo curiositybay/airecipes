@@ -68,6 +68,19 @@ function AIMealsPage() {
         {/* Recipe Results Section */}
         {recipes.length > 0 && (
           <div className='ai-meals-results-section' id='recipe-suggestions'>
+            {/* Safety Disclaimer */}
+            <div className='mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg'>
+              <div className='flex items-start'>
+                <i className='fas fa-exclamation-triangle text-amber-600 mt-1 mr-3 flex-shrink-0'></i>
+                <div className='text-sm text-amber-800'>
+                  <p className='font-medium mb-1'>
+                    AI suggestions may be inaccurate or inedible. Always follow
+                    food safety and check for allergies.
+                  </p>
+                </div>
+              </div>
+            </div>
+
             <h2 className='ai-meals-section-title'>Recipe Suggestions</h2>
             <RecipeResults recipes={recipes} />
           </div>

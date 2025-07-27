@@ -2,17 +2,20 @@
 
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { Button } from './Button';
+import ThemeSwitcher from './ThemeSwitcher';
 
 export default function AuthControls() {
   const { user, loginAsDemoUser, logout } = useAuth();
 
   return (
-    <div className='flex items-center space-x-3'>
+    <div className='flex flex-col sm:flex-row items-end justify-end gap-3'>
+      {/* Auth Controls */}
       {user ? (
         // Logged in user - show user info and logout button
-        <>
+        <div className='flex items-center space-x-3'>
           <span className='text-sm theme-text-muted'>{user.email}</span>
-          <button
+          <Button
             onClick={async () => {
               try {
                 await logout();
@@ -20,23 +23,27 @@ export default function AuthControls() {
                 console.error('Logout error:', error);
               }
             }}
-            className='px-3 py-1 text-sm theme-btn-secondary rounded transition-colors duration-200 hover:opacity-80'
+            variant='secondary'
+            size='md'
           >
             Logout
-          </button>
-        </>
+          </Button>
+        </div>
       ) : (
         // Not logged in - show login button
-        <button
+        <Button
           onClick={async () => {
             await loginAsDemoUser();
           }}
-          className='px-4 py-2 theme-btn-primary rounded-lg font-semibold transition-colors duration-200 hover:opacity-80'
+          icon='fas fa-user'
+          size='md'
         >
-          <i className='fas fa-user mr-2'></i>
-          Login
-        </button>
+          Login as demo user
+        </Button>
       )}
+
+      {/* Theme Switcher - Always visible */}
+      <ThemeSwitcher />
     </div>
   );
 }

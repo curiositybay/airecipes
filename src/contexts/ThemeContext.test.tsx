@@ -20,7 +20,7 @@ function TestComponent() {
     <div>
       <div data-testid='theme-name'>{themeName}</div>
       <div data-testid='available-themes'>{availableThemes.join(', ')}</div>
-      <button onClick={() => setTheme('ocean')}>Switch to Ocean</button>
+      <button onClick={() => setTheme('desert')}>Switch to Desert</button>
       <button onClick={() => setTheme('desert-night')}>
         Switch to Desert Night
       </button>
@@ -42,7 +42,6 @@ describe('ThemeContext', () => {
 
     expect(screen.getByTestId('theme-name')).toHaveTextContent('desert');
     expect(screen.getByTestId('available-themes')).toContainHTML('desert');
-    expect(screen.getByTestId('available-themes')).toContainHTML('ocean');
     expect(screen.getByTestId('available-themes')).toContainHTML(
       'desert-night'
     );
@@ -50,12 +49,12 @@ describe('ThemeContext', () => {
 
   it('should provide theme context with custom initial theme', () => {
     render(
-      <ThemeProvider initialTheme='ocean'>
+      <ThemeProvider initialTheme='desert-night'>
         <TestComponent />
       </ThemeProvider>
     );
 
-    expect(screen.getByTestId('theme-name')).toHaveTextContent('ocean');
+    expect(screen.getByTestId('theme-name')).toHaveTextContent('desert-night');
   });
 
   it('should allow theme switching', () => {
@@ -67,10 +66,10 @@ describe('ThemeContext', () => {
 
     expect(screen.getByTestId('theme-name')).toHaveTextContent('desert');
 
-    const oceanButton = screen.getByText('Switch to Ocean');
-    fireEvent.click(oceanButton);
+    const desertNightButton = screen.getByText('Switch to Desert Night');
+    fireEvent.click(desertNightButton);
 
-    expect(screen.getByTestId('theme-name')).toHaveTextContent('ocean');
+    expect(screen.getByTestId('theme-name')).toHaveTextContent('desert-night');
   });
 
   it('should throw error when useTheme is used outside provider', () => {

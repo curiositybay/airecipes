@@ -2,7 +2,6 @@
 
 import Footer from './Footer';
 import GitHubCorner from '../UI/GitHubCorner';
-import ThemeSwitcher from '../UI/ThemeSwitcher';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -14,11 +13,6 @@ function Layout({ children }: LayoutProps) {
       className='min-h-screen flex flex-col theme-bg relative'
       data-testid='layout-wrapper'
     >
-      {/* Theme Switcher - Top Left */}
-      <div className='absolute top-4 left-4 z-50'>
-        <ThemeSwitcher />
-      </div>
-
       <main className='flex-1'>{children}</main>
       <Footer />
       <GitHubCorner />

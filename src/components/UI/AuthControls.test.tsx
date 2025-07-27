@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import AuthControls from './AuthControls';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 
 // Mock the AuthContext
 jest.mock('@/contexts/AuthContext', () => ({
@@ -21,9 +22,13 @@ describe('AuthControls', () => {
       logout: jest.fn(),
     });
 
-    render(<AuthControls />);
+    render(
+      <ThemeProvider>
+        <AuthControls />
+      </ThemeProvider>
+    );
 
-    expect(screen.getByText('Login')).toBeInTheDocument();
+    expect(screen.getByText('Login as demo user')).toBeInTheDocument();
     expect(screen.queryByText('Logout')).not.toBeInTheDocument();
   });
 
@@ -41,11 +46,15 @@ describe('AuthControls', () => {
       logout: jest.fn(),
     });
 
-    render(<AuthControls />);
+    render(
+      <ThemeProvider>
+        <AuthControls />
+      </ThemeProvider>
+    );
 
     expect(screen.getByText('test@example.com')).toBeInTheDocument();
     expect(screen.getByText('Logout')).toBeInTheDocument();
-    expect(screen.queryByText('Login')).not.toBeInTheDocument();
+    expect(screen.queryByText('Login as demo user')).not.toBeInTheDocument();
   });
 
   it('should call loginAsDemoUser when login button is clicked', async () => {
@@ -56,9 +65,13 @@ describe('AuthControls', () => {
       logout: jest.fn(),
     });
 
-    render(<AuthControls />);
+    render(
+      <ThemeProvider>
+        <AuthControls />
+      </ThemeProvider>
+    );
 
-    const loginButton = screen.getByText('Login');
+    const loginButton = screen.getByText('Login as demo user');
     fireEvent.click(loginButton);
 
     await waitFor(() => {
@@ -81,7 +94,11 @@ describe('AuthControls', () => {
       logout: mockLogout,
     });
 
-    render(<AuthControls />);
+    render(
+      <ThemeProvider>
+        <AuthControls />
+      </ThemeProvider>
+    );
 
     const logoutButton = screen.getByText('Logout');
     fireEvent.click(logoutButton);
@@ -109,7 +126,11 @@ describe('AuthControls', () => {
       logout: mockLogout,
     });
 
-    render(<AuthControls />);
+    render(
+      <ThemeProvider>
+        <AuthControls />
+      </ThemeProvider>
+    );
 
     const logoutButton = screen.getByText('Logout');
     fireEvent.click(logoutButton);

@@ -26,7 +26,7 @@ export const Button = ({
   ...props
 }: ButtonProps) => {
   const baseClasses =
-    'inline-flex items-center justify-center font-semibold transition-all duration-300 rounded-lg group';
+    'inline-flex items-center justify-center font-semibold transition-all duration-300 rounded-lg group cursor-pointer';
 
   const variantClasses = {
     primary: 'theme-btn-primary shadow-lg hover:shadow-xl',
@@ -68,7 +68,7 @@ export const PrimaryButton = ({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`inline-flex items-center justify-center theme-text-button px-8 py-4 rounded-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl text-base theme-btn-primary group ${className}`}
+      className={`inline-flex items-center justify-center theme-text-button px-8 py-4 rounded-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl text-base theme-btn-primary group cursor-pointer ${className}`}
       {...props}
     >
       {icon && <ButtonIcon icon={icon} />}
@@ -91,7 +91,7 @@ export const SecondaryButton = ({
       type={type}
       onClick={onClick}
       disabled={disabled}
-      className={`inline-flex items-center justify-center theme-text-button px-8 py-4 rounded-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl text-base theme-btn-secondary group ${className}`}
+      className={`inline-flex items-center justify-center theme-text-button px-8 py-4 rounded-lg font-semibold transition-all duration-300 shadow-lg hover:shadow-xl text-base theme-btn-secondary group cursor-pointer ${className}`}
       {...props}
     >
       {icon && <ButtonIcon icon={icon} />}

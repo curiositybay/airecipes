@@ -1,4 +1,4 @@
-import { oceanTheme } from './themes';
+import { desertNightTheme } from './themes';
 import { defaultTheme, themes, getTheme } from './theme';
 
 describe('Theme Configuration', () => {
@@ -14,9 +14,9 @@ describe('Theme Configuration', () => {
       expect(theme).toBeDefined();
     });
 
-    it('should return ocean theme when ocean theme name is provided', () => {
-      const theme = getTheme('ocean');
-      expect(theme).toBe(oceanTheme);
+    it('should return desert-night theme when desert-night theme name is provided', () => {
+      const theme = getTheme('desert-night');
+      expect(theme).toBe(desertNightTheme);
     });
 
     it('should return default theme when non-existent theme name is provided', () => {
