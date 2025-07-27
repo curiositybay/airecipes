@@ -1,4 +1,5 @@
 import { NextRequest } from 'next/server';
+import { act, fireEvent, waitFor, screen } from '@testing-library/react';
 
 /**
  * Common test patterns and utilities for API route testing
@@ -14,6 +15,41 @@ export interface MockRequestConfig {
   body?: unknown;
   headers?: Record<string, string>;
 }
+
+/**
+ * Timer helper functions for frontend component testing
+ */
+export const timerHelpers = {
+  /**
+   * Advances timers by the specified milliseconds
+   */
+  advanceTimers: (ms: number = 500) => {
+    act(() => jest.advanceTimersByTime(ms));
+  },
+
+  /**
+   * Types into an input and waits for the value to appear in the document
+   */
+  typeAndWait: async (input: HTMLElement, value: string) => {
+    fireEvent.change(input, { target: { value } });
+    act(() => jest.advanceTimersByTime(500));
+    await waitFor(() => expect(screen.getByText(value)).toBeInTheDocument());
+  },
+
+  /**
+   * Sets up fake timers for a test
+   */
+  setupFakeTimers: () => {
+    jest.useFakeTimers();
+  },
+
+  /**
+   * Restores real timers after a test
+   */
+  restoreRealTimers: () => {
+    jest.useRealTimers();
+  },
+};
 
 /**
  * Creates a mock fetch response

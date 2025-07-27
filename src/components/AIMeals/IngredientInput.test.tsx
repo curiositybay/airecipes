@@ -1,13 +1,8 @@
 import React from 'react';
-import {
-  render,
-  screen,
-  fireEvent,
-  waitFor,
-  act,
-} from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import IngredientInput from './IngredientInput';
 import { mocks } from '@/test-utils/mocks';
+import { timerHelpers } from '@/test-utils/common-test-patterns';
 
 global.fetch = jest.fn();
 
@@ -29,21 +24,10 @@ function setup(customProps = {}) {
   };
 
   render(<IngredientInput {...props} />);
-  const input = screen.getByPlaceholderText(
-    /start typing to search ingredients/i
-  );
+
+  const input = screen.getByTestId('ingredient-input');
 
   return { input, props };
-}
-
-async function typeAndWait(input: HTMLElement, value: string) {
-  fireEvent.change(input, { target: { value } });
-  act(() => jest.advanceTimersByTime(500));
-  await waitFor(() => expect(screen.getByText(value)).toBeInTheDocument());
-}
-
-function advanceTimers(ms: number = 500) {
-  act(() => jest.advanceTimersByTime(ms));
 }
 
 function getSuggestionDiv(name: string) {
@@ -92,7 +76,7 @@ describe('IngredientInput', () => {
     );
 
     const { input, props } = setup();
-    await typeAndWait(input, 'garlic');
+    await timerHelpers.typeAndWait(input, 'garlic');
 
     await waitFor(() => {
       const suggestion = screen.getByText('garlic');
@@ -158,7 +142,7 @@ describe('IngredientInput', () => {
     ])('$name', async ({ suggestions, input, actions }) => {
       mocks.mock.ingredients.mockFetchSuggestions(suggestions);
       const { input: inputEl } = setup();
-      await typeAndWait(inputEl, input);
+      await timerHelpers.typeAndWait(inputEl, input);
 
       for (const action of actions) {
         fireEvent.keyDown(document, { key: action.key });
@@ -209,7 +193,7 @@ describe('IngredientInput', () => {
       );
 
       const { input, props } = setup();
-      await typeAndWait(input, 'garlic');
+      await timerHelpers.typeAndWait(input, 'garlic');
 
       fireEvent.keyDown(document, { key: 'ArrowDown' });
 
@@ -235,7 +219,7 @@ describe('IngredientInput', () => {
       });
 
       const { input, props } = setup();
-      await typeAndWait(input, 'garlic');
+      await timerHelpers.typeAndWait(input, 'garlic');
 
       fireEvent.keyDown(document, { key: 'Escape' });
 
@@ -302,7 +286,7 @@ describe('IngredientInput', () => {
     const { input, props } = setup();
     fireEvent.change(input, { target: { value: 'garlic' } });
 
-    advanceTimers(500);
+    timerHelpers.advanceTimers(500);
 
     await waitFor(() => {
       expect(props.setError).toHaveBeenCalledWith(
@@ -331,7 +315,7 @@ describe('IngredientInput', () => {
       fireEvent.change(input, { target: { value: inputValue } });
 
       if (caseName === 'duplicate input') {
-        advanceTimers(500);
+        timerHelpers.advanceTimers(500);
 
         await waitFor(() => {
           expect(screen.getByText('tomato')).toBeInTheDocument();
@@ -358,7 +342,7 @@ describe('IngredientInput', () => {
       });
 
       const { input, props } = setup({ ingredients: tenIngredients });
-      await typeAndWait(input, 'garlic');
+      await timerHelpers.typeAndWait(input, 'garlic');
 
       fireEvent.keyDown(input, { key: 'Enter' });
 
@@ -375,7 +359,7 @@ describe('IngredientInput', () => {
       const { input } = setup();
       fireEvent.change(input, { target: { value: 'garlic' } });
 
-      advanceTimers(500);
+      timerHelpers.advanceTimers(500);
 
       await waitFor(() => {
         expect(console.error).toHaveBeenCalledWith(
@@ -399,7 +383,7 @@ describe('IngredientInput', () => {
       );
 
       const { input, props } = setup();
-      await typeAndWait(input, 'garlic');
+      await timerHelpers.typeAndWait(input, 'garlic');
 
       fireEvent.keyDown(input, { key: 'Enter' });
 
@@ -427,7 +411,7 @@ describe('IngredientInput', () => {
       );
 
       const { input } = setup();
-      await typeAndWait(input, 'garlic');
+      await timerHelpers.typeAndWait(input, 'garlic');
 
       fireEvent.keyDown(input, { key: 'Enter' });
 
@@ -447,13 +431,13 @@ describe('IngredientInput', () => {
       );
 
       const { input } = setup();
-      await typeAndWait(input, 'garlic');
+      await timerHelpers.typeAndWait(input, 'garlic');
 
       fireEvent.blur(input);
 
       expect(screen.getByText('garlic')).toBeInTheDocument();
 
-      advanceTimers(200);
+      timerHelpers.advanceTimers(200);
 
       await waitFor(() => {
         expect(screen.queryByText('garlic')).not.toBeInTheDocument();
@@ -465,7 +449,7 @@ describe('IngredientInput', () => {
       fireEvent.change(input, { target: { value: 'garlic' } });
       fireEvent.change(input, { target: { value: '' } });
 
-      advanceTimers(500);
+      timerHelpers.advanceTimers(500);
 
       expect(global.fetch).not.toHaveBeenCalled();
     });

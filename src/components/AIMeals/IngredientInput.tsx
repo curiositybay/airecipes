@@ -230,6 +230,7 @@ function IngredientInput({
           placeholder='Start typing to search ingredients...'
           className='w-full px-4 py-3 border theme-border-input rounded-lg focus:outline-none focus:ring-2 theme-input-focus disabled:opacity-50 disabled:cursor-not-allowed theme-bg-input theme-text-primary theme-input-placeholder'
           disabled={ingredients.length >= 10}
+          data-testid='ingredient-input'
         />
         {isLoading && (
           <div className='absolute right-3 top-1/2 transform -translate-y-1/2'>

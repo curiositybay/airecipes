@@ -18,11 +18,20 @@ export default function GitHubCorner() {
 
   if (!isVisible) return null;
 
+  let transformClass = 'translate-y-full';
+  if (isAnimated) {
+    transformClass = 'translate-y-0';
+  }
+
+  let pointerEventsClass = '';
+  if (isButtonHovered) {
+    pointerEventsClass = 'pointer-events-none';
+  }
+
   return (
     <div
-      className={`fixed bottom-0 right-0 z-50 transition-transform duration-500 ease-out ${
-        isAnimated ? 'translate-y-0' : 'translate-y-full'
-      }`}
+      data-testid='github-corner-container'
+      className={`fixed bottom-0 right-0 z-50 transition-transform duration-500 ease-out ${transformClass}`}
     >
       <div className='relative'>
         <div className='absolute top-1 right-1 w-8 h-8 flex items-center justify-center z-10'>
@@ -45,7 +54,7 @@ export default function GitHubCorner() {
           href={GITHUB_REPO}
           target='_blank'
           rel='noopener noreferrer'
-          className={`block transition-opacity group ${isButtonHovered ? 'pointer-events-none' : ''}`}
+          className={`block transition-opacity group ${pointerEventsClass}`}
           aria-label='View source on GitHub'
           style={{ pointerEvents: isButtonHovered ? 'none' : 'auto' }}
         >

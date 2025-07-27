@@ -1,14 +1,9 @@
 import React from 'react';
-import {
-  render,
-  screen,
-  fireEvent,
-  waitFor,
-  act,
-} from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import RecipeCard from './RecipeCard';
 import { Recipe } from '@/types/ai-meals';
 import { mocks } from '@/test-utils/mocks';
+import { timerHelpers } from '@/test-utils/common-test-patterns';
 
 const testClipboardWithRecipe = async (
   recipe: Recipe,
@@ -61,7 +56,7 @@ describe('RecipeCard', () => {
   });
 
   it('should reset copied state after timeout', async () => {
-    jest.useFakeTimers();
+    timerHelpers.setupFakeTimers();
     mocks.mock.frontend.mockClipboardSuccess();
 
     render(<RecipeCard recipe={mocks.mock.recipes.mockRecipe} index={0} />);
@@ -74,16 +69,14 @@ describe('RecipeCard', () => {
       expect(icon).toHaveClass('fa-check');
     });
 
-    act(() => {
-      jest.advanceTimersByTime(2000);
-    });
+    timerHelpers.advanceTimers(2000);
 
     await waitFor(() => {
       const icon = copyButton.querySelector('i');
       expect(icon).toHaveClass('fa-copy');
     });
 
-    jest.useRealTimers();
+    timerHelpers.restoreRealTimers();
   });
 
   describe('formatRecipeForCopy - missing optional fields', () => {
