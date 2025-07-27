@@ -9,6 +9,13 @@ jest.mock('../UI/AuthControls', () => {
   };
 });
 
+// Mock Next.js Image component
+jest.mock('next/image', () => {
+  return function MockImage({ src, alt, ...props }: { src: string; alt: string; [key: string]: unknown }) {
+    return <img src={src} alt={alt} data-testid='ai-recipes-logo' {...props} />;
+  };
+});
+
 describe('AIMealsHero', () => {
   it('should render the hero section', () => {
     render(<AIMealsHero />);
@@ -22,14 +29,13 @@ describe('AIMealsHero', () => {
     expect(screen.getByTestId('auth-controls')).toBeInTheDocument();
   });
 
-  it('should display the correct icons', () => {
+  it('should display the logo image', () => {
     render(<AIMealsHero />);
 
-    const robotIcon = document.querySelector('.fa-robot');
-    const utensilsIcon = document.querySelector('.fa-utensils');
-
-    expect(robotIcon).toBeInTheDocument();
-    expect(utensilsIcon).toBeInTheDocument();
+    const logoImage = screen.getByTestId('ai-recipes-logo');
+    expect(logoImage).toBeInTheDocument();
+    expect(logoImage).toHaveAttribute('src', '/airecipes.png');
+    expect(logoImage).toHaveAttribute('alt', 'AI Recipes Logo');
   });
 
   it('should have the correct CSS classes', () => {

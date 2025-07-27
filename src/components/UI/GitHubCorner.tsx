@@ -56,6 +56,7 @@ export default function GitHubCorner() {
                 alt='GitHub'
                 width={120}
                 height={30}
+                style={{ width: 'auto', height: 'auto' }}
                 className='transition-transform duration-200 group-hover:scale-110'
               />
               <span className='theme-text-button text-sm font-medium transition-transform duration-200 group-hover:scale-110'>
