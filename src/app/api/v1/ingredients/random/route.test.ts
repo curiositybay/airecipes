@@ -1,14 +1,8 @@
 import mocks from '@/test-utils/mocks/mocks';
-import { setupApiRouteTest } from '@/test-utils/common-test-patterns';
 
-// Mock Prisma.
 jest.mock('@/lib/prisma', () => ({
   prisma: mocks.mock.prisma.client,
 }));
-
-// Mock logger.
-
-setupApiRouteTest({});
 
 describe('api/v1/ingredients/random/route', () => {
   let GET: () => Promise<Response>;
@@ -16,7 +10,6 @@ describe('api/v1/ingredients/random/route', () => {
   beforeEach(() => {
     jest.resetModules();
     mocks.setup.all();
-    // Import the route after mocks.
     ({ GET } = jest.requireActual('./route'));
   });
 
@@ -34,7 +27,6 @@ describe('api/v1/ingredients/random/route', () => {
         { id: 4, name: 'garlic', category: 'vegetables' },
       ];
 
-      // Mock the raw query.
       mocks.mock.prisma.client.$queryRaw.mockResolvedValue(mockIngredients);
 
       const response = await GET();
@@ -85,7 +77,6 @@ describe('api/v1/ingredients/random/route', () => {
 
       expect(responseData.details).toBe('Database connection failed');
 
-      // Restore environment.
       mocks.mock.config.env.restore(originalEnv);
     });
   });
