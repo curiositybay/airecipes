@@ -96,7 +96,7 @@ export async function requireAuth(request: NextRequest): Promise<AuthResponse> {
   const authResult = await verifyAuth(request);
 
   if (!authResult.success) {
-    throw new Error(authResult.error || 'Authentication required');
+    throw new Error(authResult.error);
   }
 
   return authResult;

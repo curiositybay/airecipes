@@ -75,7 +75,10 @@ export function hasPermission(userRole: UserRole, permission: string): boolean {
     'read-only': ['view_apps', 'view_users', 'view_metrics'],
   };
 
-  return rolePermissions[userRole]?.includes(permission) ?? false;
+  if (!rolePermissions[userRole]) {
+    return false;
+  }
+  return rolePermissions[userRole].includes(permission);
 }
 
 export function isReadOnly(userRole: UserRole): boolean {

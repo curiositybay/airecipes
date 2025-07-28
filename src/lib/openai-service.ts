@@ -281,7 +281,7 @@ class OpenAiService {
   private async logOpenAiUsage(
     method: string,
     response: unknown,
-    error: Error | null = null
+    error: Error | null
   ): Promise<void> {
     try {
       const responseObj = response as {
