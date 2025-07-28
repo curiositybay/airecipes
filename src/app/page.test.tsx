@@ -3,6 +3,12 @@ import mocks from '@/test-utils/mocks/mocks';
 // Setup mocks before importing any modules.
 mocks.setup.all();
 
+// Mock Next.js modules that are used in the page component.
+jest.mock('next/headers', () => ({
+  __esModule: true,
+  cookies: jest.fn(),
+}));
+
 // Mock console.error to avoid noise in tests.
 const originalConsoleError = console.error;
 beforeAll(() => {
@@ -30,8 +36,10 @@ describe('Home Page', () => {
 
   describe('Home component', () => {
     it('should handle authentication scenarios', async () => {
+      const { cookies } = await import('next/headers');
+
       // Test no auth token
-      mocks.mock.nextApp.mockCookies.mockResolvedValue({
+      cookies.mockResolvedValue({
         get: jest.fn().mockReturnValue(undefined),
       });
 
@@ -43,7 +51,7 @@ describe('Home Page', () => {
       const mockUser = { id: '123', email: 'test@example.com' };
       const mockToken = 'valid.jwt.token';
 
-      mocks.mock.nextApp.mockCookies.mockResolvedValue({
+      cookies.mockResolvedValue({
         get: jest.fn().mockReturnValue({ value: mockToken }),
       });
 
@@ -65,10 +73,11 @@ describe('Home Page', () => {
   describe('getServerSideUser function', () => {
     it('should handle various authentication scenarios', async () => {
       const { default: Home } = await import('./page');
+      const { cookies } = await import('next/headers');
 
       // Test expired token
       const expiredToken = 'header.eyJleHAiOjE2MDAwMDAwMDB9.signature';
-      mocks.mock.nextApp.mockCookies.mockResolvedValue({
+      cookies.mockResolvedValue({
         get: jest.fn().mockReturnValue({ value: expiredToken }),
       });
       let result = await Home();
@@ -76,7 +85,7 @@ describe('Home Page', () => {
 
       // Test invalid token format
       const invalidToken = 'invalid-token-format';
-      mocks.mock.nextApp.mockCookies.mockResolvedValue({
+      cookies.mockResolvedValue({
         get: jest.fn().mockReturnValue({ value: invalidToken }),
       });
       mocks.mock.http.fetchSuccess(mocks.mock.http.mockFetchErrorResponse);
@@ -85,7 +94,7 @@ describe('Home Page', () => {
 
       // Test auth service error
       const validToken = 'header.eyJleHAiOjk5OTk5OTk5OTl9.signature';
-      mocks.mock.nextApp.mockCookies.mockResolvedValue({
+      cookies.mockResolvedValue({
         get: jest.fn().mockReturnValue({ value: validToken }),
       });
       mocks.mock.http.fetchSuccess(mocks.mock.http.mockFetchErrorResponse);
@@ -101,7 +110,8 @@ describe('Home Page', () => {
 
     it('should handle missing or invalid user in successful response', async () => {
       const validToken = 'header.eyJleHAiOjk5OTk5OTk5OTl9.signature';
-      mocks.mock.nextApp.mockCookies.mockResolvedValue({
+      const { cookies } = await import('next/headers');
+      cookies.mockResolvedValue({
         get: jest.fn().mockReturnValue({ value: validToken }),
       });
       // Case 1: success false
@@ -125,9 +135,8 @@ describe('Home Page', () => {
     });
 
     it('should handle cookie errors', async () => {
-      mocks.mock.nextApp.mockCookies.mockRejectedValue(
-        new Error('Cookie error')
-      );
+      const { cookies } = await import('next/headers');
+      cookies.mockRejectedValue(new Error('Cookie error'));
 
       const { default: Home } = await import('./page');
       const result = await Home();

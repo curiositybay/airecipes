@@ -51,6 +51,6 @@ export const mockEnvironment = {
     updateMockConfig({ nodeEnv: 'test' });
   },
   restore: (originalEnv: string | undefined) => {
-    updateMockConfig({ nodeEnv: originalEnv || 'test' });
+    updateMockConfig({ nodeEnv: originalEnv });
   },
 };

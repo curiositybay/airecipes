@@ -17,9 +17,7 @@ export const mockClipboardSuccess = () => {
   clipboardMock.readText.mockResolvedValue('test text');
 };
 
-export const mockClipboardError = (
-  error: Error = new Error('Clipboard failed')
-) => {
+export const mockClipboardError = (error: Error) => {
   clipboardMock.writeText.mockRejectedValue(error);
   clipboardMock.readText.mockRejectedValue(error);
 };

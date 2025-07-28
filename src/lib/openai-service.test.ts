@@ -1,5 +1,5 @@
 import type { RecipeGenerationResponse, Preferences } from './openai-service';
-import { mocks } from '@/test-utils/mocks';
+import { mocks } from '@/test-utils/mocks/mocks';
 
 // Use Jest's automatic mock for openai (external library)
 jest.mock('openai', () => {

@@ -1,4 +1,4 @@
-import { mocks } from '@/test-utils/mocks';
+import { mocks } from '@/test-utils/mocks/mocks';
 
 // Use Jest's automatic mock for redis (external library)
 jest.mock('redis');

@@ -3,7 +3,7 @@ import {
   createMockRequest,
   timerHelpers,
 } from './common-test-patterns';
-import { mocks } from './mocks';
+import { mocks } from './mocks/mocks';
 
 describe('common-test-patterns', () => {
   beforeEach(() => {

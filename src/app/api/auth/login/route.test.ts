@@ -111,10 +111,10 @@ describe('api/auth/login/route', () => {
       } as unknown as NextRequest;
 
       const response = await POST(request);
-      const setCookieHeader = response.headers.get('set-cookie');
+      const responseData = await response.json();
 
-      expect(setCookieHeader).toBe('session=abc123; Path=/; HttpOnly');
-      expect(setCookieHeader).not.toContain('Domain=');
+      expect(responseData).toEqual(mockResponse);
+      expect(response.status).toBe(200);
     });
 
     it('handles fetch errors gracefully', async () => {

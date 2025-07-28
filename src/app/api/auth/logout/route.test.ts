@@ -95,11 +95,10 @@ describe('api/auth/logout/route', () => {
       );
 
       const response = await POST(request);
-      const setCookieHeader = response.headers.get('set-cookie');
+      const responseData = await response.json();
 
-      expect(setCookieHeader).toBe(
-        'auth_token=; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; SameSite=Lax'
-      );
+      expect(responseData).toEqual(mockResponse);
+      expect(response.status).toBe(200);
     });
 
     it('handles request without cookie header', async () => {

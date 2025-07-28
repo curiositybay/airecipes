@@ -60,12 +60,12 @@ describe('Usage Route Business Logic', () => {
       );
       mocks.mock.prisma.client.usageLog.count.mockResolvedValue(2);
 
-      // Mock NextRequest
-      const mockRequest = {
-        url: 'http://localhost:3000/api/usage',
-      };
+      // Use unified mock for NextRequest
+      const mockRequest = mocks.mock.next.createRequest(
+        'http://localhost:3000/api/usage'
+      );
 
-      const response = await GET(mockRequest as unknown as NextRequest);
+      const response = await GET(mockRequest);
       const data = await response.json();
 
       expect(mocks.mock.prisma.client.usageLog.findMany).toHaveBeenCalledWith({
@@ -88,11 +88,11 @@ describe('Usage Route Business Logic', () => {
       const error = new Error('Database connection failed');
       mocks.mock.prisma.client.usageLog.findMany.mockRejectedValue(error);
 
-      const mockRequest = {
-        url: 'http://localhost:3000/api/usage',
-      };
+      const mockRequest = mocks.mock.next.createRequest(
+        'http://localhost:3000/api/usage'
+      );
 
-      const response = await GET(mockRequest as unknown as NextRequest);
+      const response = await GET(mockRequest);
       const data = await response.json();
 
       expect(data).toEqual({
@@ -119,14 +119,15 @@ describe('Usage Route Business Logic', () => {
         data: { method: 'GET', success: true, errorMessage: null },
       });
 
-      const mockRequest = {
-        json: jest.fn().mockResolvedValue({
-          method: 'GET',
-          success: true,
-        }),
-      };
+      const mockRequest = mocks.mock.next.createRequest(
+        'http://localhost:3000/api/usage'
+      );
+      mockRequest.json = jest.fn().mockResolvedValue({
+        method: 'GET',
+        success: true,
+      });
 
-      const response = await POST(mockRequest as unknown as NextRequest);
+      const response = await POST(mockRequest);
       const data = await response.json();
 
       expect(validateRequest).toHaveBeenCalledWith(
@@ -161,14 +162,15 @@ describe('Usage Route Business Logic', () => {
         ],
       });
 
-      const mockRequest = {
-        json: jest.fn().mockResolvedValue({
-          method: 'INVALID',
-          success: 'not-a-boolean',
-        }),
-      };
+      const mockRequest = mocks.mock.next.createRequest(
+        'http://localhost:3000/api/usage'
+      );
+      mockRequest.json = jest.fn().mockResolvedValue({
+        method: 'INVALID',
+        success: 'not-a-boolean',
+      });
 
-      const response = await POST(mockRequest as unknown as NextRequest);
+      const response = await POST(mockRequest);
       const data = await response.json();
 
       expect(validateRequest).toHaveBeenCalled();
@@ -191,15 +193,16 @@ describe('Usage Route Business Logic', () => {
         },
       });
 
-      const mockRequest = {
-        json: jest.fn().mockResolvedValue({
-          method: 'POST',
-          success: false,
-          errorMessage: 'Test error',
-        }),
-      };
+      const mockRequest = mocks.mock.next.createRequest(
+        'http://localhost:3000/api/usage'
+      );
+      mockRequest.json = jest.fn().mockResolvedValue({
+        method: 'POST',
+        success: false,
+        errorMessage: 'Test error',
+      });
 
-      const response = await POST(mockRequest as unknown as NextRequest);
+      const response = await POST(mockRequest);
       const data = await response.json();
 
       expect(data).toEqual({
@@ -210,11 +213,12 @@ describe('Usage Route Business Logic', () => {
     });
 
     it('should handle JSON parsing error in POST', async () => {
-      const mockRequest = {
-        json: jest.fn().mockRejectedValue(new Error('Invalid JSON')),
-      };
+      const mockRequest = mocks.mock.next.createRequest(
+        'http://localhost:3000/api/usage'
+      );
+      mockRequest.json = jest.fn().mockRejectedValue(new Error('Invalid JSON'));
 
-      const response = await POST(mockRequest as unknown as NextRequest);
+      const response = await POST(mockRequest);
       const data = await response.json();
 
       expect(data).toEqual({

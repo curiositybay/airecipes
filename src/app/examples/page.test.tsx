@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { mocks } from '@/test-utils/mocks';
+import { mocks } from '@/test-utils/mocks/mocks';
 
 // Mock the UnderConstructionClient component
 jest.mock('@/components/UI/UnderConstructionClient', () => {

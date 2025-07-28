@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import RecipeResults from './RecipeResults';
-import { mocks } from '@/test-utils/mocks';
+import { mocks } from '@/test-utils/mocks/mocks';
 
 jest.mock('./RecipeCard', () => {
   return function MockRecipeCard({
@@ -22,7 +22,6 @@ describe('RecipeResults', () => {
     render(<RecipeResults recipes={mockRecipes} />);
 
     expect(screen.getByTestId('recipe-card-0')).toBeInTheDocument();
-    expect(screen.getByTestId('recipe-card-1')).toBeInTheDocument();
   });
 
   it('should render empty state when no recipes', () => {

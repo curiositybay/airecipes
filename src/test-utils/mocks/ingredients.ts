@@ -36,12 +36,8 @@ export const mockFetchSuggestions = (
   });
 };
 
-export const mockFetchError = (error: Error | number) => {
-  if (typeof error === 'number') {
-    (global.fetch as jest.Mock).mockResolvedValue({ ok: false, status: error });
-  } else {
-    (global.fetch as jest.Mock).mockRejectedValue(error);
-  }
+export const mockFetchError = (error: number) => {
+  (global.fetch as jest.Mock).mockResolvedValue({ ok: false, status: error });
 };
 
 export const mockFetchSequence = (

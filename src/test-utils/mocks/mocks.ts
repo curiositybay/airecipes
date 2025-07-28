@@ -1,17 +1,15 @@
 // Import setup functions from submodules.
 import { mockAppConfigModule } from './config';
 import { mockNextServerModule } from './next-server';
+
 import { setupFetchMocks } from './http';
-import { setupRateLimitMocks } from './rate-limit';
+
 import { setupPrismaMocks } from './prisma';
 
 import { setupValidationMocks } from './validation';
 import * as validationMocks from './validation';
 import { setupAuthMocks } from './auth';
-import { setupMiddlewareCacheMocks } from './middleware-cache';
-import { setupMiddlewareLoggerMocks } from './middleware-logger';
-import { setupReactComponentMocks } from './react-components';
-import { setupNextAppMocks } from './next-app';
+
 import {
   setupClipboardMock,
   clipboardMock,
@@ -23,16 +21,14 @@ import {
 import * as nextServerMocks from './next-server';
 import * as httpMocks from './http';
 import * as configMocks from './config';
-import * as rateLimitMocks from './rate-limit';
+
 import * as prismaMocks from './prisma';
 import * as ingredientMocks from './ingredients';
 import * as recipeMocks from './recipes';
 
 // Validation mocks are now automatically handled by Jest
 import * as authMocks from './auth';
-import * as middlewareCacheMocks from './middleware-cache';
-import * as middlewareLoggerMocks from './middleware-logger';
-import * as reactComponentMocks from './react-components';
+
 import * as nextAppMocks from './next-app';
 
 // Frontend-specific mocks
@@ -50,10 +46,6 @@ export const setupLocalStorageMock = () => {
   return localStorageMock;
 };
 
-export const setupScrollIntoViewMock = () => {
-  Element.prototype.scrollIntoView = jest.fn();
-};
-
 // Create a single mocks object that contains everything.
 export const mocks = {
   // Setup and teardown methods.
@@ -61,15 +53,12 @@ export const mocks = {
     all: () => {
       mockAppConfigModule();
       mockNextServerModule();
+
       setupFetchMocks();
-      setupRateLimitMocks();
+
       setupPrismaMocks();
       setupValidationMocks();
       setupAuthMocks();
-      setupMiddlewareCacheMocks();
-      setupMiddlewareLoggerMocks();
-      setupReactComponentMocks();
-      setupNextAppMocks();
     },
 
     clear: () => {
@@ -80,16 +69,9 @@ export const mocks = {
       localStorageMock.clear.mockClear();
     },
 
-    // Convenience method that returns cleanup function.
-    withCleanup: () => {
-      mocks.setup.all();
-      return () => mocks.setup.clear();
-    },
-
     // Frontend-specific setup methods.
     frontend: {
       setupLocalStorage: setupLocalStorageMock,
-      setupScrollIntoView: setupScrollIntoViewMock,
       setupClipboard: setupClipboardMock,
     },
   },
@@ -106,8 +88,6 @@ export const mocks = {
     // HTTP/fetch mocks.
     http: {
       ...httpMocks,
-      authSuccess: httpMocks.mockAuthSuccessResponse,
-      authFailure: httpMocks.mockAuthFailureResponse,
       networkError: httpMocks.mockNetworkError,
       fetchSuccess: httpMocks.mockFetchSuccess,
       fetchFailure: httpMocks.mockFetchFailure,
@@ -118,17 +98,6 @@ export const mocks = {
       ...configMocks,
       app: configMocks.mockAppConfig,
       env: configMocks.mockEnvironment,
-    },
-
-    // Rate limit mocks.
-    rateLimit: {
-      ...rateLimitMocks,
-      fn: rateLimitMocks.mockRateLimit,
-      success: rateLimitMocks.mockRateLimitSuccess,
-      failure: rateLimitMocks.mockRateLimitFailure,
-      successResponse: rateLimitMocks.mockRateLimitSuccessResponse,
-      failureResponse: rateLimitMocks.mockRateLimitFailureResponse,
-      error: rateLimitMocks.mockRateLimitError,
     },
 
     // Prisma mocks.
@@ -159,21 +128,6 @@ export const mocks = {
       ...recipeMocks,
     },
 
-    // Middleware cache mocks.
-    middlewareCache: {
-      ...middlewareCacheMocks,
-    },
-
-    // Middleware logger mocks.
-    middlewareLogger: {
-      ...middlewareLoggerMocks,
-    },
-
-    // React component mocks.
-    react: {
-      ...reactComponentMocks,
-    },
-
     // Next.js app mocks.
     nextApp: {
       ...nextAppMocks,
@@ -183,7 +137,6 @@ export const mocks = {
     frontend: {
       localStorage: localStorageMock,
       setupLocalStorage: setupLocalStorageMock,
-      setupScrollIntoView: setupScrollIntoViewMock,
       clipboard: clipboardMock,
       setupClipboard: setupClipboardMock,
       mockClipboardSuccess,

@@ -2,15 +2,19 @@ import mocks from './test-utils/mocks/mocks';
 
 // Mock the middleware dependencies before importing.
 jest.mock('@/lib/middleware-cache', () => ({
-  getCachedAuthResult: mocks.mock.middlewareCache.mockGetCachedAuthResult,
-  cacheAuthResult: mocks.mock.middlewareCache.mockCacheAuthResult,
-  extractUserIdFromToken: mocks.mock.middlewareCache.mockExtractUserIdFromToken,
-  clearCache: mocks.mock.middlewareCache.mockClearCache,
+  getCachedAuthResult: jest.fn(),
+  cacheAuthResult: jest.fn(),
+  extractUserIdFromToken: jest.fn(),
 }));
 
 jest.mock('@/lib/middleware-logger', () => ({
   __esModule: true,
-  default: mocks.mock.middlewareLogger.mockMiddlewareLogger,
+  default: {
+    info: jest.fn(),
+    warn: jest.fn(),
+    error: jest.fn(),
+    debug: jest.fn(),
+  },
 }));
 
 jest.mock('next/server', () => ({
@@ -27,17 +31,17 @@ mocks.setup.all();
 
 import { NextResponse } from 'next/server';
 import middleware, { config } from './middleware';
+import {
+  getCachedAuthResult as mockGetCachedAuthResult,
+  cacheAuthResult as mockCacheAuthResult,
+  extractUserIdFromToken as mockExtractUserIdFromToken,
+} from '@/lib/middleware-cache';
+import middlewareLogger from '@/lib/middleware-logger';
 
 describe('middleware', () => {
   let mockNext: jest.MockedFunction<typeof NextResponse.next>;
   let mockRedirect: jest.MockedFunction<typeof NextResponse.redirect>;
-  let mockGetCachedAuthResult: jest.MockedFunction<
-    (...args: unknown[]) => Promise<unknown>
-  >;
-  let mockCacheAuthResult: jest.MockedFunction<(...args: unknown[]) => boolean>;
-  let mockExtractUserIdFromToken: jest.MockedFunction<
-    (token: string) => string | null
-  >;
+  // Local mocks are already defined at the top level.
   let mockLogger: jest.Mocked<{
     info: jest.MockedFunction<
       (message: string, meta?: Record<string, unknown>) => void
@@ -63,12 +67,7 @@ describe('middleware', () => {
     >;
 
     // Get mocked functions from the mocks architecture.
-    mockGetCachedAuthResult =
-      mocks.mock.middlewareCache.mockGetCachedAuthResult;
-    mockCacheAuthResult = mocks.mock.middlewareCache.mockCacheAuthResult;
-    mockExtractUserIdFromToken =
-      mocks.mock.middlewareCache.mockExtractUserIdFromToken;
-    mockLogger = mocks.mock.middlewareLogger.mockMiddlewareLogger;
+    mockLogger = middlewareLogger as jest.Mocked<typeof middlewareLogger>;
   });
 
   afterEach(() => {
@@ -108,7 +107,7 @@ describe('middleware', () => {
     expect(response.headers.get('x-api-call-track')).toBe('true');
   });
 
-  it('should allow admin routes with valid auth token', async () => {
+  it('should handle auth verification from service', async () => {
     const request = mocks.mock.next.createRequest(
       'http://localhost:3000/admin/dashboard',
       {},
@@ -117,7 +116,15 @@ describe('middleware', () => {
     const response = mocks.mock.next.createResponse();
     mockNext.mockReturnValue(response as unknown as NextResponse);
 
-    mocks.mock.http.fetchSuccess(mocks.mock.http.authSuccess);
+    mocks.mock.http.fetchSuccess({
+      ok: true,
+      status: 200,
+      json: () =>
+        Promise.resolve({
+          success: true,
+          user: { id: '1', email: 'test@example.com' },
+        }),
+    });
 
     await middleware(request);
 
@@ -188,7 +195,15 @@ describe('middleware', () => {
 
     // Mock userId extraction failure.
     mockExtractUserIdFromToken.mockReturnValue(null);
-    mocks.mock.http.fetchSuccess(mocks.mock.http.authSuccess);
+    mocks.mock.http.fetchSuccess({
+      ok: true,
+      status: 200,
+      json: () =>
+        Promise.resolve({
+          success: true,
+          user: { id: '1', email: 'test@example.com' },
+        }),
+    });
 
     await middleware(request);
 
@@ -208,7 +223,15 @@ describe('middleware', () => {
     // Mock cache miss.
     mockExtractUserIdFromToken.mockReturnValue('user123');
     mockGetCachedAuthResult.mockResolvedValue(null);
-    mocks.mock.http.fetchSuccess(mocks.mock.http.authSuccess);
+    mocks.mock.http.fetchSuccess({
+      ok: true,
+      status: 200,
+      json: () =>
+        Promise.resolve({
+          success: true,
+          user: { id: '1', email: 'test@example.com' },
+        }),
+    });
 
     await middleware(request);
 

@@ -1,4 +1,4 @@
-import { mocks } from '@/test-utils/mocks';
+import { mocks } from '@/test-utils/mocks/mocks';
 import {
   hashToken,
   generateAuthCacheKey,

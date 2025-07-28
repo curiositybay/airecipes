@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import RecipeCard from './RecipeCard';
 import { Recipe } from '@/types/ai-meals';
-import { mocks } from '@/test-utils/mocks';
+import { mocks } from '@/test-utils/mocks/mocks';
 import { timerHelpers } from '@/test-utils/common-test-patterns';
 
 const testClipboardWithRecipe = async (

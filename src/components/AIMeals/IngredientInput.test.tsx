@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import IngredientInput from './IngredientInput';
-import { mocks } from '@/test-utils/mocks';
+import { mocks } from '@/test-utils/mocks/mocks';
 import { timerHelpers } from '@/test-utils/common-test-patterns';
 
 global.fetch = jest.fn();
