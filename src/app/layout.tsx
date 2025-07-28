@@ -31,11 +31,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <body className={inter.className}>
-      <ThemeProvider initialTheme='desert'>
-        <Layout>{children}</Layout>
-      </ThemeProvider>
-      <StructuredData />
-    </body>
+    <html lang="en">
+      <body className={inter.className}>
+        <ThemeProvider initialTheme='desert'>
+          <Layout>{children}</Layout>
+        </ThemeProvider>
+        <StructuredData />
+      </body>
+    </html>
   );
 }
