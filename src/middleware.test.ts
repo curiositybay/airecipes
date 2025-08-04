@@ -1,10 +1,14 @@
 import mocks from './test-utils/mocks/mocks';
 
 // Mock the middleware dependencies before importing.
+const mockGetCachedAuthResult = jest.fn();
+const mockCacheAuthResult = jest.fn();
+const mockExtractUserIdFromToken = jest.fn();
+
 jest.mock('@/lib/middleware-cache', () => ({
-  getCachedAuthResult: jest.fn(),
-  cacheAuthResult: jest.fn(),
-  extractUserIdFromToken: jest.fn(),
+  getCachedAuthResult: mockGetCachedAuthResult,
+  cacheAuthResult: mockCacheAuthResult,
+  extractUserIdFromToken: mockExtractUserIdFromToken,
 }));
 
 jest.mock('@/lib/middleware-logger', () => ({
@@ -31,11 +35,9 @@ mocks.setup.all();
 
 import { NextResponse } from 'next/server';
 import middleware, { config } from './middleware';
-import {
-  getCachedAuthResult as mockGetCachedAuthResult,
-  cacheAuthResult as mockCacheAuthResult,
-  extractUserIdFromToken as mockExtractUserIdFromToken,
-} from '@/lib/middleware-cache';
+// These imports are used for their side effects in the mock setup
+
+// Mock functions are used for their side effects in the mock setup
 import middlewareLogger from '@/lib/middleware-logger';
 
 describe('middleware', () => {
@@ -164,7 +166,7 @@ describe('middleware', () => {
 
     // Mock cache hit.
     mockExtractUserIdFromToken.mockReturnValue('user123');
-    mockGetCachedAuthResult.mockResolvedValue({
+    mockGetCachedAuthResult.mockReturnValue({
       id: 'user123',
       email: 'cached@example.com',
       role: 'user',
@@ -222,7 +224,7 @@ describe('middleware', () => {
 
     // Mock cache miss.
     mockExtractUserIdFromToken.mockReturnValue('user123');
-    mockGetCachedAuthResult.mockResolvedValue(null);
+    mockGetCachedAuthResult.mockReturnValue(null);
     mocks.mock.http.fetchSuccess({
       ok: true,
       status: 200,

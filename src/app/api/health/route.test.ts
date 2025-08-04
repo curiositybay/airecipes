@@ -41,7 +41,9 @@ describe('api/health/route', () => {
   };
 
   const mockDatabaseFailure = () => {
-    mocks.mock.prisma.client.$queryRaw.mockRejectedValue(new Error('Database error'));
+    mocks.mock.prisma.client.$queryRaw.mockRejectedValue(
+      new Error('Database error')
+    );
   };
 
   const mockRedisFailure = () => {

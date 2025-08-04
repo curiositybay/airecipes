@@ -22,12 +22,14 @@ describe('prisma', () => {
 
     // Store original global and reset it
     originalGlobal = globalThis;
-    (globalThis as unknown as { prisma?: PrismaClient }).prisma = undefined;
+    (globalThis as { prisma?: PrismaClient }).prisma = undefined;
   });
 
   afterEach(() => {
     // Restore original global
-    (globalThis as { prisma?: PrismaClient }).prisma = originalGlobal.prisma;
+    (globalThis as { prisma?: PrismaClient }).prisma = (
+      originalGlobal as { prisma?: PrismaClient }
+    ).prisma;
   });
 
   it('should create a new PrismaClient instance when global.prisma is undefined', async () => {
@@ -50,8 +52,6 @@ describe('prisma', () => {
     jest.resetModules();
     await import('./prisma');
 
-    expect(
-      (globalThis as unknown as { prisma?: PrismaClient }).prisma
-    ).toBeUndefined();
+    expect((globalThis as { prisma?: PrismaClient }).prisma).toBeUndefined();
   });
 });

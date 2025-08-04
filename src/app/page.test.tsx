@@ -39,7 +39,7 @@ describe('Home Page', () => {
       const { cookies } = await import('next/headers');
 
       // Test no auth token
-      cookies.mockResolvedValue({
+      (cookies as jest.Mock).mockResolvedValue({
         get: jest.fn().mockReturnValue(undefined),
       });
 
@@ -51,7 +51,7 @@ describe('Home Page', () => {
       const mockUser = { id: '123', email: 'test@example.com' };
       const mockToken = 'valid.jwt.token';
 
-      cookies.mockResolvedValue({
+      (cookies as jest.Mock).mockResolvedValue({
         get: jest.fn().mockReturnValue({ value: mockToken }),
       });
 
@@ -77,7 +77,7 @@ describe('Home Page', () => {
 
       // Test expired token
       const expiredToken = 'header.eyJleHAiOjE2MDAwMDAwMDB9.signature';
-      cookies.mockResolvedValue({
+      (cookies as jest.Mock).mockResolvedValue({
         get: jest.fn().mockReturnValue({ value: expiredToken }),
       });
       let result = await Home();
@@ -85,7 +85,7 @@ describe('Home Page', () => {
 
       // Test invalid token format
       const invalidToken = 'invalid-token-format';
-      cookies.mockResolvedValue({
+      (cookies as jest.Mock).mockResolvedValue({
         get: jest.fn().mockReturnValue({ value: invalidToken }),
       });
       mocks.mock.http.fetchSuccess(mocks.mock.http.mockFetchErrorResponse);
@@ -94,7 +94,7 @@ describe('Home Page', () => {
 
       // Test auth service error
       const validToken = 'header.eyJleHAiOjk5OTk5OTk5OTl9.signature';
-      cookies.mockResolvedValue({
+      (cookies as jest.Mock).mockResolvedValue({
         get: jest.fn().mockReturnValue({ value: validToken }),
       });
       mocks.mock.http.fetchSuccess(mocks.mock.http.mockFetchErrorResponse);
@@ -111,7 +111,7 @@ describe('Home Page', () => {
     it('should handle missing or invalid user in successful response', async () => {
       const validToken = 'header.eyJleHAiOjk5OTk5OTk5OTl9.signature';
       const { cookies } = await import('next/headers');
-      cookies.mockResolvedValue({
+      (cookies as jest.Mock).mockResolvedValue({
         get: jest.fn().mockReturnValue({ value: validToken }),
       });
       // Case 1: success false
@@ -136,7 +136,7 @@ describe('Home Page', () => {
 
     it('should handle cookie errors', async () => {
       const { cookies } = await import('next/headers');
-      cookies.mockRejectedValue(new Error('Cookie error'));
+      (cookies as jest.Mock).mockRejectedValue(new Error('Cookie error'));
 
       const { default: Home } = await import('./page');
       const result = await Home();

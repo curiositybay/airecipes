@@ -67,11 +67,14 @@ export async function GET() {
 
       for (let attempt = 1; attempt <= maxRetries; attempt++) {
         try {
-          const response = await fetch(`${appConfig.authServiceUrl}/api/health`, {
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' },
-            signal: AbortSignal.timeout(3000), // Reduced timeout to 3 seconds
-          });
+          const response = await fetch(
+            `${appConfig.authServiceUrl}/api/health`,
+            {
+              method: 'GET',
+              headers: { 'Content-Type': 'application/json' },
+              signal: AbortSignal.timeout(3000), // Reduced timeout to 3 seconds
+            }
+          );
 
           if (response.ok) {
             authServiceHealthy = true;
@@ -79,14 +82,26 @@ export async function GET() {
             previousHealthStates.authService = true;
             break;
           } else {
-            if (attempt === maxRetries && previousHealthStates.authService !== false) {
-              logger.warn(`Auth service health check failed (attempt ${attempt}/${maxRetries}):`, response.status);
+            if (
+              attempt === maxRetries &&
+              previousHealthStates.authService !== false
+            ) {
+              logger.warn(
+                `Auth service health check failed (attempt ${attempt}/${maxRetries}):`,
+                response.status
+              );
               previousHealthStates.authService = false;
             }
           }
         } catch (error) {
-          if (attempt === maxRetries && previousHealthStates.authService !== false) {
-            logger.warn(`Auth service health check error (attempt ${attempt}/${maxRetries}):`, error);
+          if (
+            attempt === maxRetries &&
+            previousHealthStates.authService !== false
+          ) {
+            logger.warn(
+              `Auth service health check error (attempt ${attempt}/${maxRetries}):`,
+              error
+            );
             previousHealthStates.authService = false;
           }
         }
@@ -108,7 +123,6 @@ export async function GET() {
 
     // Determine overall health status - only fail if critical services (database/redis) are down
     const criticalServicesHealthy = healthChecks.database && healthChecks.redis;
-    const allChecksPassed = Object.values(healthChecks).every(check => check);
     const responseTime = Date.now() - startTime;
 
     const healthData = {
@@ -129,7 +143,9 @@ export async function GET() {
       if (statusCode === 200) {
         logger.info('Health check endpoint now returning 200 (healthy)');
       } else {
-        logger.warn(`Health check endpoint now returning ${statusCode} (unhealthy)`);
+        logger.warn(
+          `Health check endpoint now returning ${statusCode} (unhealthy)`
+        );
       }
       lastHealthStatus = statusCode;
     }
@@ -140,7 +156,9 @@ export async function GET() {
 
     const errorStatusCode = 503;
     if (lastHealthStatus !== errorStatusCode) {
-      logger.warn(`Health check endpoint now returning ${errorStatusCode} (error)`);
+      logger.warn(
+        `Health check endpoint now returning ${errorStatusCode} (error)`
+      );
       lastHealthStatus = errorStatusCode;
     }
 

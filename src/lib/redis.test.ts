@@ -31,7 +31,7 @@ describe('redis', () => {
         url: 'redis://localhost:6379',
         password: 'test-password',
       },
-    });
+    } as Partial<typeof mocks.mock.config.app>);
 
     // Create mock Redis client
     mockRedisClient = {
@@ -71,7 +71,11 @@ describe('redis', () => {
 
     expect(handler).toBeDefined();
     if (handler) {
-      handler(eventName === 'error' ? new Error('Redis error') : undefined);
+      handler(
+        eventName === 'error'
+          ? new Error('Redis error')
+          : new Error('Redis event')
+      );
     }
   };
 
@@ -405,7 +409,9 @@ describe('redis', () => {
 
     it('should return false when ping fails with Error', async () => {
       // Add ping method to mock client
-      mockRedisClient.ping = jest.fn().mockRejectedValue(new Error('Ping failed'));
+      mockRedisClient.ping = jest
+        .fn()
+        .mockRejectedValue(new Error('Ping failed'));
 
       const { testRedisConnection } = await import('./redis');
 
