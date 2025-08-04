@@ -17,7 +17,20 @@ global.fetch = jest.fn();
 Element.prototype.scrollIntoView = jest.fn();
 
 const mockUseAuth = jest.requireMock('@/contexts/AuthContext').useAuth;
-import Swal from 'sweetalert2';
+
+// Mock the themedSwal utility
+jest.mock('@/lib/swal-theme', () => ({
+  themedSwal: {
+    confirm: jest.fn().mockResolvedValue({ isConfirmed: false }),
+    info: jest.fn().mockResolvedValue({ isConfirmed: true }),
+    success: jest.fn().mockResolvedValue({ isConfirmed: true }),
+    warning: jest.fn().mockResolvedValue({ isConfirmed: true }),
+    error: jest.fn().mockResolvedValue({ isConfirmed: true }),
+    custom: jest.fn().mockResolvedValue({ isConfirmed: true }),
+  },
+}));
+
+import { themedSwal } from '@/lib/swal-theme';
 
 // Helper function to mock fetch response
 function mockFetchResponse(data: Record<string, unknown>, ok = true) {
@@ -84,7 +97,9 @@ describe('useAIMealsRecipeService', () => {
   describe('authentication handling', () => {
     describe('when user is not authenticated', () => {
       it('should prompt for demo login', async () => {
-        (Swal.fire as jest.Mock).mockResolvedValue({ isConfirmed: true });
+        (themedSwal.confirm as jest.Mock).mockResolvedValue({
+          isConfirmed: true,
+        });
 
         const { result } = renderHook(() => useAIMealsRecipeService());
 
@@ -92,20 +107,19 @@ describe('useAIMealsRecipeService', () => {
           await result.current.generateRecipes(['tomato']);
         });
 
-        expect(Swal.fire).toHaveBeenCalledWith({
+        expect(themedSwal.confirm).toHaveBeenCalledWith({
           title: 'Demo Login Required',
           text: 'To test the recipe generation functionality, you will be automatically logged in as a demo user.',
           icon: 'info',
-          showCancelButton: true,
-          confirmButtonColor: '#3085d6',
-          cancelButtonColor: '#d33',
           confirmButtonText: 'Continue as Demo User',
           cancelButtonText: 'Cancel',
         });
       });
 
       it('should call loginAsDemoUser when user confirms demo login', async () => {
-        (Swal.fire as jest.Mock).mockResolvedValue({ isConfirmed: true });
+        (themedSwal.confirm as jest.Mock).mockResolvedValue({
+          isConfirmed: true,
+        });
         mockFetchResponse({ recipes: [] });
 
         const { result } = renderHook(() => useAIMealsRecipeService());
@@ -118,7 +132,9 @@ describe('useAIMealsRecipeService', () => {
       });
 
       it('should not proceed with recipe generation when user cancels demo login', async () => {
-        (Swal.fire as jest.Mock).mockResolvedValue({ isConfirmed: false });
+        (themedSwal.confirm as jest.Mock).mockResolvedValue({
+          isConfirmed: false,
+        });
 
         const { result } = renderHook(() => useAIMealsRecipeService());
 
@@ -126,7 +142,7 @@ describe('useAIMealsRecipeService', () => {
           await result.current.generateRecipes(['tomato']);
         });
 
-        expect(Swal.fire).toHaveBeenCalled();
+        expect(themedSwal.confirm).toHaveBeenCalled();
         expect(global.fetch).not.toHaveBeenCalled();
       });
     });

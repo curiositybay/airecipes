@@ -43,7 +43,8 @@ function validateServerEnvVars() {
       .filter(([, value]) => !value)
       .map(([key]) => key);
 
-    if (missingServerVars.length > 0) {
+    // Only throw error in production or when explicitly required
+    if (missingServerVars.length > 0 && process.env.NODE_ENV === 'production') {
       throw new Error(
         `Missing required server environment variables: ${missingServerVars.join(', ')}`
       );

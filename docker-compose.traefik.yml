@@ -12,27 +12,31 @@ services:
       - app-network
       - proxy-network
     healthcheck:
-      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1"]
+      test:
+        [
+          'CMD-SHELL',
+          'wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1',
+        ]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
     labels:
       # Enable Traefik for this service
-      - "traefik.enable=true"
+      - 'traefik.enable=true'
       # HTTP router configuration
-      - "traefik.http.routers.airecipes.rule=Host(`airecipes.curiositybay.com`)"
-      - "traefik.http.routers.airecipes.entrypoints=websecure"
-      - "traefik.http.routers.airecipes.tls.certresolver=letsencrypt"
+      - 'traefik.http.routers.airecipes.rule=Host(`airecipes.curiositybay.com`)'
+      - 'traefik.http.routers.airecipes.entrypoints=websecure'
+      - 'traefik.http.routers.airecipes.tls.certresolver=letsencrypt'
       # Service configuration
-      - "traefik.http.services.airecipes.loadbalancer.server.port=3000"
+      - 'traefik.http.services.airecipes.loadbalancer.server.port=3000'
       # Middleware configuration
-      - "traefik.http.routers.airecipes.middlewares=security-headers,compression"
+      - 'traefik.http.routers.airecipes.middlewares=security-headers,compression'
       # Rate limiting (adjust as needed)
-      - "traefik.http.middlewares.airecipes-rate-limit.ratelimit.average=50"
-      - "traefik.http.middlewares.airecipes-rate-limit.ratelimit.burst=100"
-      - "traefik.http.routers.airecipes.middlewares=airecipes-rate-limit"
-      - "traefik.http.routers.airecipes.priority=100"
+      - 'traefik.http.middlewares.airecipes-rate-limit.ratelimit.average=50'
+      - 'traefik.http.middlewares.airecipes-rate-limit.ratelimit.burst=100'
+      - 'traefik.http.routers.airecipes.middlewares=airecipes-rate-limit'
+      - 'traefik.http.routers.airecipes.priority=100'
 
 volumes:
   airecipes_data:

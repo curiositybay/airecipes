@@ -6,9 +6,9 @@ const mockCacheAuthResult = jest.fn();
 const mockExtractUserIdFromToken = jest.fn();
 
 jest.mock('@/lib/middleware-cache', () => ({
-  getCachedAuthResult: mockGetCachedAuthResult,
-  cacheAuthResult: mockCacheAuthResult,
-  extractUserIdFromToken: mockExtractUserIdFromToken,
+  getCachedAuthResult: () => mockGetCachedAuthResult(),
+  cacheAuthResult: () => mockCacheAuthResult(),
+  extractUserIdFromToken: () => mockExtractUserIdFromToken(),
 }));
 
 jest.mock('@/lib/middleware-logger', () => ({

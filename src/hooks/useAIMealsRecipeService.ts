@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Recipe } from '@/types/ai-meals';
-import Swal from 'sweetalert2';
+import { themedSwal } from '@/lib/swal-theme';
 import { useAuth } from '@/contexts/AuthContext';
 
 /**
@@ -23,13 +23,10 @@ export function useAIMealsRecipeService() {
 
     // Check if user is logged in.
     if (!user) {
-      const result = await Swal.fire({
+      const result = await themedSwal.confirm({
         title: 'Demo Login Required',
         text: 'To test the recipe generation functionality, you will be automatically logged in as a demo user.',
         icon: 'info',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
         confirmButtonText: 'Continue as Demo User',
         cancelButtonText: 'Cancel',
       });

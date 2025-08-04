@@ -81,6 +81,19 @@
   /* Footer Colors */
   --color-footer: #f3f4f6;
   --color-footer-text: #4b5563;
+
+  /* SweetAlert2 Theme Colors */
+  --swal-background: var(--color-surface);
+  --swal-title-color: var(--color-text-primary);
+  --swal-text-color: var(--color-text-secondary);
+  --swal-confirm-button-bg: var(--color-primary);
+  --swal-confirm-button-hover-bg: var(--color-primary-hover);
+  --swal-confirm-button-text: var(--color-button-text);
+  --swal-cancel-button-bg: var(--color-neutral);
+  --swal-cancel-button-hover-bg: var(--color-neutral-text);
+  --swal-cancel-button-text: var(--color-button-text);
+  --swal-border-color: var(--color-border);
+  --swal-icon-color: var(--color-text-icon-primary);
 }
 
 /* Background Utilities */
@@ -277,4 +290,71 @@
 
 .theme-focus-border:focus {
   border-color: var(--color-input-focus);
+}
+
+/* SweetAlert2 Theme Overrides */
+.swal2-popup {
+  background-color: var(--swal-background) !important;
+  border: 1px solid var(--swal-border-color) !important;
+  border-radius: 8px !important;
+}
+
+.swal2-title {
+  color: var(--swal-title-color) !important;
+}
+
+.swal2-html-container {
+  color: var(--swal-text-color) !important;
+}
+
+.swal2-confirm {
+  background-color: var(--swal-confirm-button-bg) !important;
+  color: var(--swal-confirm-button-text) !important;
+  border: none !important;
+  border-radius: 6px !important;
+  padding: 8px 16px !important;
+  font-weight: 500 !important;
+  transition: background-color 0.2s ease !important;
+}
+
+.swal2-confirm:hover {
+  background-color: var(--swal-confirm-button-hover-bg) !important;
+}
+
+.swal2-cancel {
+  background-color: var(--swal-cancel-button-bg) !important;
+  color: var(--swal-cancel-button-text) !important;
+  border: none !important;
+  border-radius: 6px !important;
+  padding: 8px 16px !important;
+  font-weight: 500 !important;
+  transition: background-color 0.2s ease !important;
+}
+
+.swal2-cancel:hover {
+  background-color: var(--swal-cancel-button-hover-bg) !important;
+}
+
+.swal2-icon {
+  color: var(--swal-icon-color) !important;
+}
+
+.swal2-icon.swal2-info {
+  border-color: var(--color-info) !important;
+  color: var(--color-info) !important;
+}
+
+.swal2-icon.swal2-success {
+  border-color: var(--color-success) !important;
+  color: var(--color-success) !important;
+}
+
+.swal2-icon.swal2-warning {
+  border-color: var(--color-warning) !important;
+  color: var(--color-warning) !important;
+}
+
+.swal2-icon.swal2-error {
+  border-color: var(--color-error) !important;
+  color: var(--color-error) !important;
 }
