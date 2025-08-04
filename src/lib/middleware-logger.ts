@@ -1,8 +1,6 @@
 // Middleware-compatible logger that doesn't use Node.js APIs.
 import { appConfig } from '@/config/app';
 
-const environment = appConfig.environment;
-
 interface LogLevel {
   debug: number;
   info: number;
@@ -17,19 +15,22 @@ const LOG_LEVELS: LogLevel = {
   error: 3,
 };
 
-let currentLevel: number;
-if (environment === 'development') {
-  currentLevel = LOG_LEVELS.debug;
-} else if (environment === 'error-only') {
-  currentLevel = LOG_LEVELS.error;
-} else if (environment === 'none') {
-  currentLevel = 999; // Higher than any log level.
-} else {
-  currentLevel = LOG_LEVELS.info;
+function getCurrentLevel(): number {
+  const environment = appConfig.environment;
+
+  if (environment === 'development') {
+    return LOG_LEVELS.debug;
+  } else if (environment === 'error-only') {
+    return LOG_LEVELS.error;
+  } else if (environment === 'none') {
+    return 999; // Higher than any log level.
+  } else {
+    return LOG_LEVELS.info;
+  }
 }
 
 function shouldLog(level: keyof LogLevel): boolean {
-  return LOG_LEVELS[level] >= currentLevel;
+  return LOG_LEVELS[level] >= getCurrentLevel();
 }
 
 // Export for testing.

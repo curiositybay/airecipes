@@ -1,5 +1,27 @@
 import '@testing-library/jest-dom';
 
+// Set up test environment variables before any modules are loaded
+process.env.NODE_ENV = 'test';
+process.env.NEXT_PUBLIC_APP_NAME = 'Test App';
+process.env.NEXT_PUBLIC_APP_VERSION = '0.0.1';
+process.env.NEXT_PUBLIC_APP_ENVIRONMENT = 'test';
+process.env.NEXT_PUBLIC_APP_DESCRIPTION = 'Test App Description';
+process.env.NEXT_PUBLIC_API_URL = 'http://localhost:3000';
+process.env.NEXT_PUBLIC_APP_SLUG = 'test-app';
+process.env.NEXT_PUBLIC_APP_DOMAIN = 'test-domain.com';
+process.env.NEXT_PUBLIC_APP_URL = 'https://test-domain.com';
+process.env.NEXT_PUBLIC_GITHUB_REPO = 'https://github.com/test/repo';
+process.env.NEXT_PUBLIC_APP_AUTHOR = 'Test Author';
+process.env.NEXT_PUBLIC_APP_KEYWORDS = 'test, app';
+process.env.NEXT_PUBLIC_TWITTER_HANDLE = '@test';
+process.env.NEXT_PUBLIC_CONTACT_EMAIL = 'test@example.com';
+process.env.NEXT_PUBLIC_404_MESSAGE = 'Test 404 message';
+process.env.NEXT_PUBLIC_500_MESSAGE = 'Test 500 message';
+process.env.OPENAI_API_KEY = 'test-openai-key';
+process.env.OPENAI_MODEL = 'gpt-4o-mini';
+process.env.AUTH_SERVICE_URL = 'http://test-auth-service';
+process.env.REDIS_URL = 'redis://localhost:6379';
+
 // Mocks CSS imports - handles Tailwind CSS v4 syntax.
 jest.mock('*.css', () => ({}));
 jest.mock('*.scss', () => ({}));
