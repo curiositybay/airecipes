@@ -28,14 +28,6 @@ describe('middleware-logger', () => {
       // Import logger after mocks are set up
       const { default: logger } = await import('./middleware-logger');
 
-      // Debug: Check what environment is being used
-      const { appConfig } = await import('@/config/app');
-      console.log('Current environment:', appConfig.environment);
-      console.log(
-        'Mock config environment:',
-        mocks.mock.config.app.environment
-      );
-
       const message = 'Test debug message';
       const meta = { debug: 'info' };
 
