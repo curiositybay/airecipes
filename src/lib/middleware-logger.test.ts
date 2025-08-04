@@ -21,17 +21,20 @@ describe('middleware-logger', () => {
   });
 
   describe('logger methods', () => {
-    it('should call console.debug when logging debug message in development', () => {
+    it('should call console.debug when logging debug message in development', async () => {
       // Set environment to development for this test
       mocks.mock.config.updateMockConfig({ environment: 'development' });
 
       // Import logger after mocks are set up
-      const logger = require('./middleware-logger').default;
+      const { default: logger } = await import('./middleware-logger');
 
       // Debug: Check what environment is being used
-      const { appConfig } = require('@/config/app');
+      const { appConfig } = await import('@/config/app');
       console.log('Current environment:', appConfig.environment);
-      console.log('Mock config environment:', mocks.mock.config.app.environment);
+      console.log(
+        'Mock config environment:',
+        mocks.mock.config.app.environment
+      );
 
       const message = 'Test debug message';
       const meta = { debug: 'info' };
