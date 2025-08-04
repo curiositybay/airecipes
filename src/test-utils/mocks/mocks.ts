@@ -155,8 +155,6 @@ export const mocks = {
         OPENAI_API_KEY: 'test-openai-key',
         OPENAI_MODEL: 'gpt-4o-mini',
         AUTH_SERVICE_URL: 'http://test-auth-service',
-        REDIS_URL: 'redis://localhost:6379',
-        REDIS_PASSWORD: 'test-password',
       },
     },
   },

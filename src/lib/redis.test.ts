@@ -16,6 +16,7 @@ describe('redis', () => {
     del: jest.MockedFunction<(key: string | string[]) => Promise<number>>;
     keys: jest.MockedFunction<(pattern: string) => Promise<string[]>>;
     quit: jest.MockedFunction<() => Promise<void>>;
+    ping: jest.MockedFunction<() => Promise<string>>;
   };
 
   beforeEach(() => {
@@ -41,6 +42,7 @@ describe('redis', () => {
       del: jest.fn(),
       keys: jest.fn(),
       quit: jest.fn(),
+      ping: jest.fn(),
     };
 
     // Get the redis mock from Jest's automatic mock
@@ -376,6 +378,53 @@ describe('redis', () => {
       await closeRedisClient();
 
       expect(mockRedisClient.quit).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('testRedisConnection', () => {
+    it('should return true when Redis connection is successful', async () => {
+      // Add ping method to mock client
+      mockRedisClient.ping = jest.fn().mockResolvedValue('PONG');
+
+      const { testRedisConnection } = await import('./redis');
+
+      const result = await testRedisConnection();
+
+      expect(mockRedisClient.ping).toHaveBeenCalled();
+      expect(result).toBe(true);
+    });
+
+    it('should return false when Redis client is not available', async () => {
+      mockRedisUnavailable();
+      const { testRedisConnection } = await import('./redis');
+
+      const result = await testRedisConnection();
+
+      expect(result).toBe(false);
+    });
+
+    it('should return false when ping fails with Error', async () => {
+      // Add ping method to mock client
+      mockRedisClient.ping = jest.fn().mockRejectedValue(new Error('Ping failed'));
+
+      const { testRedisConnection } = await import('./redis');
+
+      const result = await testRedisConnection();
+
+      expect(mockRedisClient.ping).toHaveBeenCalled();
+      expect(result).toBe(false);
+    });
+
+    it('should return false when ping fails with non-Error', async () => {
+      // Add ping method to mock client
+      mockRedisClient.ping = jest.fn().mockRejectedValue('String error');
+
+      const { testRedisConnection } = await import('./redis');
+
+      const result = await testRedisConnection();
+
+      expect(mockRedisClient.ping).toHaveBeenCalled();
+      expect(result).toBe(false);
     });
   });
 });

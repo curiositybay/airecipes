@@ -164,3 +164,22 @@ export async function closeRedisClient() {
     }
   }
 }
+
+// Test Redis connection for monitoring.
+export async function testRedisConnection(): Promise<boolean> {
+  try {
+    const client = await getRedisClient();
+    if (!client) {
+      return false;
+    }
+
+    // Simple ping test to verify connection.
+    await client.ping();
+    return true;
+  } catch (error) {
+    logger.error('Redis connection test failed', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+    });
+    return false;
+  }
+}
