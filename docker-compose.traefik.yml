@@ -1,50 +1,42 @@
-name: ${APP_NAME}
-
 services:
-  app:
-    image: dockerhubuser/appname:latest
-    container_name: ${APP_NAME}-app
+  airecipes:
+    image: megalomatt/airecipes:latest
+    container_name: airecipes
     restart: unless-stopped
     env_file:
-      - /app/env/server/location/.env
+      - /srv/deploy/docker/apps/airecipes/.env
     volumes:
-      - app_data:/app/data
-      - app_logs:/app/logs
+      - airecipes_data:/app/data
+      - airecipes_logs:/app/logs
     networks:
       - app-network
       - proxy-network
     healthcheck:
-      test:
-        [
-          'CMD-SHELL',
-          'wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1',
-        ]
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
     labels:
       # Enable Traefik for this service
-      - 'traefik.enable=true'
+      - "traefik.enable=true"
       # HTTP router configuration
-      - 'traefik.http.routers.app.rule=Host(`${APP_NAME}.${NEXT_PUBLIC_APP_DOMAIN}`)'
-      - 'traefik.http.routers.app.entrypoints=websecure'
-      - 'traefik.http.routers.app.tls.certresolver=letsencrypt'
+      - "traefik.http.routers.airecipes.rule=Host(`airecipes.curiositybay.com`)"
+      - "traefik.http.routers.airecipes.entrypoints=websecure"
+      - "traefik.http.routers.airecipes.tls.certresolver=letsencrypt"
       # Service configuration
-      - 'traefik.http.services.app.loadbalancer.server.port=3000'
+      - "traefik.http.services.airecipes.loadbalancer.server.port=3000"
       # Middleware configuration
-      - 'traefik.http.routers.app.middlewares=security-headers,compression'
+      - "traefik.http.routers.airecipes.middlewares=security-headers,compression"
       # Rate limiting (adjust as needed)
-      - 'traefik.http.middlewares.app-rate-limit.ratelimit.average=50'
-      - 'traefik.http.middlewares.app-rate-limit.ratelimit.burst=100'
-      - 'traefik.http.routers.app.middlewares=app-rate-limit'
-      - 'traefik.http.routers.app.priority=100'
+      - "traefik.http.middlewares.airecipes-rate-limit.ratelimit.average=50"
+      - "traefik.http.middlewares.airecipes-rate-limit.ratelimit.burst=100"
+      - "traefik.http.routers.airecipes.middlewares=airecipes-rate-limit"
+      - "traefik.http.routers.airecipes.priority=100"
 
 volumes:
-  app_data:
-    name: ${APP_NAME}-app-data
-  app_logs:
-    name: ${APP_NAME}-app-logs
+  airecipes_data:
+  airecipes_logs:
 
 networks:
   app-network:
