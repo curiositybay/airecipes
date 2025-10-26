@@ -18,7 +18,7 @@ export async function initRedisClient() {
   try {
     redisClient = createClient({
       url: appConfig.redis.url,
-      ...(appConfig.redis.password && { password: appConfig.redis.password }),
+      ...(appConfig.redis.password && appConfig.redis.password.trim() !== '' && { password: appConfig.redis.password }),
     });
 
     redisClient.on('error', (err: Error) => {

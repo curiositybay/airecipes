@@ -1,4 +1,4 @@
-import mocks from '../../../test-utils/mocks/mocks';
+import mocks from '@/test-utils/mocks/mocks';
 import winston from 'winston';
 
 // Setup mocks before importing anything.

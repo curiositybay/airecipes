@@ -9,7 +9,7 @@ jest.mock('./Footer', () => {
   return MockFooter;
 });
 
-jest.mock('../UI/GitHubCorner', () => {
+jest.mock('@/components/UI/GitHubCorner', () => {
   const MockGitHubCorner = () => <div data-testid='github-corner' />;
   MockGitHubCorner.displayName = 'MockGitHubCorner';
   return MockGitHubCorner;

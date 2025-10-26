@@ -1,4 +1,4 @@
-import AuthControls from '../UI/AuthControls';
+import AuthControls from '@/components/UI/AuthControls';
 import Image from 'next/image';
 
 /**

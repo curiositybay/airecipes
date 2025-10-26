@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getExamples, createExample } from './exampleUtils';
-import { prisma } from '../../../../lib/prisma';
-import logger from '../../../../lib/logger';
+import { prisma } from '@/lib/prisma';
+import logger from '@/lib/logger';
 import {
   createExampleSchema,
   validateRequest,
-} from '../../../../lib/validation';
+} from '@/lib/validation';
 
 export async function GET() {
   try {

@@ -1,4 +1,4 @@
-import mocks from '../../../test-utils/mocks/mocks';
+import mocks from '@/test-utils/mocks/mocks';
 
 // Setup mocks before importing anything.
 mocks.setup.all();

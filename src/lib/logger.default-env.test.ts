@@ -1,7 +1,7 @@
 import winston from 'winston';
 
 // Mock appConfig with no environment
-jest.mock('../config/app', () => ({
+jest.mock('@/config/app', () => ({
   appConfig: {
     // environment intentionally omitted
   },

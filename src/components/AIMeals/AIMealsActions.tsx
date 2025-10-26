@@ -1,4 +1,4 @@
-import { PrimaryButton, SecondaryButton } from '../UI/Button';
+import { PrimaryButton, SecondaryButton } from '@/components/UI/Button';
 
 interface AIMealsActionsProps {
   onGetRecipes: () => void;

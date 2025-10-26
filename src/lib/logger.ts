@@ -1,5 +1,5 @@
 import winston from 'winston';
-import { appConfig } from '../config/app';
+import { appConfig } from '@/config/app';
 
 const environment = appConfig.environment || 'development';
 

@@ -1,7 +1,7 @@
 import winston from 'winston';
 
 // Mock appConfig for production environment
-jest.mock('../config/app', () => ({
+jest.mock('@/config/app', () => ({
   appConfig: {
     environment: 'production',
   },

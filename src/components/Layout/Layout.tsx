@@ -1,7 +1,7 @@
 'use client';
 
 import Footer from './Footer';
-import GitHubCorner from '../UI/GitHubCorner';
+import GitHubCorner from '@/components/UI/GitHubCorner';
 
 interface LayoutProps {
   children: React.ReactNode;

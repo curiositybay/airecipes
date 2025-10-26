@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { appConfig } from '../config/app';
+import { appConfig } from '@/config/app';
 
 /**
  * PrismaClient is attached to the `global` object in development to prevent

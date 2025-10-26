@@ -1,4 +1,4 @@
-import { Theme } from '../theme';
+import { Theme } from '@/config/theme';
 
 export const desertNightTheme: Theme = {
   name: 'desert-night',

@@ -2,7 +2,7 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import AIMealsActions from './AIMealsActions';
 
-jest.mock('../UI/Button', () => ({
+jest.mock('@/components/UI/Button', () => ({
   PrimaryButton: ({
     children,
     onClick,

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import logger from '../../../lib/logger';
-import { createUsageLogSchema, validateRequest } from '../../../lib/validation';
+import logger from '@/lib/logger';
+import { createUsageLogSchema, validateRequest } from '@/lib/validation';
 import { getUsageLogs, createUsageLog } from './logic';
 
 export async function GET(request: NextRequest) {

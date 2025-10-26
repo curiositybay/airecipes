@@ -13,6 +13,11 @@ const customJestConfig = {
   },
   moduleDirectories: ['node_modules', 'src'],
   roots: ['<rootDir>/src'],
+  transform: {
+    '^.+\\.(ts|tsx)$': ['ts-jest', {
+      tsconfig: 'tsconfig.test.json'
+    }]
+  },
 
   collectCoverageFrom: [
     'src/**/*.{js,jsx,ts,tsx}',

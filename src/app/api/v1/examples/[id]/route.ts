@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { updateExample, deleteExample } from '../exampleUtils';
-import { prisma } from '../../../../../lib/prisma';
-import logger from '../../../../../lib/logger';
+import { updateExample, deleteExample } from '@/app/api/v1/examples/exampleUtils';
+import { prisma } from '@/lib/prisma';
+import logger from '@/lib/logger';
 import {
   updateExampleSchema,
   validateRequest,
-} from '../../../../../lib/validation';
+} from '@/lib/validation';
 
 export async function PUT(
   request: NextRequest,

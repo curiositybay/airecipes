@@ -3,7 +3,7 @@ import { render, screen } from '@testing-library/react';
 import AIMealsHero from './AIMealsHero';
 
 // Mock dependencies
-jest.mock('../UI/AuthControls', () => {
+jest.mock('@/components/UI/AuthControls', () => {
   return function MockAuthControls() {
     return <div data-testid='auth-controls'>Auth Controls</div>;
   };
