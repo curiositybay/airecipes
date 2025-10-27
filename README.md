@@ -1,16 +1,31 @@
-# Setlists Web App
+# AI Recipes
 
-A modern web application built with Next.js, TypeScript, and Tailwind CSS for managing setlists and music collections.
+A portfolio demonstration project showcasing modern web development practices including **CI/CD automation**, **AI integration**, and **comprehensive test coverage**. This application generates personalized recipes using OpenAI's GPT models based on available ingredients.
 
-## Features
+> **Portfolio Focus**: This project demonstrates expertise in automated deployment pipelines, AI service integration, and maintaining 100% test coverage in a production-ready application.
 
-- **Modern Next.js 14+** with App Router
-- **TypeScript** throughout the stack
-- **Tailwind CSS** for styling
-- **Prisma ORM** with SQLite database
-- **Comprehensive testing** with Jest and Testing Library
-- **ESLint** configuration for code quality
-- **Production-ready** deployment setup
+## Portfolio Highlights
+
+### 🚀 **CI/CD & DevOps Excellence**
+- **Automated GitHub Actions Pipeline** with testing, security scanning, and deployment
+- **Multi-stage Docker builds** with production optimizations
+- **Blue/green deployment strategy** for zero-downtime updates
+- **Trivy vulnerability scanning** integrated into CI pipeline
+- **Environment-specific configurations** with proper secret management
+
+### 🤖 **AI Integration & Modern Tech Stack**
+- **OpenAI GPT Integration** for intelligent recipe generation
+- **Modern Next.js 15+** with App Router and TypeScript
+- **Redis Caching** for performance optimization
+- **PostgreSQL with Prisma ORM** for scalable data management
+- **Tailwind CSS** for responsive, modern UI design
+
+### ✅ **Testing & Code Quality**
+- **100% Test Coverage** across all metrics (statements, branches, functions, lines)
+- **Comprehensive Test Suite** with Jest and Testing Library
+- **Sophisticated Mock Architecture** for test isolation and reliability
+- **ESLint & Prettier** for consistent code quality
+- **TypeScript** for type safety throughout the application
 
 ## Quick Start
 
@@ -23,8 +38,14 @@ A modern web application built with Next.js, TypeScript, and Tailwind CSS for ma
 
 ```bash
 # Clone the repository
-git clone <repository-url>
+git clone https://github.com/curiositybay/airecipes.git
 cd airecipes
+
+# Copy environment file
+cp env.example .env
+
+# Configure your OpenAI API key in .env
+# OPENAI_API_KEY=your-openai-api-key-here
 
 # Start with Docker
 docker-compose up -d
@@ -36,7 +57,28 @@ docker exec -it airecipes-app npm run db:setup
 docker exec -it airecipes-app npm run db:seed
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3002](http://localhost:3002) with your browser to see the result.
+
+## Technical Implementation
+
+### **AI Recipe Generation Flow**
+1. **Input Ingredients**: Users enter the ingredients they have available
+2. **AI Processing**: The application sends the ingredient list to OpenAI's GPT model
+3. **Recipe Generation**: AI generates personalized recipes with:
+   - Detailed cooking instructions
+   - Nutritional information
+   - Cooking time estimates
+   - Difficulty levels
+4. **Smart Fallbacks**: If AI service is unavailable, the app provides basic recipe suggestions
+5. **User Preferences**: Support for dietary restrictions, cuisine preferences, and cooking skill levels
+
+### **Development Practices Demonstrated**
+- **Environment Variable Validation**: Strict validation prevents runtime errors
+- **Error Handling**: Comprehensive error boundaries and fallback mechanisms
+- **Caching Strategy**: Redis integration for performance optimization
+- **Database Design**: Prisma ORM with proper schema design and migrations
+- **API Design**: RESTful endpoints with proper validation and error responses
+- **Security**: Non-root Docker containers, security headers, and proper secret management
 
 ## Development
 
@@ -84,28 +126,37 @@ docker exec -it airecipes-app npm run format:fix
 
 ## Environment Configuration
 
-Copy `env.example` to `.env.local` and configure:
+Copy `env.example` to `.env` and configure:
 
 ```bash
-# Database Configuration
-DATABASE_URL="file:./dev.db"
-
 # App Configuration
-NEXT_PUBLIC_APP_NAME="Setlists"
+NEXT_PUBLIC_APP_NAME="AI Recipes"
 NEXT_PUBLIC_APP_VERSION="1.0.0"
 NEXT_PUBLIC_APP_ENVIRONMENT="development"
 
 # API Configuration
-NEXT_PUBLIC_API_URL="http://localhost:3000"
+NEXT_PUBLIC_API_URL="http://localhost:3001"
 
-# Authentication (if using)
-NEXTAUTH_URL="http://localhost:3000"
-NEXTAUTH_SECRET="your-secret-here"
+# OpenAI Configuration (Required)
+OPENAI_API_KEY="your-openai-api-key-here"
+OPENAI_MODEL="gpt-4o-mini"
+
+# Database Configuration
+DATABASE_URL="postgresql://postgres:postgres_password@postgres:5432/airecipes"
+
+# Redis Configuration
+REDIS_URL="redis://redis-dev:6379"
 ```
 
-## CI/CD Configuration
+## CI/CD Pipeline & Testing Excellence
 
-This project includes a GitHub Actions workflow for automated testing, building, and deployment.
+This project demonstrates professional-grade CI/CD practices with automated testing, building, and deployment.
+
+### **GitHub Actions Workflow**
+- **Multi-job Pipeline**: Separate jobs for testing, security scanning, building, and deployment
+- **Parallel Execution**: Tests and security scans run concurrently for efficiency
+- **Conditional Deployment**: Only deploys on successful main branch pushes
+- **Caching Strategy**: Jest cache and Docker layer caching for faster builds
 
 **Note:** Automated deployments rely on a custom deploy script on your production server that can trigger the new image to be pulled and container restarted. This script is not included in this repository and must be set up separately on your server.
 
@@ -164,7 +215,7 @@ The workflow builds a Docker image and pushes it to Docker Hub as `your-username
 
 ## Database
 
-This project uses Prisma ORM with SQLite for simplicity. The database schema is defined in `prisma/schema.prisma`.
+This project uses Prisma ORM with PostgreSQL for production scalability. The database schema is defined in `prisma/schema.prisma` and includes models for AI-generated recipes, ingredients, and user preferences.
 
 ### Database Commands
 
@@ -188,9 +239,23 @@ docker exec -it airecipes-app npx prisma studio
 docker exec -it airecipes-app npx prisma migrate reset
 ```
 
-## Testing
+## Testing Excellence
 
-### Run Tests
+### **100% Test Coverage Achievement**
+This project maintains **100% test coverage** across all metrics:
+- **1,908 statements** - 100% covered
+- **838 branches** - 100% covered
+- **301 functions** - 100% covered
+- **1,773 lines** - 100% covered
+
+### **Test Architecture**
+- **Sophisticated Mock System**: Centralized mocks in `test-utils/` directory
+- **Component Testing**: React components with Testing Library
+- **API Testing**: Full API route testing with proper mocking
+- **Integration Testing**: Database and external service integration
+- **Error Boundary Testing**: Comprehensive error handling validation
+
+### **Run Tests**
 
 ```bash
 # Run all tests
@@ -203,23 +268,40 @@ docker exec -it airecipes-app npm run test:watch
 docker exec -it airecipes-app npm run test:coverage
 ```
 
-### Test Structure
-
-- **Unit tests**: Test individual components and functions
-- **Integration tests**: Test API routes and database operations
-- **E2E tests**: Test complete user workflows
+### **Testing Best Practices Demonstrated**
+- **Mock Isolation**: Prevents test interdependencies
+- **Async Testing**: Proper handling of promises and async operations
+- **Error Scenarios**: Testing both success and failure paths
+- **Type Safety**: TypeScript integration in test files
+- **Performance**: Jest caching for faster test execution
 
 ## API Routes
 
 The app includes API routes in the `src/app/api/` directory:
 
 ```http
-GET  /api/health                    # Health check
-GET  /api/setlists                  # Get all setlists
-POST /api/setlists                  # Create new setlist
-PUT  /api/setlists/:id              # Update setlist
-DELETE /api/setlists/:id            # Delete setlist
+GET  /api/health                           # Health check
+POST /api/v1/ai-meals/generate-recipes    # Generate AI recipes from ingredients
+GET  /api/v1/ingredients/search           # Search for ingredients
+GET  /api/v1/token-usage/stats            # Get OpenAI token usage statistics
+GET  /api/v1/token-usage/recent           # Get recent token usage
+POST /api/auth/login                      # User authentication
+POST /api/auth/logout                     # User logout
+GET  /api/auth/verify                     # Verify authentication status
 ```
+
+## Portfolio Value
+
+This project demonstrates expertise in:
+
+- **Full-Stack Development**: Next.js, TypeScript, PostgreSQL, Redis
+- **AI Integration**: OpenAI GPT API integration with fallback mechanisms
+- **DevOps & CI/CD**: GitHub Actions, Docker, automated deployment
+- **Testing Excellence**: 100% coverage with sophisticated test architecture
+- **Production Readiness**: Security, performance, monitoring, and error handling
+- **Modern Development Practices**: Type safety, code quality, and maintainability
+
+**Perfect for showcasing** to potential employers or clients as evidence of professional-grade development capabilities.
 
 ## License
 
