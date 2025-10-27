@@ -1,7 +1,31 @@
 {
-  "name": "nextjs-app-template",
-  "version": "0.1.0",
+  "name": "airecipes",
+  "version": "1.0.0",
+  "description": "Portfolio demonstration: AI-powered recipe generation with 100% test coverage, CI/CD automation, and modern web development practices",
   "private": true,
+  "keywords": [
+    "ai",
+    "recipes",
+    "openai",
+    "nextjs",
+    "typescript",
+    "cooking",
+    "food",
+    "ingredients",
+    "portfolio",
+    "cicd",
+    "testing",
+    "docker",
+    "devops",
+    "fullstack"
+  ],
+  "author": "Curiosity Bay",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/curiositybay/airecipes.git"
+  },
+  "homepage": "https://github.com/curiositybay/airecipes#readme",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
