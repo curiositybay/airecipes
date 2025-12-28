@@ -26,8 +26,11 @@ RUN apk add --no-cache libc6-compat
 COPY --from=deps /app/node_modules ./node_modules
 COPY package.json package-lock.json* ./
 COPY prisma ./prisma/
-COPY ${ENV_FILE} .env
+# Copy source code first (excluding .env files via .dockerignore)
 COPY . .
+# Copy production env file LAST to ensure it's not overwritten by any local .env
+# This ensures NEXT_PUBLIC_* variables are set correctly for the build
+COPY ${ENV_FILE} .env
 
 # Generate Prisma client and build the app with caching
 RUN --mount=type=cache,target=/root/.npm \
@@ -84,7 +87,7 @@ RUN --mount=from=builder,source=/app/node_modules,target=/src/node_modules \
       fi; \
     done && \
     # Copy known top-level dependencies as fallback (update this list if Prisma adds new deps)
-    for pkg in jiti tslib dotenv valibot pathe zeptomatch grammex get-port-please remeda std-env proper-lockfile graceful-fs retry effect fast-check c12 perfect-debounce exsolve ohash defu confbox chokidar giget pkg-types rc9 destr deepmerge-ts tsx esbuild postgres-array pg get-tsconfig resolve-pkg-maps; do \
+    for pkg in jiti tslib dotenv valibot pathe zeptomatch grammex get-port-please remeda std-env proper-lockfile graceful-fs retry effect fast-check c12 perfect-debounce exsolve ohash defu confbox chokidar giget pkg-types rc9 destr deepmerge-ts tsx esbuild postgres-array pg get-tsconfig resolve-pkg-maps empathic; do \
       if [ -d "/src/node_modules/$pkg" ] && [ ! -d "./node_modules/$pkg" ]; then \
         cp -r "/src/node_modules/$pkg" "./node_modules/$pkg" 2>/dev/null || true; \
       fi; \
@@ -105,4 +108,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1
 
 
-CMD ["sh", "-c", "npx prisma migrate deploy && node server.js --hostname 0.0.0.0"]
+CMD ["sh", "-c", "npx prisma migrate deploy && npx prisma generate && node server.js --hostname 0.0.0.0"]
