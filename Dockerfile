@@ -68,13 +68,27 @@ COPY --chown=nextjs:nodejs --from=builder /app/scripts ./scripts
 # Ensure script files are executable
 RUN chmod +x scripts/*.js
 
-# Copy minimal Prisma and runtime dependencies
+# Copy Prisma core packages
 COPY --chown=nextjs:nodejs --from=builder /app/node_modules/prisma ./node_modules/prisma
-COPY --chown=nextjs:nodejs --from=builder /app/node_modules/jiti ./node_modules/jiti
-COPY --chown=nextjs:nodejs --from=builder /app/node_modules/tslib ./node_modules/tslib
 COPY --chown=nextjs:nodejs --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 COPY --chown=nextjs:nodejs --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --chown=nextjs:nodejs --from=builder /app/node_modules/.bin ./node_modules/.bin
+
+# Copy all Prisma dependencies automatically (nested + known fallback list)
+RUN --mount=from=builder,source=/app/node_modules,target=/src/node_modules \
+    mkdir -p ./node_modules && \
+    # Copy nested dependencies from prisma packages (where npm installs them)
+    for pkg_dir in /src/node_modules/prisma/node_modules /src/node_modules/@prisma/dev/node_modules /src/node_modules/@prisma/config/node_modules; do \
+      if [ -d "$pkg_dir" ]; then \
+        cp -r "$pkg_dir"/* ./node_modules/ 2>/dev/null || true; \
+      fi; \
+    done && \
+    # Copy known top-level dependencies as fallback (update this list if Prisma adds new deps)
+    for pkg in jiti tslib dotenv valibot pathe zeptomatch grammex get-port-please remeda std-env proper-lockfile graceful-fs retry effect fast-check c12 perfect-debounce exsolve ohash defu confbox chokidar giget pkg-types rc9 destr deepmerge-ts tsx esbuild postgres-array pg get-tsconfig resolve-pkg-maps; do \
+      if [ -d "/src/node_modules/$pkg" ] && [ ! -d "./node_modules/$pkg" ]; then \
+        cp -r "/src/node_modules/$pkg" "./node_modules/$pkg" 2>/dev/null || true; \
+      fi; \
+    done
 
 COPY --chown=nextjs:nodejs --from=builder /app/prisma ./prisma
 COPY --chown=nextjs:nodejs --from=builder /app/package.json ./package.json
