@@ -144,6 +144,7 @@ class OpenAiService {
                     fat: { type: 'string' },
                   },
                   required: ['calories', 'protein', 'carbs', 'fat'],
+                  additionalProperties: false,
                 },
               },
               required: [
@@ -177,6 +178,7 @@ class OpenAiService {
               },
             },
             required: ['additionalIngredients', 'cookingTips', 'substitutions'],
+            additionalProperties: false,
           },
         },
         required: ['recipes', 'suggestions'],
@@ -198,11 +200,12 @@ class OpenAiService {
             content: prompt,
           },
         ],
-        max_completion_tokens: 2000,
+        max_completion_tokens: 8192,
         response_format: {
           type: 'json_schema',
           json_schema: {
             name: 'RecipeGenerationResponse',
+            strict: true,
             schema: schema,
           },
         },
